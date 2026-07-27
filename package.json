@@ -1,0 +1,14 @@
+{
+  "name": "sml-web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SMC — Smart City Research Center (KMITL) website monorepo",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:api": "pnpm --filter @sml/api dev",
+    "dev:web": "pnpm --filter @sml/web dev",
+    "db:up": "docker compose up -d",
+    "db:stop": "docker compose stop",
+    "build": "pnpm -r build"
+  }
+}

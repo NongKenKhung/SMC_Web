@@ -1,0 +1,99 @@
+// SML — Prisma schema
+// dev ใช้ SQLite | production เปลี่ยน provider เป็น "postgresql" + DATABASE_URL ใหม่
+// หมายเหตุ: หลีกเลี่ยง enum/Json เพื่อให้สลับ SQLite ↔ Postgres ได้โดยไม่แก้ schema
+//  - role: "ADMIN" | "EDITOR"            (string)
+//  - category: "ACTIVITY" | "NEWS" | "WORK" (string)
+//  - SiteContent.valueTh/valueEn เก็บ JSON string
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("EDITOR")
+  createdAt    DateTime @default(now())
+}
+
+model Solution {
+  id         Int        @id @default(autoincrement())
+  slug       String     @unique
+  parentId   Int?
+  parent     Solution?  @relation("SolutionTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children   Solution[] @relation("SolutionTree")
+  order      Int        @default(0)
+  published  Boolean    @default(true)
+  icon       String?
+  nameTh     String
+  nameEn     String?
+  summaryTh  String?
+  summaryEn  String?
+  bodyTh     String?
+  bodyEn     String?
+  coverImage String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Partner {
+  id         Int     @id @default(autoincrement())
+  name       String
+  caption    String?
+  logoUrl    String?
+  websiteUrl String?
+  order      Int     @default(0)
+  published  Boolean @default(true)
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  category    String   @default("ACTIVITY")
+  titleTh     String
+  titleEn     String?
+  excerptTh   String?
+  excerptEn   String?
+  bodyTh      String?
+  bodyEn      String?
+  coverImage  String?
+  published   Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteContent {
+  key       String   @id
+  valueTh   String?
+  valueEn   String?
+  updatedAt DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        Int       @id @default(autoincrement())
+  name      String
+  org       String?
+  email     String
+  phone     String?
+  topic     String?
+  message   String
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+}
+
+model Media {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  url       String
+  mime      String
+  size      Int
+  createdAt DateTime @default(now())
+}

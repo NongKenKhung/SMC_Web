@@ -1,0 +1,18 @@
+# Dev database — Postgres แยกจาก container เดิมของเครื่อง (sml_postgres ที่พอร์ต 5432)
+# ใช้: docker compose up -d   |  หยุด: docker compose stop
+# ค่าตัวแปรอ่านจากไฟล์ .env (root) อัตโนมัติ
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sml-dev-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sml_dev_pass}
+      POSTGRES_DB: ${DB_NAME:-sml}
+    ports:
+      - "${DB_PORT:-5431}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
