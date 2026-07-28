@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-sml_dev_pass}
       POSTGRES_DB: ${DB_NAME:-sml}
     ports:
-      - "${DB_PORT:-5431}:5432"
+      - "${DB_PORT:-5430}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 

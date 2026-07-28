@@ -11,8 +11,12 @@ apps/web          Next.js          (เว็บ + หน้า admin ที่ 
 packages/shared   types ที่ใช้ร่วมกัน
 ```
 
-ฐานข้อมูล: **PostgreSQL 16 ใน Docker** — container `sml-dev-db` พอร์ต **5431**
+ฐานข้อมูล: **PostgreSQL 16 ใน Docker** — container `sml-dev-db` พอร์ต **5430**
 (แยกจาก container `sml_postgres` เดิมของเครื่องที่ใช้พอร์ต 5432 — อย่าสับสนกัน)
+
+> พอร์ตนี้อยู่ใน `.env` **สองที่**: `DB_PORT` (docker-compose ใช้) และพอร์ตใน
+> `DATABASE_URL` (Prisma/API ใช้) — แก้ต้องแก้ให้ตรงกันทั้งคู่ ไม่งั้น API จะขึ้น
+> `Can't reach database server`
 
 ## ค่าตั้งค่า (.env ไฟล์เดียว)
 
