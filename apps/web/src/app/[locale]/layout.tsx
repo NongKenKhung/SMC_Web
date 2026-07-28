@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Anton, Sarabun } from "next/font/google";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import SiteFooter from "@/components/SiteFooter";
@@ -8,24 +7,8 @@ import SmoothScroll from "@/components/SmoothScroll";
 import { FxInit, RevealInit, ToTop } from "@/components/Ux";
 import { getContent, getSolutionsTree, type ContactContent } from "@/lib/api";
 import { isLocale, LOCALES } from "@/lib/i18n";
-import "../globals.css";
 
-/* ฟอนต์ไทยแบบมีหัว — Sarabun (มาตรฐานเอกสารราชการไทย อ่านง่าย มีน้ำหนักครบ) */
-const thaiFont = Sarabun({
-  subsets: ["thai", "latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-thai",
-  display: "swap",
-});
-
-/* ฟอนต์ดิสเพลย์ทรงโปสเตอร์ — ใช้กับตัวอักษรยักษ์ภาษาอังกฤษเท่านั้น
-   (หัว hero, ตัวอักษรฉากหลัง, แถบ marquee, เลขสถิติ) */
-const displayFont = Anton({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-display",
-  display: "swap",
-});
+/* <html>/<body> และฟอนต์อยู่ที่ app/layout.tsx (root) — ที่นี่ห่อด้วย div เท่านั้น */
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
@@ -65,24 +48,23 @@ export default async function LocaleLayout({
   ]);
 
   return (
-    <html lang={locale} className={`${thaiFont.variable} ${displayFont.variable}`}>
-      {/* site-body = เปิดเอฟเฟกต์เฉพาะหน้าเว็บผู้เข้าชม (ฟิล์มเกรน ฯลฯ) ไม่แตะหน้า admin */}
-      <body className="site-body">
-        {/* การเลื่อนแบบนุ่ม — ใช้เฉพาะหน้าเว็บผู้เข้าชม ไม่ใช้ในหน้า admin ที่ต้องกรอกข้อมูล */}
-        <Suspense fallback={null}>
-          <SmoothScroll />
-        </Suspense>
-        {/* ไฟส่องตามเมาส์บนการ์ด (.glow) */}
-        <FxInit />
-        <SiteHeader locale={locale} tree={tree ?? []} />
-        {children}
-        <SiteFooter locale={locale} tree={tree ?? []} contact={contact} />
-        <ToTop />
-        {/* useSearchParams ใน RevealInit ต้องอยู่ใต้ Suspense ตามข้อกำหนด Next */}
-        <Suspense fallback={null}>
-          <RevealInit />
-        </Suspense>
-      </body>
-    </html>
+    /* lang อยู่ตรงนี้เพราะ <html> เป็นของ root layout ที่เปลี่ยนตามภาษาไม่ได้
+       site-body = เปิดเอฟเฟกต์เฉพาะหน้าเว็บผู้เข้าชม (ฟิล์มเกรน ฯลฯ) ไม่แตะหน้า admin */
+    <div lang={locale} className="site-body">
+      {/* การเลื่อนแบบนุ่ม — ใช้เฉพาะหน้าเว็บผู้เข้าชม ไม่ใช้ในหน้า admin ที่ต้องกรอกข้อมูล */}
+      <Suspense fallback={null}>
+        <SmoothScroll />
+      </Suspense>
+      {/* ไฟส่องตามเมาส์บนการ์ด (.glow) */}
+      <FxInit />
+      <SiteHeader locale={locale} tree={tree ?? []} />
+      {children}
+      <SiteFooter locale={locale} tree={tree ?? []} contact={contact} />
+      <ToTop />
+      {/* useSearchParams ใน RevealInit ต้องอยู่ใต้ Suspense ตามข้อกำหนด Next */}
+      <Suspense fallback={null}>
+        <RevealInit />
+      </Suspense>
+    </div>
   );
 }

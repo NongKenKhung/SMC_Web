@@ -1,16 +1,8 @@
 import type { Metadata } from "next";
-import { Sarabun } from "next/font/google";
 import AdminShell from "./AdminShell";
-import "../globals.css";
 import "./admin.css";
 
-/* ฟอนต์ไทยแบบมีหัว ใช้ชุดเดียวกับหน้าเว็บ */
-const thaiFont = Sarabun({
-  subsets: ["thai", "latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-thai",
-  display: "swap",
-});
+/* <html>/<body> และฟอนต์อยู่ที่ app/layout.tsx (root) */
 
 export const metadata: Metadata = {
   title: "SMC Admin",
@@ -20,11 +12,5 @@ export const metadata: Metadata = {
 export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="th" className={thaiFont.variable}>
-      <body>
-        <AdminShell>{children}</AdminShell>
-      </body>
-    </html>
-  );
+  return <AdminShell>{children}</AdminShell>;
 }
