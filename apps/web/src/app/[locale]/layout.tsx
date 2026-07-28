@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Sarabun } from "next/font/google";
+import { Anton, Sarabun } from "next/font/google";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SmoothScroll from "@/components/SmoothScroll";
-import { RevealInit, ToTop } from "@/components/Ux";
+import { FxInit, RevealInit, ToTop } from "@/components/Ux";
 import { getContent, getSolutionsTree, type ContactContent } from "@/lib/api";
 import { isLocale, LOCALES } from "@/lib/i18n";
 import "../globals.css";
@@ -15,6 +15,15 @@ const thaiFont = Sarabun({
   subsets: ["thai", "latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-thai",
+  display: "swap",
+});
+
+/* ฟอนต์ดิสเพลย์ทรงโปสเตอร์ — ใช้กับตัวอักษรยักษ์ภาษาอังกฤษเท่านั้น
+   (หัว hero, ตัวอักษรฉากหลัง, แถบ marquee, เลขสถิติ) */
+const displayFont = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -56,12 +65,15 @@ export default async function LocaleLayout({
   ]);
 
   return (
-    <html lang={locale} className={thaiFont.variable}>
-      <body>
+    <html lang={locale} className={`${thaiFont.variable} ${displayFont.variable}`}>
+      {/* site-body = เปิดเอฟเฟกต์เฉพาะหน้าเว็บผู้เข้าชม (ฟิล์มเกรน ฯลฯ) ไม่แตะหน้า admin */}
+      <body className="site-body">
         {/* การเลื่อนแบบนุ่ม — ใช้เฉพาะหน้าเว็บผู้เข้าชม ไม่ใช้ในหน้า admin ที่ต้องกรอกข้อมูล */}
         <Suspense fallback={null}>
           <SmoothScroll />
         </Suspense>
+        {/* ไฟส่องตามเมาส์บนการ์ด (.glow) */}
+        <FxInit />
         <SiteHeader locale={locale} tree={tree ?? []} />
         {children}
         <SiteFooter locale={locale} tree={tree ?? []} contact={contact} />

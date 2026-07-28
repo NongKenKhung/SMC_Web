@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Accordion } from "@/components/Ux";
+import { Accordion, Stat } from "@/components/Ux";
 import RichContent, { blockText } from "@/components/RichContent";
 import {
   getBlocks, getContent, getPageMedia, getPartners, getPosts, getSolutionsTree, mediaUrl,
@@ -18,6 +18,17 @@ const THUMB_ICONS = [
   <svg key="0" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="2" width="10" height="20" rx="3" /><circle cx="12" cy="7" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="17" r="1.6" /></svg>,
   <svg key="1" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="3" /></svg>,
   <svg key="2" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /><path d="M14 3h7v7" /></svg>,
+];
+
+/* ตัวอักษรยักษ์ใน hero — ซอยเป็นรายตัวเพื่อทำอนิเมชันโผล่ทีละตัว (เทคนิคเดียวกับ gsap.com)
+   SMART เป็นสีขาว ส่วน CITY ไล่จากเหลืองไปส้มทีละตัวอักษร */
+const HERO_LETTERS = [..."SMART", " ", ..."CITY"];
+const CITY_COLORS = ["#F9C846", "#F7A63A", "#F58A2E", "#F26B21"];
+
+/* คำในแถบตัววิ่ง (marquee) คั่นหัวเรื่องแบบงานนิทรรศการ */
+const MARQ = [
+  "Smart City", "AI & Computer Vision", "IoT Sensor Network", "Big Data Platform",
+  "Digital Twin", "Smart Mobility", "Research", "Innovation",
 ];
 
 /* เนื้อหาเริ่มต้นของ 3 บทบาท + เทคโนโลยีหลัก
@@ -89,7 +100,8 @@ export default async function Home({
 
   return (
     <main>
-      {/* ===== 1. Hero เต็มจอ — ตัวอักษรยักษ์ ชิดซ้าย + ตรึงจอตอนเลื่อนผ่าน ===== */}
+      {/* ===== 1. Hero เต็มจอ — ตรึงจอไว้ให้ section ถัดไปเลื่อนทับแบบม่าน (เทคนิคจาก Expo) ===== */}
+      <div className="hero-pin">
       <section className={`hero pin-fade${poster ? " has-poster" : ""}`}>
         {poster ? (
           <>
@@ -99,6 +111,9 @@ export default async function Home({
         ) : (
           <div className="dots" />
         )}
+        {/* แสงออโรราลอยช้า ๆ (แบบ linear.app) */}
+        <span className="orb orb-a" aria-hidden="true" />
+        <span className="orb orb-b" aria-hidden="true" />
         <svg className="hero-net" viewBox="0 0 1440 240" fill="none" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
           <g stroke="#F9C846" strokeWidth="1" opacity=".45">
             <path d="M60 150 L240 90 L420 140 L600 70 L790 130 L980 60 L1170 120 L1380 80" />
@@ -128,7 +143,23 @@ export default async function Home({
             {hero?.eyebrow ?? "Smart City Research Center · School of Engineering · KMITL"}
           </span>
           <h1>
-            <span className="display-en">Smart City</span>
+            {/* ซอยตัวอักษรทีละตัวเพื่อให้โผล่ไล่กัน — screen reader อ่านจาก aria-label */}
+            <span className="display-en" aria-label="Smart City">
+              {HERO_LETTERS.map((ch, i) =>
+                ch === " " ? (
+                  <span key={i} className="ltr-gap" />
+                ) : (
+                  <i
+                    key={i}
+                    aria-hidden="true"
+                    className="ltr"
+                    style={{ "--i": i, color: i > 5 ? CITY_COLORS[i - 6] : undefined } as React.CSSProperties}
+                  >
+                    {ch}
+                  </i>
+                ),
+              )}
+            </span>
             <span className="display-th">
               {hero?.titleLine1} {hero?.titleLine2}
             </span>
@@ -142,16 +173,28 @@ export default async function Home({
           </div>
           <div className="hero-stats">
             {hero?.stats?.map((s) => (
-              <div key={s.label}><b>{s.value}</b><span>{s.label}</span></div>
+              <div key={s.label}><Stat value={s.value} /><span>{s.label}</span></div>
             ))}
           </div>
         </div>
 
         <span className="scroll-hint" aria-hidden="true">Scroll<i /></span>
       </section>
+      </div>
 
-      {/* ===== 2. บทบาทของศูนย์วิจัย (พื้นเข้ม + ตัวอักษรฉากหลัง) ===== */}
-      <section className="sec-x dark-sec">
+      {/* ===== 2. บทบาทของศูนย์วิจัย — เลื่อนทับ hero แบบม่าน มีแถบตัววิ่งคั่นหัว ===== */}
+      <section className="sec-x dark-sec curtain">
+        <div className="marq" aria-hidden="true">
+          <div className="marq-track">
+            {[0, 1].map((seg) => (
+              <div className="marq-seg" key={seg}>
+                {MARQ.map((m, i) => (
+                  <span key={i} className={i % 2 ? "o" : undefined}>{m}</span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
         <span className="ghost-head">Research</span>
         <div className="container">
           <div className="sec-head-x reveal">
@@ -161,7 +204,7 @@ export default async function Home({
           </div>
           <div className="pillars-x">
             {pillars.map((p, i) => (
-              <article className={`pillar-x reveal${i ? ` d${i}` : ""}`} key={`${p.title}-${i}`}>
+              <article className={`pillar-x glow reveal${i ? ` d${i}` : ""}`} key={`${p.title}-${i}`}>
                 <div className="num-x">{String(i + 1).padStart(2, "0")}</div>
                 <h3>{p.title}</h3>
                 {p.en && <span className="en-x">{p.en}</span>}
@@ -222,7 +265,7 @@ export default async function Home({
           </div>
           <div className="sol-x">
             {(tree ?? []).map((s, i) => (
-              <Link href={`${base}/solutions/${s.slug}`} key={s.id} className={`sol-x-item reveal${i ? ` d${i}` : ""}`}>
+              <Link href={`${base}/solutions/${s.slug}`} key={s.id} className={`sol-x-item glow reveal${i ? ` d${i}` : ""}`}>
                 <span className="sol-x-num">{String(i + 1).padStart(2, "0")}</span>
                 <div className="sol-x-body">
                   <h3>{pick(s, "name", locale)}</h3>
@@ -276,7 +319,7 @@ export default async function Home({
           </div>
           <div className="post-grid">
             {(posts ?? []).map((p, i) => (
-              <Link href={`${base}/blog/${p.slug}`} key={p.id} className={`post-card reveal${i ? ` d${i}` : ""}`}>
+              <Link href={`${base}/blog/${p.slug}`} key={p.id} className={`post-card glow reveal${i ? ` d${i}` : ""}`}>
                 <div className={`thumb t${p.id % 6}`}>
                   {p.coverImage ? <img src={mediaUrl(p.coverImage)!} alt="" /> : THUMB_ICONS[i % THUMB_ICONS.length]}
                 </div>

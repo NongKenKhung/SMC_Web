@@ -1,8 +1,72 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { getLenis } from "@/components/SmoothScroll";
+
+/** ตัวเลขสถิติวิ่งจาก 0 ไปค่าจริงเมื่อเลื่อนมาเห็น (นับเฉพาะส่วนตัวเลข คงคำนำหน้า/ต่อท้ายไว้)
+ *  เรนเดอร์ค่าจริงตั้งแต่แรก — ถ้า JS ไม่ทำงานหรือผู้ใช้ปิดการเคลื่อนไหว ก็ยังเห็นตัวเลขถูกต้อง */
+export function Stat({ value }: { value: string }) {
+  const ref = useRef<HTMLElement>(null);
+  const [txt, setTxt] = useState(value);
+  useEffect(() => {
+    setTxt(value);
+    const m = value.match(/^([^\d]*)(\d[\d,]*)(.*)$/);
+    if (!m) return;
+    const target = parseInt(m[2].replace(/,/g, ""), 10);
+    if (!Number.isFinite(target) || target <= 0) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        const t0 = performance.now();
+        const dur = 1400;
+        const step = (now: number) => {
+          const p = Math.min(1, (now - t0) / dur);
+          const eased = 1 - Math.pow(1 - p, 3); // พุ่งตอนแรก ชะลอตอนท้าย
+          setTxt(`${m[1]}${Math.round(target * eased).toLocaleString()}${m[3]}`);
+          if (p < 1) raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [value]);
+  return <b ref={ref}>{txt}</b>;
+}
+
+/** ไฟส่องตามตำแหน่งเมาส์บนการ์ดที่มี class .glow
+ *  ตัวเดียวฟังทั้งหน้า (event delegation) แล้วเซ็ตพิกัดเป็น CSS variable ให้การ์ดใบนั้น */
+export function FxInit() {
+  useEffect(() => {
+    let raf = 0;
+    const onMove = (e: PointerEvent) => {
+      const card = (e.target as HTMLElement)?.closest?.(".glow") as HTMLElement | null;
+      if (!card || raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+        card.style.setProperty("--my", `${e.clientY - r.top}px`);
+      });
+    };
+    document.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      document.removeEventListener("pointermove", onMove);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+  return null;
+}
 
 /** ปุ่มกลับขึ้นบนสุด */
 export function ToTop() {
