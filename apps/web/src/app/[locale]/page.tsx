@@ -14,12 +14,6 @@ const ArrowR = () => (
   </svg>
 );
 
-const SOL_ICONS = [
-  <svg key="0" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="2" width="10" height="20" rx="3" /><circle cx="12" cy="7" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="17" r="1.6" /></svg>,
-  <svg key="1" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14" /><path d="M9 10h2M9 14h2M13 10h2M13 14h2M11 21v-4h2v4" /></svg>,
-  <svg key="2" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="3" /></svg>,
-];
-
 const THUMB_ICONS = [
   <svg key="0" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="2" width="10" height="20" rx="3" /><circle cx="12" cy="7" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="17" r="1.6" /></svg>,
   <svg key="1" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="3" /></svg>,
@@ -95,7 +89,7 @@ export default async function Home({
 
   return (
     <main>
-      {/* ===== Hero ===== */}
+      {/* ===== 1. Hero เต็มจอ — ตัวอักษรยักษ์ ชิดซ้าย ===== */}
       <section className={`hero${poster ? " has-poster" : ""}`}>
         {poster ? (
           <>
@@ -106,17 +100,16 @@ export default async function Home({
           <div className="dots" />
         )}
         <svg className="hero-net" viewBox="0 0 1440 240" fill="none" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-          <g stroke="#F9C846" strokeWidth="1" opacity=".5">
+          <g stroke="#F9C846" strokeWidth="1" opacity=".45">
             <path d="M60 150 L240 90 L420 140 L600 70 L790 130 L980 60 L1170 120 L1380 80" />
             <path d="M240 90 L410 40 L600 70 M790 130 L940 170 L1170 120 M420 140 L560 180 M980 60 L1120 30 L1380 80" />
           </g>
-          <g fill="#F9C846" opacity=".85">
+          <g fill="#F9C846" opacity=".8">
             <circle cx="60" cy="150" r="4" /><circle cx="240" cy="90" r="5" /><circle cx="420" cy="140" r="4" />
             <circle cx="600" cy="70" r="5" /><circle cx="790" cy="130" r="4" /><circle cx="980" cy="60" r="5" />
-            <circle cx="1170" cy="120" r="4" /><circle cx="1380" cy="80" r="5" /><circle cx="410" cy="40" r="3" />
-            <circle cx="940" cy="170" r="3" /><circle cx="1120" cy="30" r="3" /><circle cx="560" cy="180" r="3" />
+            <circle cx="1170" cy="120" r="4" /><circle cx="1380" cy="80" r="5" />
           </g>
-          <g fill="#16294F" opacity=".9">
+          <g fill="#16294F" opacity=".85">
             <rect x="0" y="190" width="70" height="50" /><rect x="80" y="165" width="55" height="75" />
             <rect x="145" y="200" width="60" height="40" /><rect x="215" y="150" width="48" height="90" />
             <rect x="275" y="185" width="70" height="55" /><rect x="360" y="160" width="45" height="80" />
@@ -129,58 +122,49 @@ export default async function Home({
             <rect x="1310" y="190" width="130" height="50" />
           </g>
         </svg>
+
         <div className="hero-inner">
-          <span className="eyebrow">{hero?.eyebrow ?? "Smart City Research Center · School of Engineering · KMITL"}</span>
-          <h1 className="reveal in">
-            {hero?.titleLine1} <span className="grad">{hero?.titleLine2}</span>
+          <span className="hero-tag">
+            {hero?.eyebrow ?? "Smart City Research Center · School of Engineering · KMITL"}
+          </span>
+          <h1>
+            <span className="display-en">Smart City</span>
+            <span className="display-th">
+              {hero?.titleLine1} {hero?.titleLine2}
+            </span>
           </h1>
-          <p className="lead reveal in d1">{hero?.lead}</p>
-          <div className="hero-cta reveal in d2">
+          <p className="hero-lead">{hero?.lead}</p>
+          <div className="hero-cta">
             <Link href={`${base}/solutions`} className="btn btn-primary">
               {t.common.getStarted} <ArrowR />
             </Link>
             <Link href={`${base}/contact`} className="btn btn-ghost">{t.common.contactLab}</Link>
           </div>
-          <div className="hero-stats reveal in d3">
+          <div className="hero-stats">
             {hero?.stats?.map((s) => (
               <div key={s.label}><b>{s.value}</b><span>{s.label}</span></div>
             ))}
           </div>
         </div>
+
+        <span className="scroll-hint" aria-hidden="true">Scroll<i /></span>
       </section>
 
-      {/* ===== วิดีโอ ===== */}
-      <section className="sec">
+      {/* ===== 2. บทบาทของศูนย์วิจัย (พื้นเข้ม + ตัวอักษรฉากหลัง) ===== */}
+      <section className="sec-x dark-sec">
+        <span className="ghost-head">Research</span>
         <div className="container">
-          <figure className="video-card reveal">
-            <div className="dots2" />
-            <button className="play-btn" title={t.home.videoCaption} aria-label="Play">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-            </button>
-            <figcaption>{t.home.videoCaption}</figcaption>
-          </figure>
-        </div>
-      </section>
-
-      {/* ===== 3 บทบาท ===== */}
-      <section className="sec dark-sec">
-        <div className="container">
-          <div className="sec-head reveal">
-            <span className="eyebrow">{t.home.whatWeDo}</span>
+          <div className="sec-head-x reveal">
+            <span className="sec-label">{t.home.whatWeDo}</span>
             <h2>{t.home.whatWeDoTitle}</h2>
-            <p className="lead">{t.home.whatWeDoLead}</p>
+            <p>{t.home.whatWeDoLead}</p>
           </div>
-          <div className="pillars">
+          <div className="pillars-x">
             {pillars.map((p, i) => (
-              <article className={`pillar reveal${i ? ` d${i}` : ""}`} key={p.title}>
-                <div className="p-icon">
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    {i === 0 && <><path d="M9 3h6M10 3v5.5L4.7 18a2 2 0 0 0 1.8 3h11a2 2 0 0 0 1.8-3L14 8.5V3" /><path d="M7 15h10" /></>}
-                    {i === 1 && <><path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z" /><path d="M12 11l8-4.5M12 11v9M12 11L4 6.5" /></>}
-                    {i === 2 && <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></>}
-                  </svg>
-                </div>
-                <h3>{p.title} {p.en && <em>{p.en}</em>}</h3>
+              <article className={`pillar-x reveal${i ? ` d${i}` : ""}`} key={`${p.title}-${i}`}>
+                <div className="num-x">{String(i + 1).padStart(2, "0")}</div>
+                <h3>{p.title}</h3>
+                {p.en && <span className="en-x">{p.en}</span>}
                 {p.html ? <RichContent html={p.body} className="prose-sm" /> : <p>{p.body}</p>}
               </article>
             ))}
@@ -188,8 +172,8 @@ export default async function Home({
         </div>
       </section>
 
-      {/* ===== เทคโนโลยีหลัก ===== */}
-      <section className="sec">
+      {/* ===== 3. เทคโนโลยีหลัก (รูป + accordion) ===== */}
+      <section className="sec-x">
         <div className="container split">
           <div className="mock-visual reveal">
             <svg width="66%" viewBox="0 0 300 300" fill="none" aria-hidden="true">
@@ -211,12 +195,12 @@ export default async function Home({
             <span className="ph-label">{t.home.imgPlaceholder}</span>
           </div>
           <div>
-            <div className="sec-head left reveal">
-              <span className="eyebrow">{t.home.coreTech}</span>
+            <div className="sec-head-x reveal">
+              <span className="sec-label">{t.home.coreTech}</span>
               <h2>
                 {t.home.coreTechTitle1} <span className="grad">{t.home.coreTechTitle2}</span> {t.home.coreTechTitle3}
               </h2>
-              <p className="lead">{t.home.coreTechLead}</p>
+              <p>{t.home.coreTechLead}</p>
             </div>
             <div className="reveal d1">
               <Accordion items={techs} />
@@ -225,43 +209,47 @@ export default async function Home({
         </div>
       </section>
 
-      {/* ===== โซลูชัน ===== */}
-      <section className="sec soft-sec">
+      {/* ===== 4. โซลูชัน (รายการแถวใหญ่ กดได้ทั้งใบ) ===== */}
+      <section className="sec-x soft-sec">
+        <span className="ghost-head">Solutions</span>
         <div className="container">
-          <div className="sec-head reveal">
-            <span className="eyebrow">Solution &amp; Product</span>
+          <div className="sec-head-x reveal">
+            <span className="sec-label">Solution &amp; Product</span>
             <h2>
               {t.home.solutionsTitle1} <span className="grad">{t.home.solutionsTitle2}</span>
             </h2>
-            <p className="lead">{t.home.solutionsLead}</p>
+            <p>{t.home.solutionsLead}</p>
           </div>
-          <div className="sol-grid">
+          <div className="sol-x">
             {(tree ?? []).map((s, i) => (
-              <article className={`card reveal${i ? ` d${i}` : ""}`} key={s.id}>
-                <div className="sol-icon">{SOL_ICONS[i % SOL_ICONS.length]}</div>
-                <h3>{pick(s, "name", locale)}</h3>
-                <p>{pick(s, "summary", locale)}</p>
-                <div className="chips">
-                  {s.children.map((c) => (
-                    <span className="chip" key={c.id}>{pick(c, "name", locale)}</span>
-                  ))}
+              <Link href={`${base}/solutions/${s.slug}`} key={s.id} className={`sol-x-item reveal${i ? ` d${i}` : ""}`}>
+                <span className="sol-x-num">{String(i + 1).padStart(2, "0")}</span>
+                <div className="sol-x-body">
+                  <h3>{pick(s, "name", locale)}</h3>
+                  <p>{pick(s, "summary", locale)}</p>
+                  {s.children.length > 0 && (
+                    <div className="sol-x-chips">
+                      {s.children.map((c) => (
+                        <span className="chip" key={c.id}>{pick(c, "name", locale)}</span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <Link className="more" href={`${base}/solutions/${s.slug}`}>
-                  {t.common.readMore} <ArrowR />
-                </Link>
-              </article>
+                <span className="sol-x-go"><ArrowR /></span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== พาร์ทเนอร์ ===== */}
-      <section className="sec">
+      {/* ===== 5. พาร์ทเนอร์ ===== */}
+      <section className="sec-x">
+        <span className="ghost-head">Partners</span>
         <div className="container">
-          <div className="sec-head reveal">
-            <span className="eyebrow">Our Partners</span>
+          <div className="sec-head-x center reveal">
+            <span className="sec-label">Our Partners</span>
             <h2>{t.home.partnersTitle}</h2>
-            <p className="lead">{t.home.partnersLead}</p>
+            <p>{t.home.partnersLead}</p>
           </div>
           <div className="logo-row reveal">
             {(partners ?? []).slice(0, 5).map((p) => (
@@ -271,19 +259,20 @@ export default async function Home({
               </div>
             ))}
           </div>
-          <p style={{ textAlign: "center", marginTop: 34 }} className="reveal d1">
+          <p style={{ textAlign: "center", marginTop: "var(--sp-10)" }} className="reveal d1">
             <Link className="btn btn-navy" href={`${base}/partners`}>{t.home.viewAllPartners}</Link>
           </p>
         </div>
       </section>
 
-      {/* ===== กิจกรรมล่าสุด ===== */}
-      <section className="sec soft-sec">
+      {/* ===== 6. กิจกรรมล่าสุด ===== */}
+      <section className="sec-x soft-sec">
+        <span className="ghost-head">News</span>
         <div className="container">
-          <div className="sec-head reveal">
-            <span className="eyebrow">Activity &amp; News</span>
+          <div className="sec-head-x center reveal">
+            <span className="sec-label">Activity &amp; News</span>
             <h2>{t.home.blogTitle}</h2>
-            <p className="lead">{t.home.blogLead}</p>
+            <p>{t.home.blogLead}</p>
           </div>
           <div className="post-grid">
             {(posts ?? []).map((p, i) => (
@@ -304,13 +293,13 @@ export default async function Home({
               </Link>
             ))}
           </div>
-          <p style={{ textAlign: "center", marginTop: 44 }} className="reveal">
+          <p style={{ textAlign: "center", marginTop: "var(--sp-12)" }} className="reveal">
             <Link className="btn btn-primary" href={`${base}/blog`}>{t.home.viewAllPosts}</Link>
           </p>
         </div>
       </section>
 
-      {/* ===== ปิดท้าย: eyebrow bookend (คู่กับหัว hero ด้านบน) ===== */}
+      {/* ===== 7. ปิดท้าย ===== */}
       <section className="closing">
         <div className="container">
           <span className="eyebrow closing-eyebrow">
