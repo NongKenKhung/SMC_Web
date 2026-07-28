@@ -1,17 +1,13 @@
 /* Admin CRUD ทั้งหมด — ทุก controller ครอบด้วย JwtAuthGuard
    (เฟสถัดไปถ้าไฟล์โตค่อยแยกเป็น feature ละไฟล์) */
 import {
-  Body, Controller, Delete, Get, Module, NotFoundException, Param,
-  ParseIntPipe, Patch, Post, Put, UploadedFile, UseGuards, UseInterceptors,
+  Body, Controller, Delete, Get, Module, Param,
+  ParseIntPipe, Patch, Post, Put, UseGuards,
 } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
 import { Type } from "class-transformer";
 import {
   IsBoolean, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength,
 } from "class-validator";
-import { diskStorage } from "multer";
-import { existsSync, mkdirSync } from "node:fs";
-import { extname, join } from "node:path";
 import { JwtAuthGuard } from "../auth/auth.module";
 import { PrismaService } from "../prisma/prisma.module";
 
@@ -288,49 +284,7 @@ export class AdminMessagesController {
   }
 }
 
-/* ---------- อัปโหลดรูป ---------- */
-export const UPLOAD_DIR = join(process.cwd(), "uploads");
-if (!existsSync(UPLOAD_DIR)) mkdirSync(UPLOAD_DIR, { recursive: true });
-
-@UseGuards(JwtAuthGuard)
-@Controller("admin/media")
-export class AdminMediaController {
-  constructor(private readonly prisma: PrismaService) {}
-
-  @Post()
-  @UseInterceptors(
-    FileInterceptor("file", {
-      storage: diskStorage({
-        destination: UPLOAD_DIR,
-        filename: (_req, file, cb) => {
-          const safe = `${Date.now()}-${Math.round(Math.random() * 1e6)}${extname(file.originalname).toLowerCase()}`;
-          cb(null, safe);
-        },
-      }),
-      limits: { fileSize: 5 * 1024 * 1024 },
-      fileFilter: (_req, file, cb) => {
-        cb(null, /^image\/(png|jpe?g|webp|gif|svg\+xml)$/.test(file.mimetype));
-      },
-    }),
-  )
-  async upload(@UploadedFile() file?: Express.Multer.File) {
-    if (!file) throw new NotFoundException("ไม่พบไฟล์ หรือชนิดไฟล์ไม่ใช่รูปภาพ");
-    const media = await this.prisma.media.create({
-      data: {
-        filename: file.originalname,
-        url: `/uploads/${file.filename}`,
-        mime: file.mimetype,
-        size: file.size,
-      },
-    });
-    return { id: media.id, url: media.url };
-  }
-
-  @Get()
-  list() {
-    return this.prisma.media.findMany({ orderBy: { createdAt: "desc" }, take: 100 });
-  }
-}
+/* คลังสื่อ + ไฟล์แนบ ย้ายไปอยู่ที่ src/media/media.module.ts แล้ว (Phase 6A) */
 
 @Module({
   controllers: [
@@ -339,7 +293,6 @@ export class AdminMediaController {
     AdminPostsController,
     AdminContentController,
     AdminMessagesController,
-    AdminMediaController,
   ],
 })
 export class AdminModule {}

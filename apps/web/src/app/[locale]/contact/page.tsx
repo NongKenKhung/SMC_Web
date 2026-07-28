@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import ContactForm from "@/components/ContactForm";
 import PageBanner from "@/components/PageBanner";
-import { getContent, type ContactContent } from "@/lib/api";
+import { getContent, getPageMedia, type ContactContent } from "@/lib/api";
 import { dict, isLocale } from "@/lib/i18n";
 
 const Icon = {
@@ -37,10 +37,12 @@ export default async function ContactPage({
   const t = dict(locale);
   const base = `/${locale}`;
   const contact = await getContent<ContactContent>("site.contact", locale);
+  const pageMedia = await getPageMedia("contact");
 
   return (
     <main>
       <PageBanner
+        poster={pageMedia?.poster}
         title={t.contact.title}
         crumbs={[{ label: t.common.home, href: base }, { label: t.nav.contact }]}
       />

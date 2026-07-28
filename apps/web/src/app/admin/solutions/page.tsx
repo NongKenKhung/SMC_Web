@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import AttachmentEditor from "@/components/admin/AttachmentEditor";
 import Upload from "@/components/admin/Upload";
 import { adminFetch, type AdminSolution } from "@/lib/admin";
 
@@ -165,6 +166,13 @@ export default function AdminSolutions() {
               <input type="checkbox" checked={!!form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
               เผยแพร่ (แสดงบนเว็บ)
             </label>
+
+            {/* ไฟล์แนบ — บันทึกทันทีเมื่อกด ไม่ต้องรอ "บันทึก" ของฟอร์ม */}
+            <div style={{ display: "grid", gap: 14 }}>
+              <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="POSTER" />
+              <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="GALLERY" />
+              <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="DOWNLOAD" />
+            </div>
             <div className="adm-actions">
               <button className="adm-btn" type="submit">บันทึก</button>
               <button className="adm-btn ghost" type="button" onClick={() => setForm(null)}>ยกเลิก</button>

@@ -512,6 +512,80 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 .map-pin { width: 54px; height: 54px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--orange); display: grid; place-items: center; box-shadow: 0 12px 26px rgba(242, 107, 33, 0.4); }
 .map-pin svg { transform: rotate(45deg); }
 
+/* ---------- แกลเลอรี + ไฟล์ดาวน์โหลด (Phase 6A) ---------- */
+.gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+.gal-item {
+  position: relative; border-radius: 14px; overflow: hidden; background: var(--navy-soft);
+  border: 1px solid var(--line); padding: 0; display: block; width: 100%; transition: .28s;
+}
+.gal-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.gal-item img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.gal-item span {
+  position: absolute; inset: auto 0 0 0; padding: 22px 14px 12px; text-align: left;
+  font-size: .84rem; color: #fff; line-height: 1.45;
+  background: linear-gradient(transparent, rgba(11, 23, 48, .82));
+}
+.gal-light {
+  position: fixed; inset: 0; z-index: 120; background: rgba(11, 23, 48, .92);
+  display: grid; place-items: center; padding: 32px 60px;
+}
+.gal-light figure { max-width: min(1100px, 100%); max-height: 86vh; display: grid; gap: 12px; }
+.gal-light img { max-width: 100%; max-height: 76vh; object-fit: contain; border-radius: 10px; margin-inline: auto; }
+.gal-light figcaption { color: #c7d1e4; font-size: .9rem; text-align: center; }
+.gal-close {
+  position: absolute; top: 18px; right: 22px; width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(255, 255, 255, .12); color: #fff; font-size: 1.6rem; line-height: 1; transition: .2s;
+}
+.gal-close:hover { background: var(--orange); }
+.gal-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 46px; height: 46px; border-radius: 50%; font-size: 2rem; line-height: 1;
+  background: rgba(255, 255, 255, .12); color: #fff; transition: .2s;
+}
+.gal-nav:hover { background: var(--orange); }
+.gal-nav.prev { left: 14px; }
+.gal-nav.next { right: 14px; }
+
+.dl-list { display: grid; gap: 12px; max-width: 760px; margin-inline: auto; }
+.dl-list a {
+  display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+  background: #fff; border: 1px solid var(--line); border-radius: 14px; transition: .25s;
+}
+.dl-list a:hover { border-color: var(--orange); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+.dl-ico {
+  flex: none; width: 44px; height: 44px; border-radius: 12px;
+  background: var(--orange-soft); color: var(--orange); display: grid; place-items: center;
+}
+.dl-body { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.dl-body b { font-size: .96rem; font-weight: 600; color: var(--ink); word-break: break-word; }
+.dl-body small { font-size: .78rem; color: var(--muted); }
+.dl-btn {
+  flex: none; display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 999px; background: var(--navy); color: #fff;
+  font-size: .84rem; font-weight: 600; transition: .2s;
+}
+.dl-list a:hover .dl-btn { background: var(--orange); }
+
+/* poster ทับพื้นหลัง hero/banner (ถ้าไม่ใส่รูป จะใช้ gradient เดิม) */
+.has-poster { position: relative; }
+.has-poster > .poster-img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+}
+.has-poster > .poster-veil {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(180deg, rgba(11, 23, 48, .82), rgba(16, 41, 79, .88));
+}
+.has-poster > *:not(.poster-img):not(.poster-veil) { position: relative; z-index: 2; }
+
+@media (max-width: 640px) {
+  .gal-light { padding: 20px 12px; }
+  .gal-nav { width: 38px; height: 38px; font-size: 1.5rem; }
+  .gal-nav.prev { left: 4px; }
+  .gal-nav.next { right: 4px; }
+  .dl-list a { flex-wrap: wrap; }
+  .dl-btn { width: 100%; justify-content: center; }
+}
+
 /* ---------- ปิดท้ายหน้าแรก (eyebrow bookend) ---------- */
 .closing { text-align: center; padding: 54px 0; border-top: 1px solid var(--line); }
 .closing-eyebrow { justify-content: center; margin: 0; }

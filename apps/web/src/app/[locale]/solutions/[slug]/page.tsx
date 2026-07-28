@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DownloadList, Gallery } from "@/components/Attachments";
 import PageBanner from "@/components/PageBanner";
 import { getSolution, mediaUrl } from "@/lib/api";
 import { dict, isLocale, pick } from "@/lib/i18n";
@@ -61,7 +62,9 @@ export default async function SolutionDetail({
             <p className="lead">{pick(sol, "summary", locale)}</p>
           </div>
           <div className="detail-hero reveal">
-            {sol.coverImage ? (
+            {sol.poster ? (
+              <img src={mediaUrl(sol.poster.url)!} alt={sol.poster.altTh ?? name} />
+            ) : sol.coverImage ? (
               <img src={mediaUrl(sol.coverImage)!} alt={name} />
             ) : (
               <>
@@ -121,6 +124,10 @@ export default async function SolutionDetail({
           </div>
         </section>
       )}
+
+      {/* แกลเลอรี + ไฟล์ดาวน์โหลด (จัดการผ่าน admin) */}
+      <Gallery items={sol.gallery ?? []} locale={locale} />
+      <DownloadList items={sol.downloads ?? []} locale={locale} />
 
       {/* CTA */}
       <section className="sec-tight">

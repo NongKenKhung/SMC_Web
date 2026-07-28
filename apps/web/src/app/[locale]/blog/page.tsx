@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageBanner from "@/components/PageBanner";
-import { getPosts, mediaUrl } from "@/lib/api";
+import { getPageMedia, getPosts, mediaUrl } from "@/lib/api";
 import { dict, fmtDate, isLocale, pick } from "@/lib/i18n";
 
 const CATS = ["ACTIVITY", "NEWS", "WORK"] as const;
@@ -21,10 +21,12 @@ export default async function BlogPage({
 
   const active = category && (CATS as readonly string[]).includes(category) ? category : undefined;
   const posts = (await getPosts({ category: active, take: 30 })) ?? [];
+  const pageMedia = await getPageMedia("blog");
 
   return (
     <main>
       <PageBanner
+        poster={pageMedia?.poster}
         title={t.blog.title}
         crumbs={[{ label: t.common.home, href: base }, { label: t.nav.blog }]}
       />

@@ -1,9 +1,13 @@
 import { Controller, Get, Injectable, Module, NotFoundException, Param } from "@nestjs/common";
+import { AttachmentsService, MediaModule } from "../media/media.module";
 import { PrismaService } from "../prisma/prisma.module";
 
 @Injectable()
 export class SolutionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly attachments: AttachmentsService,
+  ) {}
 
   /** โครงต้นไม้ 2 ชั้น (หมวด → หัวข้อย่อย) สำหรับเมนู dropdown และหน้า hub */
   findTree() {
@@ -38,7 +42,9 @@ export class SolutionsService {
       },
     });
     if (!solution) throw new NotFoundException(`ไม่พบ solution: ${slug}`);
-    return solution;
+    // แนบ poster / แกลเลอรี / ไฟล์ดาวน์โหลด (Phase 6A)
+    const media = await this.attachments.grouped("SOLUTION", String(solution.id));
+    return { ...solution, ...media };
   }
 }
 
@@ -58,6 +64,7 @@ export class SolutionsController {
 }
 
 @Module({
+  imports: [MediaModule], // ต้องมี ไม่งั้น inject AttachmentsService ไม่ได้ตอน runtime
   providers: [SolutionsService],
   controllers: [SolutionsController],
 })

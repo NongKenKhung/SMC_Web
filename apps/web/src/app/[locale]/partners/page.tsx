@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageBanner from "@/components/PageBanner";
-import { getPartners, mediaUrl } from "@/lib/api";
+import { getPageMedia, getPartners, mediaUrl } from "@/lib/api";
 import { dict, isLocale } from "@/lib/i18n";
 
 export default async function PartnersPage({
@@ -14,10 +14,12 @@ export default async function PartnersPage({
   const t = dict(locale);
   const base = `/${locale}`;
   const partners = (await getPartners()) ?? [];
+  const pageMedia = await getPageMedia("partners");
 
   return (
     <main>
       <PageBanner
+        poster={pageMedia?.poster}
         title={t.partners.title}
         crumbs={[{ label: t.common.home, href: base }, { label: t.nav.partners }]}
       />

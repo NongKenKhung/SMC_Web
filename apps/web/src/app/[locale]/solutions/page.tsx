@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageBanner from "@/components/PageBanner";
-import { getSolutionsTree } from "@/lib/api";
+import { getPageMedia, getSolutionsTree } from "@/lib/api";
 import { dict, isLocale, pick } from "@/lib/i18n";
 
 const CIRCLE_ICONS = [
@@ -26,10 +26,12 @@ export default async function SolutionsHub({
   const t = dict(locale);
   const base = `/${locale}`;
   const tree = (await getSolutionsTree()) ?? [];
+  const pageMedia = await getPageMedia("solutions");
 
   return (
     <main>
       <PageBanner
+        poster={pageMedia?.poster}
         title={t.solutions.title}
         crumbs={[{ label: t.common.home, href: base }, { label: t.solutions.title }]}
       />

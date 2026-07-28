@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageBanner from "@/components/PageBanner";
-import { getContent, type AboutContent } from "@/lib/api";
+import { getContent, getPageMedia, type AboutContent } from "@/lib/api";
 import { dict, isLocale } from "@/lib/i18n";
 
 /* Timeline mock — จะย้ายเข้า DB/admin ในเฟส 4 */
@@ -41,10 +41,12 @@ export default async function AboutPage({
   const t = dict(locale);
   const base = `/${locale}`;
   const about = await getContent<AboutContent>("about.main", locale);
+  const pageMedia = await getPageMedia("about");
 
   return (
     <main>
       <PageBanner
+        poster={pageMedia?.poster}
         title={t.about.title}
         crumbs={[{ label: t.common.home, href: base }, { label: t.about.title }]}
       />

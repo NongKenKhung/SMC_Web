@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DownloadList, Gallery } from "@/components/Attachments";
 import PageBanner from "@/components/PageBanner";
 import { getPost, mediaUrl } from "@/lib/api";
 import { dict, fmtDate, isLocale, pick } from "@/lib/i18n";
@@ -46,9 +47,16 @@ export default async function PostPage({
             <p>{pick(post, "excerpt", locale)}</p>
             <p>{pick(post, "body", locale)}</p>
           </div>
-          <p style={{ marginTop: 40 }}>
-            <Link className="btn btn-navy" href={`${base}/blog`}>{t.blog.backToList}</Link>
-          </p>
+        </div>
+      </section>
+
+      {/* แกลเลอรี + ไฟล์ดาวน์โหลด (จัดการผ่าน admin) */}
+      <Gallery items={post.gallery ?? []} locale={locale} />
+      <DownloadList items={post.downloads ?? []} locale={locale} />
+
+      <section className="sec-tight">
+        <div className="container post-single">
+          <Link className="btn btn-navy" href={`${base}/blog`}>{t.blog.backToList}</Link>
         </div>
       </section>
     </main>

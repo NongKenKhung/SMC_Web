@@ -14,7 +14,27 @@ export interface SolutionNode {
   children: Omit<SolutionNode, "children">[];
 }
 
-export interface SolutionDetail {
+/* ---------- ไฟล์แนบ (Phase 6A) ---------- */
+export interface AttachmentItem {
+  id: number;
+  mediaId: number;
+  url: string;
+  filename: string;
+  mime: string;
+  size: number;
+  altTh: string | null;
+  altEn: string | null;
+  captionTh: string | null;
+  captionEn: string | null;
+  order: number;
+}
+export interface WithAttachments {
+  poster?: AttachmentItem | null;
+  gallery?: AttachmentItem[];
+  downloads?: AttachmentItem[];
+}
+
+export interface SolutionDetail extends WithAttachments {
   id: number;
   slug: string;
   nameTh: string;
@@ -48,9 +68,13 @@ export interface PostItem {
   publishedAt: string;
 }
 
-export interface PostDetail extends PostItem {
+export interface PostDetail extends PostItem, WithAttachments {
   bodyTh: string | null;
   bodyEn: string | null;
+}
+
+export interface PageMedia extends WithAttachments {
+  slug: string;
 }
 
 export interface HeroContent {
@@ -94,6 +118,10 @@ export const getPosts = (opts?: { category?: string; take?: number }) => {
   return get<PostItem[]>(`/posts${qs ? `?${qs}` : ""}`);
 };
 export const getPost = (slug: string) => get<PostDetail>(`/posts/${slug}`);
+/** poster ของ banner/hero แต่ละหน้า (Phase 6A) */
+export const getPageMedia = (slug: string) => get<PageMedia>(`/pages/${slug}`);
+/** ลิงก์ดาวน์โหลดที่บังคับให้บันทึกไฟล์ + ใช้ชื่อไฟล์เดิม */
+export const downloadUrl = (mediaId: number) => `${API}/media/${mediaId}/download`;
 /** ดึง content ตามภาษา — ถ้าไม่มีคำแปลอังกฤษจะ fallback เป็นไทย */
 export const getContent = async <T,>(
   key: string,

@@ -78,6 +78,39 @@ export interface AdminMessage {
   phone: string | null; topic: string | null; message: string;
   createdAt: string; readAt: string | null;
 }
+export interface AdminMedia {
+  id: number;
+  filename: string;
+  storedName: string | null;
+  url: string;
+  mime: string;
+  size: number;
+  kind: string; // IMAGE | FILE
+  width: number | null;
+  height: number | null;
+  altTh: string | null;
+  altEn: string | null;
+  createdAt: string;
+}
+export interface AdminAttachment {
+  id: number;
+  mediaId: number;
+  ownerType: string; // SOLUTION | POST | PAGE
+  ownerId: string;
+  role: string; // GALLERY | DOWNLOAD | POSTER
+  order: number;
+  captionTh: string | null;
+  captionEn: string | null;
+  media: AdminMedia;
+}
+
+/** แปลงขนาดไฟล์เป็นข้อความอ่านง่าย */
+export function fileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
 export interface AdminContentRow {
   key: string;
   valueTh: Record<string, unknown> | null;

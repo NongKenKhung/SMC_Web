@@ -90,10 +90,35 @@ model ContactMessage {
 }
 
 model Media {
-  id        Int      @id @default(autoincrement())
-  filename  String
-  url       String
-  mime      String
-  size      Int
-  createdAt DateTime @default(now())
+  id          Int          @id @default(autoincrement())
+  filename    String // ชื่อไฟล์ตอนอัปโหลด (ใช้เป็นชื่อตอนดาวน์โหลด)
+  storedName  String? // ชื่อไฟล์จริงบนดิสก์ — ใช้ตอนลบ ไม่ต้อง parse url
+  url         String // /uploads/xxx
+  mime        String
+  size        Int
+  kind        String       @default("IMAGE") // IMAGE | FILE
+  width       Int?
+  height      Int?
+  altTh       String?
+  altEn       String?
+  createdAt   DateTime     @default(now())
+  attachments Attachment[]
+
+  @@index([kind, createdAt])
+}
+
+// ตารางกลาง: ผูก media เข้ากับรายการอะไรก็ได้ (แกลเลอรี/ไฟล์แนบ/poster)
+// เพิ่มชนิดใหม่ภายหลัง = เพิ่มค่า role ไม่ต้องแก้โครง
+model Attachment {
+  id        Int     @id @default(autoincrement())
+  mediaId   Int
+  media     Media   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  ownerType String // SOLUTION | POST | PAGE
+  ownerId   String // id ของ solution/post หรือ slug ของหน้า (String เพื่อรองรับทั้งคู่)
+  role      String // GALLERY | DOWNLOAD | POSTER
+  order     Int     @default(0)
+  captionTh String?
+  captionEn String?
+
+  @@index([ownerType, ownerId, role, order])
 }

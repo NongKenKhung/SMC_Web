@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Accordion } from "@/components/Ux";
 import {
-  getContent, getPartners, getPosts, getSolutionsTree, mediaUrl,
+  getContent, getPageMedia, getPartners, getPosts, getSolutionsTree, mediaUrl,
   type HeroContent,
 } from "@/lib/api";
 import { dict, fmtDate, isLocale, pick } from "@/lib/i18n";
@@ -64,18 +64,27 @@ export default async function Home({
   const t = dict(locale);
   const base = `/${locale}`;
 
-  const [hero, tree, partners, posts] = await Promise.all([
+  const [hero, tree, partners, posts, pageMedia] = await Promise.all([
     getContent<HeroContent>("home.hero", locale),
     getSolutionsTree(),
     getPartners(),
     getPosts({ take: 3 }),
+    getPageMedia("home"),
   ]);
+  const poster = pageMedia?.poster ?? null;
 
   return (
     <main>
       {/* ===== Hero ===== */}
-      <section className="hero">
-        <div className="dots" />
+      <section className={`hero${poster ? " has-poster" : ""}`}>
+        {poster ? (
+          <>
+            <img className="poster-img" src={mediaUrl(poster.url)!} alt={poster.altTh ?? ""} />
+            <span className="poster-veil" />
+          </>
+        ) : (
+          <div className="dots" />
+        )}
         <svg className="hero-net" viewBox="0 0 1440 240" fill="none" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
           <g stroke="#F9C846" strokeWidth="1" opacity=".5">
             <path d="M60 150 L240 90 L420 140 L600 70 L790 130 L980 60 L1170 120 L1380 80" />

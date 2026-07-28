@@ -1,9 +1,13 @@
 import { Controller, DefaultValuePipe, Get, Injectable, Module, NotFoundException, Param, ParseIntPipe, Query } from "@nestjs/common";
+import { AttachmentsService, MediaModule } from "../media/media.module";
 import { PrismaService } from "../prisma/prisma.module";
 
 @Injectable()
 export class PostsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly attachments: AttachmentsService,
+  ) {}
 
   findAll(category?: string, take = 20) {
     return this.prisma.post.findMany({
@@ -26,7 +30,9 @@ export class PostsService {
       where: { slug, published: true },
     });
     if (!post) throw new NotFoundException(`ไม่พบโพสต์: ${slug}`);
-    return post;
+    // แนบ poster / แกลเลอรี / ไฟล์ดาวน์โหลด (Phase 6A)
+    const media = await this.attachments.grouped("POST", String(post.id));
+    return { ...post, ...media };
   }
 }
 
@@ -49,6 +55,7 @@ export class PostsController {
 }
 
 @Module({
+  imports: [MediaModule],
   providers: [PostsService],
   controllers: [PostsController],
 })

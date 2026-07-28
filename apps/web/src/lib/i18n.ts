@@ -9,14 +9,17 @@ export function isLocale(v: string): v is Locale {
   return (LOCALES as readonly string[]).includes(v);
 }
 
-/** เลือก field ตามภาษา เช่น pick(post, "title", "en") → post.titleEn ?? post.titleTh */
-export function pick(
-  obj: Record<string, unknown>,
+/** เลือก field ตามภาษา เช่น pick(post, "title", "en") → post.titleEn ?? post.titleTh
+ *  รับ object อะไรก็ได้ (generic) — ถ้าประกาศเป็น Record<string, unknown> ตรง ๆ
+ *  จะรับ interface ไม่ได้ เพราะ interface ไม่มี implicit index signature (TS2345) */
+export function pick<T extends object>(
+  obj: T,
   base: string,
   locale: Locale,
 ): string {
-  const th = (obj[`${base}Th`] as string | null | undefined) ?? "";
-  const en = (obj[`${base}En`] as string | null | undefined) ?? "";
+  const rec = obj as Record<string, unknown>;
+  const th = (rec[`${base}Th`] as string | null | undefined) ?? "";
+  const en = (rec[`${base}En`] as string | null | undefined) ?? "";
   return locale === "en" && en ? en : th;
 }
 
@@ -134,6 +137,15 @@ const th = {
     rights: "© 2569 Smart City Research Center — KMITL. สงวนลิขสิทธิ์",
     mockTag: "ข้อมูลตัวอย่าง — แก้ไขผ่านระบบ admin ในเฟส 4",
   },
+  media: {
+    galleryTitle: "ภาพประกอบ",
+    downloadsTitle: "เอกสารดาวน์โหลด",
+    downloadsLead: "ดาวน์โหลดเอกสารประกอบเพิ่มเติมได้ที่นี่",
+    download: "ดาวน์โหลด",
+    close: "ปิด",
+    prev: "รูปก่อนหน้า",
+    next: "รูปถัดไป",
+  },
   categories: { ACTIVITY: "กิจกรรม", NEWS: "ข่าว", WORK: "ผลงาน" } as Record<string, string>,
 };
 
@@ -250,6 +262,15 @@ const en: typeof th = {
     contact: "Contact",
     rights: "© 2026 Smart City Research Center — KMITL. All rights reserved.",
     mockTag: "Sample data — editable via admin in Phase 4",
+  },
+  media: {
+    galleryTitle: "Gallery",
+    downloadsTitle: "Documents",
+    downloadsLead: "Download supporting documents here",
+    download: "Download",
+    close: "Close",
+    prev: "Previous image",
+    next: "Next image",
   },
   categories: { ACTIVITY: "Activity", NEWS: "News", WORK: "Works" } as Record<string, string>,
 };
