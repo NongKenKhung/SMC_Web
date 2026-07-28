@@ -271,7 +271,7 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 .acc-item.open .acc-icon { background: var(--orange); color: #fff; transform: rotate(45deg); }
 .acc-panel { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
 .acc-item.open .acc-panel { max-height: 200px; }
-.acc-panel p { padding: 0 40px 18px 4px; color: var(--muted); font-size: 0.93rem; }
+.acc-panel p, .acc-panel .acc-body { padding: 0 40px 18px 4px; color: var(--muted); font-size: 0.93rem; }
 
 /* ---------- การ์ด ---------- */
 .soft-sec { background: var(--soft); }
@@ -448,8 +448,43 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 .detail-hero .ph-label { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); background: rgba(11, 23, 48, 0.7); font-size: 0.78rem; padding: 6px 14px; border-radius: 999px; color: #c7d1e4; white-space: nowrap; }
 .detail-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+/* เนื้อหาจาก rich text editor (Phase 6B) — HTML ผ่าน sanitize ฝั่งเซิร์ฟเวอร์แล้ว */
 .prose { max-width: 760px; margin-inline: auto; color: var(--muted); }
+.prose > * + * { margin-top: 14px; }
 .prose p + p { margin-top: 12px; }
+.prose h2 { font-size: 1.5rem; font-weight: 700; color: var(--navy); margin-top: 32px; line-height: 1.4; }
+.prose h3 { font-size: 1.2rem; font-weight: 600; color: var(--navy); margin-top: 26px; }
+.prose h4 { font-size: 1.05rem; font-weight: 600; color: var(--ink); margin-top: 22px; }
+.prose strong { color: var(--ink); font-weight: 600; }
+.prose ul, .prose ol { padding-left: 1.5em; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li { margin: 6px 0; }
+.prose li::marker { color: var(--orange); }
+.prose a { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { color: var(--orange-600); }
+.prose img { border-radius: 14px; margin-inline: auto; box-shadow: var(--shadow-sm); }
+.prose blockquote {
+  border-left: 4px solid var(--orange); padding: 4px 0 4px 18px;
+  color: var(--ink); font-size: 1.02rem; font-style: italic;
+}
+.prose code { background: var(--soft); border: 1px solid var(--line); padding: 2px 6px; border-radius: 5px; font-size: .9em; }
+.prose pre { background: var(--navy-950); color: #e6ecf7; padding: 16px 18px; border-radius: 12px; overflow-x: auto; }
+.prose pre code { background: none; border: none; color: inherit; }
+.prose hr { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
+.prose table { width: 100%; border-collapse: collapse; font-size: .93rem; display: block; overflow-x: auto; }
+.prose th, .prose td { border: 1px solid var(--line); padding: 10px 14px; text-align: left; }
+.prose th { background: var(--soft); color: var(--navy); font-weight: 600; }
+
+/* เนื้อหา rich text ในการ์ด (ตัวเล็กลง ไม่จำกัดความกว้าง) */
+.prose-sm { color: inherit; font-size: inherit; }
+.prose-sm > * + * { margin-top: 8px; }
+.prose-sm ul, .prose-sm ol { padding-left: 1.3em; }
+.prose-sm ul { list-style: disc; }
+.prose-sm ol { list-style: decimal; }
+.prose-sm a { color: var(--orange); text-decoration: underline; }
+.prose-sm strong { font-weight: 600; }
+.prose-sm img { max-width: 100%; border-radius: 10px; }
 
 /* ---------- Blog ---------- */
 .filter-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 44px; }
@@ -469,6 +504,8 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 .post-single { max-width: 780px; margin-inline: auto; }
 .post-single .post-meta { margin-bottom: 18px; }
 .post-single h2 { color: var(--navy); font-size: 1.6rem; line-height: 1.4; margin-bottom: 18px; }
+.post-lead { font-size: 1.05rem; color: var(--ink); line-height: 1.75; margin-bottom: 20px; }
+.post-single .prose { max-width: none; margin-inline: 0; }
 
 /* ---------- Contact ---------- */
 .contact-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; align-items: start; }

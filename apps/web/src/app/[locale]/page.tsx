@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Accordion } from "@/components/Ux";
+import RichContent, { blockText } from "@/components/RichContent";
 import {
-  getContent, getPageMedia, getPartners, getPosts, getSolutionsTree, mediaUrl,
+  getBlocks, getContent, getPageMedia, getPartners, getPosts, getSolutionsTree, mediaUrl,
   type HeroContent,
 } from "@/lib/api";
 import { dict, fmtDate, isLocale, pick } from "@/lib/i18n";
@@ -25,7 +26,9 @@ const THUMB_ICONS = [
   <svg key="2" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /><path d="M14 3h7v7" /></svg>,
 ];
 
-/* เนื้อหา 3 บทบาท + เทคโนโลยี 4 ด้าน (จะย้ายเข้า SiteContent ในเฟส 4) */
+/* เนื้อหาเริ่มต้นของ 3 บทบาท + เทคโนโลยีหลัก
+   ใช้เมื่อยังไม่มีข้อมูลในระบบ admin (กลุ่ม home.pillars / home.techs)
+   พอเพิ่มรายการแรกใน admin ระบบจะใช้ข้อมูลจากฐานข้อมูลแทนทันที */
 const PILLARS = {
   th: [
     { title: "งานวิจัย", en: "Research", body: "พัฒนาองค์ความรู้ด้าน AI, IoT และ Data Analytics สำหรับบริบทเมืองไทย ตีพิมพ์และต่อยอดร่วมกับเครือข่ายวิชาการ" },
@@ -64,14 +67,31 @@ export default async function Home({
   const t = dict(locale);
   const base = `/${locale}`;
 
-  const [hero, tree, partners, posts, pageMedia] = await Promise.all([
+  const [hero, tree, partners, posts, pageMedia, blocks] = await Promise.all([
     getContent<HeroContent>("home.hero", locale),
     getSolutionsTree(),
     getPartners(),
     getPosts({ take: 3 }),
     getPageMedia("home"),
+    getBlocks(["home.pillars", "home.techs"]),
   ]);
   const poster = pageMedia?.poster ?? null;
+
+  /* ถ้ามีข้อมูลใน admin ใช้ของนั้น ไม่มีก็ใช้ค่าเริ่มต้นที่ฝังมากับระบบ */
+  const pillarBlocks = blocks["home.pillars"] ?? [];
+  const pillars = pillarBlocks.length
+    ? pillarBlocks.map((b) => ({
+        title: blockText(b, "title", locale),
+        en: blockText(b, "subtitle", locale),
+        body: blockText(b, "body", locale),
+        html: true,
+      }))
+    : PILLARS[locale].map((p) => ({ ...p, html: false }));
+
+  const techBlocks = blocks["home.techs"] ?? [];
+  const techs = techBlocks.length
+    ? techBlocks.map((b) => ({ title: blockText(b, "title", locale), body: blockText(b, "body", locale), html: true }))
+    : TECHS[locale].map((x) => ({ ...x, html: false }));
 
   return (
     <main>
@@ -151,7 +171,7 @@ export default async function Home({
             <p className="lead">{t.home.whatWeDoLead}</p>
           </div>
           <div className="pillars">
-            {PILLARS[locale].map((p, i) => (
+            {pillars.map((p, i) => (
               <article className={`pillar reveal${i ? ` d${i}` : ""}`} key={p.title}>
                 <div className="p-icon">
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -160,8 +180,8 @@ export default async function Home({
                     {i === 2 && <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></>}
                   </svg>
                 </div>
-                <h3>{p.title} <em>{p.en}</em></h3>
-                <p>{p.body}</p>
+                <h3>{p.title} {p.en && <em>{p.en}</em>}</h3>
+                {p.html ? <RichContent html={p.body} className="prose-sm" /> : <p>{p.body}</p>}
               </article>
             ))}
           </div>
@@ -199,7 +219,7 @@ export default async function Home({
               <p className="lead">{t.home.coreTechLead}</p>
             </div>
             <div className="reveal d1">
-              <Accordion items={TECHS[locale]} />
+              <Accordion items={techs} />
             </div>
           </div>
         </div>

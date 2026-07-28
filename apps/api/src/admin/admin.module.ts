@@ -9,7 +9,11 @@ import {
   IsBoolean, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength,
 } from "class-validator";
 import { JwtAuthGuard } from "../auth/auth.module";
+import { cleanHtmlFields } from "../common/sanitize";
 import { PrismaService } from "../prisma/prisma.module";
+
+/** field ที่รับ HTML จาก rich text editor — ต้อง sanitize ก่อนบันทึกเสมอ (Phase 6B) */
+const HTML_FIELDS = ["bodyTh", "bodyEn"] as const;
 
 /* ---------- DTOs ---------- */
 class SolutionDto {
@@ -146,12 +150,12 @@ export class AdminSolutionsController {
 
   @Post()
   create(@Body() dto: SolutionDto) {
-    return this.prisma.solution.create({ data: { ...dto } });
+    return this.prisma.solution.create({ data: cleanHtmlFields(dto, HTML_FIELDS) });
   }
 
   @Patch(":id")
   update(@Param("id", ParseIntPipe) id: number, @Body() dto: SolutionPatchDto) {
-    return this.prisma.solution.update({ where: { id }, data: { ...dto } });
+    return this.prisma.solution.update({ where: { id }, data: cleanHtmlFields(dto, HTML_FIELDS) });
   }
 
   @Delete(":id")
@@ -203,7 +207,7 @@ export class AdminPostsController {
 
   @Post()
   create(@Body() dto: PostDto) {
-    const { publishedAt, ...rest } = dto;
+    const { publishedAt, ...rest } = cleanHtmlFields(dto, HTML_FIELDS);
     return this.prisma.post.create({
       data: { ...rest, ...(publishedAt ? { publishedAt: new Date(publishedAt) } : {}) },
     });
@@ -211,7 +215,7 @@ export class AdminPostsController {
 
   @Patch(":id")
   update(@Param("id", ParseIntPipe) id: number, @Body() dto: PostPatchDto) {
-    const { publishedAt, ...rest } = dto;
+    const { publishedAt, ...rest } = cleanHtmlFields(dto, HTML_FIELDS);
     return this.prisma.post.update({
       where: { id },
       data: { ...rest, ...(publishedAt ? { publishedAt: new Date(publishedAt) } : {}) },

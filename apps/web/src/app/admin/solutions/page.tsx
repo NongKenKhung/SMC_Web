@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AttachmentEditor from "@/components/admin/AttachmentEditor";
+import RichText from "@/components/admin/RichText";
 import Upload from "@/components/admin/Upload";
 import { adminFetch, type AdminSolution } from "@/lib/admin";
 
@@ -148,15 +149,21 @@ export default function AdminSolutions() {
                 <textarea value={form.summaryEn ?? ""} onChange={(e) => setForm({ ...form, summaryEn: e.target.value })} />
               </div>
             </div>
-            <div className="row2">
-              <div>
-                <label>เนื้อหา (ไทย)</label>
-                <textarea value={form.bodyTh ?? ""} onChange={(e) => setForm({ ...form, bodyTh: e.target.value })} />
-              </div>
-              <div>
-                <label>เนื้อหา (อังกฤษ)</label>
-                <textarea value={form.bodyEn ?? ""} onChange={(e) => setForm({ ...form, bodyEn: e.target.value })} />
-              </div>
+            <div>
+              <label>เนื้อหา (ไทย)</label>
+              <RichText
+                value={form.bodyTh ?? ""}
+                onChange={(html) => setForm({ ...form, bodyTh: html })}
+                placeholder="พิมพ์เนื้อหา จัดหัวข้อ ใส่รายการ แทรกรูปจากคลังสื่อได้"
+              />
+            </div>
+            <div>
+              <label>เนื้อหา (อังกฤษ)</label>
+              <RichText
+                value={form.bodyEn ?? ""}
+                onChange={(html) => setForm({ ...form, bodyEn: html })}
+                placeholder="English content (optional)"
+              />
             </div>
             <div>
               <label>รูปประกอบ</label>

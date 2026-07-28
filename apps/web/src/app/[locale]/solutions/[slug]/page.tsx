@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DownloadList, Gallery } from "@/components/Attachments";
 import PageBanner from "@/components/PageBanner";
-import { getSolution, mediaUrl } from "@/lib/api";
+import RichContent, { blockText } from "@/components/RichContent";
+import { getBlocks, getSolution, mediaUrl } from "@/lib/api";
 import { dict, isLocale, pick } from "@/lib/i18n";
 
 /* ฟีเจอร์ mock 6 ข้อ — เนื้อหาจริงของแต่ละระบบจะมาจาก bodyTh/bodyEn (แก้ผ่าน admin เฟส 4) */
@@ -35,6 +36,13 @@ export default async function SolutionDetail({
 
   const sol = await getSolution(slug);
   if (!sol) notFound();
+
+  /* ฟีเจอร์ของ solution นี้ — แก้ผ่าน admin ได้ (กลุ่ม solution.features:<id>)
+     ยังไม่มีข้อมูลก็ใช้รายการเริ่มต้นที่ฝังมากับระบบ */
+  const featBlocks = (await getBlocks([`solution.features:${sol.id}`]))[`solution.features:${sol.id}`] ?? [];
+  const features = featBlocks.length
+    ? featBlocks.map((b) => ({ title: blockText(b, "title", locale), body: blockText(b, "body", locale), html: true }))
+    : FEATURES[locale].map((f) => ({ ...f, html: false }));
 
   const name = pick(sol, "name", locale);
   const isCategory = sol.children.length > 0;
@@ -77,8 +85,8 @@ export default async function SolutionDetail({
             )}
           </div>
           {pick(sol, "body", locale) && (
-            <div className="prose reveal" style={{ marginTop: 42 }}>
-              <p>{pick(sol, "body", locale)}</p>
+            <div className="reveal" style={{ marginTop: 42 }}>
+              <RichContent html={pick(sol, "body", locale)} />
             </div>
           )}
         </div>
@@ -113,11 +121,11 @@ export default async function SolutionDetail({
               <h2>{locale === "th" ? "ความสามารถของระบบ" : "System capabilities"}</h2>
             </div>
             <div className="feature-grid">
-              {FEATURES[locale].map((f, i) => (
-                <article className={`card feat reveal${i % 3 ? ` d${i % 3}` : ""}`} key={f.title}>
+              {features.map((f, i) => (
+                <article className={`card feat reveal${i % 3 ? ` d${i % 3}` : ""}`} key={`${f.title}-${i}`}>
                   <div className="num">{i + 1}</div>
                   <h4>{f.title}</h4>
-                  <p>{f.body}</p>
+                  {f.html ? <RichContent html={f.body} className="prose-sm" /> : <p>{f.body}</p>}
                 </article>
               ))}
             </div>

@@ -61,22 +61,25 @@ export function RevealInit() {
   return null;
 }
 
-/** Accordion (เทคโนโลยีหลัก) */
+/** Accordion (เทคโนโลยีหลัก)
+ *  item.html = true เมื่อ body เป็น HTML จาก rich text editor (ผ่าน sanitize ที่เซิร์ฟเวอร์แล้ว) */
 export function Accordion({
   items,
 }: {
-  items: { title: string; body: string }[];
+  items: { title: string; body: string; html?: boolean }[];
 }) {
   const [open, setOpen] = useState(0);
   return (
     <div className="acc">
       {items.map((it, i) => (
         <div className={`acc-item${open === i ? " open" : ""}`} key={it.title}>
-          <button className="acc-btn" onClick={() => setOpen(open === i ? -1 : i)}>
+          <button type="button" className="acc-btn" onClick={() => setOpen(open === i ? -1 : i)}>
             {it.title} <span className="acc-icon">+</span>
           </button>
           <div className="acc-panel">
-            <p>{it.body}</p>
+            {it.html
+              ? <div className="acc-body prose-sm" dangerouslySetInnerHTML={{ __html: it.body }} />
+              : <p>{it.body}</p>}
           </div>
         </div>
       ))}

@@ -78,6 +78,22 @@ export interface AdminMessage {
   phone: string | null; topic: string | null; message: string;
   createdAt: string; readAt: string | null;
 }
+export interface AdminBlock {
+  id: number;
+  group: string;
+  order: number;
+  published: boolean;
+  icon: string | null;
+  titleTh: string;
+  titleEn: string | null;
+  subtitleTh: string | null;
+  subtitleEn: string | null;
+  bodyTh: string | null; // HTML ที่ sanitize แล้วฝั่งเซิร์ฟเวอร์
+  bodyEn: string | null;
+  image: string | null;
+  meta: string | null;
+}
+
 export interface AdminMedia {
   id: number;
   filename: string;

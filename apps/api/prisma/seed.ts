@@ -222,7 +222,97 @@ async function main() {
     });
   }
 
-  console.log("✅ Seed เสร็จ (TH+EN): admin 1, solutions 8, partners 8, posts 6, contents 3");
+  /* ---------- Block: เนื้อหารายการซ้ำ ๆ ที่แก้ผ่าน admin ได้ (Phase 6B) ----------
+     ใส่เฉพาะตอนที่กลุ่มนั้นยังว่าง — จะได้ไม่ทับของที่ทีมแก้ไปแล้ว */
+  const seedBlocks = async (
+    group: string,
+    rows: Array<{ titleTh: string; titleEn?: string; subtitleTh?: string; subtitleEn?: string; bodyTh?: string; bodyEn?: string }>,
+  ) => {
+    if ((await prisma.block.count({ where: { group } })) > 0) return;
+    await prisma.block.createMany({
+      data: rows.map((r, i) => ({ ...r, group, order: i + 1 })),
+    });
+  };
+
+  await seedBlocks("home.pillars", [
+    {
+      titleTh: "งานวิจัย", titleEn: "Research", subtitleTh: "Research", subtitleEn: "Research",
+      bodyTh: "<p>พัฒนาองค์ความรู้ด้าน AI, IoT และ Data Analytics สำหรับบริบทเมืองไทย ตีพิมพ์และต่อยอดร่วมกับเครือข่ายวิชาการ</p>",
+      bodyEn: "<p>Advancing AI, IoT and data analytics for the Thai urban context, published and extended with academic networks.</p>",
+    },
+    {
+      titleTh: "นวัตกรรมต้นแบบ", titleEn: "Prototype", subtitleTh: "Prototype", subtitleEn: "Innovation",
+      bodyTh: "<p>แปลงงานวิจัยเป็นระบบต้นแบบที่ติดตั้งใช้งานได้จริง ทดสอบในพื้นที่จริงร่วมกับหน่วยงานท้องถิ่น</p>",
+      bodyEn: "<p>Turning research into deployable prototype systems, field-tested with local government partners.</p>",
+    },
+    {
+      titleTh: "บริการวิชาการ", titleEn: "Academic Service", subtitleTh: "Service", subtitleEn: "Service",
+      bodyTh: "<p>ให้คำปรึกษา ฝึกอบรม และถ่ายทอดเทคโนโลยีให้หน่วยงานรัฐ เอกชน และชุมชนที่ต้องการพัฒนาเมืองอัจฉริยะ</p>",
+      bodyEn: "<p>Consulting, training and technology transfer for government, private sector and communities.</p>",
+    },
+  ]);
+
+  await seedBlocks("home.techs", [
+    {
+      titleTh: "IoT & Sensor Network", titleEn: "IoT & Sensor Network",
+      bodyTh: "<p>เครือข่ายเซนเซอร์เก็บข้อมูลเมืองแบบเรียลไทม์ ทั้งจราจร สิ่งแวดล้อม และพลังงาน เชื่อมต่อผ่าน LoRa / NB-IoT / 5G</p>",
+      bodyEn: "<p>Real-time city sensing — traffic, environment and energy — connected over LoRa / NB-IoT / 5G.</p>",
+    },
+    {
+      titleTh: "AI & Computer Vision", titleEn: "AI & Computer Vision",
+      bodyTh: "<p>วิเคราะห์ภาพจากกล้อง CCTV ตรวจจับยานพาหนะ บุคคล และเหตุการณ์ผิดปกติ ประมวลผลได้แบบเรียลไทม์</p>",
+      bodyEn: "<p>CCTV analytics detecting vehicles, people and anomalies in real time.</p>",
+    },
+    {
+      titleTh: "Big Data & City Platform", titleEn: "Big Data & City Platform",
+      bodyTh: "<p>แพลตฟอร์มรวมศูนย์ข้อมูลเมือง (City Data Platform) พร้อมแดชบอร์ดสำหรับผู้บริหารเมืองใช้ตัดสินใจ</p>",
+      bodyEn: "<p>A centralized City Data Platform with dashboards for decision makers.</p>",
+    },
+    {
+      titleTh: "Digital Twin & Simulation", titleEn: "Digital Twin & Simulation",
+      bodyTh: "<p>แบบจำลองเมืองเสมือนสำหรับทดลองนโยบายและจำลองสถานการณ์ ก่อนลงทุนจริงในพื้นที่</p>",
+      bodyEn: "<p>Virtual city models to test policies and scenarios before real investment.</p>",
+    },
+  ]);
+
+  await seedBlocks("about.timeline", [
+    {
+      subtitleTh: "2564", subtitleEn: "2021", titleTh: "ก่อตั้งศูนย์วิจัย SMC", titleEn: "SMC founded",
+      bodyTh: "<p>รวมทีมวิจัยด้าน AI / IoT ก่อตั้งศูนย์วิจัยเมืองอัจฉริยะที่ สจล.</p>",
+      bodyEn: "<p>AI / IoT researchers founded the smart-city research center at KMITL.</p>",
+    },
+    {
+      subtitleTh: "2565", subtitleEn: "2022", titleTh: "โครงการนำร่องแรก", titleEn: "First pilot project",
+      bodyTh: "<p>ทดลองระบบจราจรอัจฉริยะร่วมกับเทศบาลตัวอย่าง เก็บข้อมูลและปรับปรุงระบบจากการใช้งานจริง</p>",
+      bodyEn: "<p>Piloted an intelligent traffic system with a partner municipality, iterating from real usage.</p>",
+    },
+    {
+      subtitleTh: "2566", subtitleEn: "2023", titleTh: "ขยายเครือข่ายความร่วมมือ", titleEn: "Growing partnerships",
+      bodyTh: "<p>ลงนาม MOU กับหน่วยงาน 3 แห่ง และเปิดตัว City Data Platform เวอร์ชันแรก</p>",
+      bodyEn: "<p>Signed MOUs with 3 organizations and launched the first City Data Platform.</p>",
+    },
+    {
+      subtitleTh: "2567–ปัจจุบัน", subtitleEn: "2024–present", titleTh: "ขยายผลสู่ 5 จังหวัด", titleEn: "Scaling to 5 provinces",
+      bodyTh: "<p>นำโซลูชัน Smart CCTV และระบบตรวจวัดสิ่งแวดล้อมไปติดตั้งใช้งานจริงในหลายพื้นที่</p>",
+      bodyEn: "<p>Deployed Smart CCTV and environmental monitoring solutions across multiple areas.</p>",
+    },
+  ]);
+
+  await seedBlocks("about.story", [
+    {
+      titleTh: "ย่อหน้าที่ 1", titleEn: "Paragraph 1",
+      bodyTh: "<p>Smart City Research Center (SMC) ก่อตั้งขึ้นโดยทีมอาจารย์และนักวิจัย คณะวิศวกรรมศาสตร์ สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง จากความตั้งใจที่จะนำงานวิจัยด้าน AI, IoT และข้อมูลเมือง ออกจากห้องแลปไปสู่การใช้งานจริง</p>",
+      bodyEn: "<p>Smart City Research Center (SMC) was founded by faculty and researchers of the Faculty of Engineering, KMITL, with the intent of taking AI, IoT and urban-data research out of the lab and into the real world.</p>",
+    },
+    {
+      titleTh: "ย่อหน้าที่ 2", titleEn: "Paragraph 2",
+      bodyTh: "<p>ปัจจุบันศูนย์วิจัยทำงานร่วมกับเทศบาล หน่วยงานภาครัฐ และภาคเอกชนหลายแห่ง ทั้งโครงการนำร่องและโครงการติดตั้งจริง ครอบคลุมระบบจราจร ความปลอดภัย สิ่งแวดล้อม และแพลตฟอร์มข้อมูลเมือง</p>",
+      bodyEn: "<p>Today the center works with municipalities, government agencies and private partners on both pilots and production deployments — covering traffic, safety, environment and city data platforms.</p>",
+    },
+  ]);
+
+  const blockCount = await prisma.block.count();
+  console.log(`✅ Seed เสร็จ (TH+EN): admin 1, solutions 8, partners 8, posts 6, contents 3, blocks ${blockCount}`);
 }
 
 main()

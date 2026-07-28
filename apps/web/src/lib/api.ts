@@ -14,6 +14,22 @@ export interface SolutionNode {
   children: Omit<SolutionNode, "children">[];
 }
 
+/* ---------- Block: เนื้อหารายการซ้ำ ๆ ที่แก้ผ่าน admin (Phase 6B) ---------- */
+export interface BlockItem {
+  id: number;
+  group: string;
+  order: number;
+  icon: string | null;
+  titleTh: string;
+  titleEn: string | null;
+  subtitleTh: string | null;
+  subtitleEn: string | null;
+  bodyTh: string | null; // HTML ที่ผ่าน sanitize ฝั่งเซิร์ฟเวอร์แล้ว
+  bodyEn: string | null;
+  image: string | null;
+  meta: string | null;
+}
+
 /* ---------- ไฟล์แนบ (Phase 6A) ---------- */
 export interface AttachmentItem {
   id: number;
@@ -118,6 +134,12 @@ export const getPosts = (opts?: { category?: string; take?: number }) => {
   return get<PostItem[]>(`/posts${qs ? `?${qs}` : ""}`);
 };
 export const getPost = (slug: string) => get<PostDetail>(`/posts/${slug}`);
+/** ดึงเนื้อหาหลายชุดในครั้งเดียว เช่น getBlocks(["home.pillars", "home.techs"]) */
+export const getBlocks = async (groups: string[]) => {
+  const res = await get<Record<string, BlockItem[]>>(`/blocks?groups=${groups.map(encodeURIComponent).join(",")}`);
+  return res ?? {};
+};
+
 /** poster ของ banner/hero แต่ละหน้า (Phase 6A) */
 export const getPageMedia = (slug: string) => get<PageMedia>(`/pages/${slug}`);
 /** ลิงก์ดาวน์โหลดที่บังคับให้บันทึกไฟล์ + ใช้ชื่อไฟล์เดิม */

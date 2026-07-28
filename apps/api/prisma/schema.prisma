@@ -107,6 +107,27 @@ model Media {
   @@index([kind, createdAt])
 }
 
+// รายการเนื้อหาซ้ำ ๆ ทุกชนิดใช้ตารางนี้ร่วมกัน (Phase 6B)
+// group = home.pillars | home.techs | about.timeline | about.story | solution.features:<id>
+// เพิ่มชุดใหม่ = เพิ่มค่า group ไม่ต้องแก้โครงฐานข้อมูล
+model Block {
+  id         Int     @id @default(autoincrement())
+  group      String
+  order      Int     @default(0)
+  published  Boolean @default(true)
+  icon       String? // ชื่อไอคอนในชุดของเว็บ หรือ url รูป
+  titleTh    String
+  titleEn    String?
+  subtitleTh String? // ใช้เป็น "ปี" ใน timeline หรือคำกำกับ (เช่น Research)
+  subtitleEn String?
+  bodyTh     String? // HTML ที่ sanitize แล้ว
+  bodyEn     String?
+  image      String?
+  meta       String? // JSON string เผื่อ field เฉพาะทางในอนาคต
+
+  @@index([group, order])
+}
+
 // ตารางกลาง: ผูก media เข้ากับรายการอะไรก็ได้ (แกลเลอรี/ไฟล์แนบ/poster)
 // เพิ่มชนิดใหม่ภายหลัง = เพิ่มค่า role ไม่ต้องแก้โครง
 model Attachment {

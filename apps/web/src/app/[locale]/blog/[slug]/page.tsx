@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DownloadList, Gallery } from "@/components/Attachments";
 import PageBanner from "@/components/PageBanner";
+import RichContent from "@/components/RichContent";
 import { getPost, mediaUrl } from "@/lib/api";
 import { dict, fmtDate, isLocale, pick } from "@/lib/i18n";
 
@@ -43,9 +44,11 @@ export default async function PostPage({
           {post.coverImage && (
             <p><img src={mediaUrl(post.coverImage)!} alt="" style={{ borderRadius: 16 }} /></p>
           )}
-          <div className="prose reveal in" style={{ margin: 0, maxWidth: "none" }}>
-            <p>{pick(post, "excerpt", locale)}</p>
-            <p>{pick(post, "body", locale)}</p>
+          <div className="reveal in">
+            {pick(post, "excerpt", locale) && (
+              <p className="post-lead">{pick(post, "excerpt", locale)}</p>
+            )}
+            <RichContent html={pick(post, "body", locale)} className="prose" />
           </div>
         </div>
       </section>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AttachmentEditor from "@/components/admin/AttachmentEditor";
+import RichText from "@/components/admin/RichText";
 import Upload from "@/components/admin/Upload";
 import { adminFetch, type AdminPost } from "@/lib/admin";
 
@@ -144,15 +145,21 @@ export default function AdminPosts() {
                 <textarea value={form.excerptEn ?? ""} onChange={(e) => setForm({ ...form, excerptEn: e.target.value })} />
               </div>
             </div>
-            <div className="row2">
-              <div>
-                <label>เนื้อหาเต็ม (ไทย)</label>
-                <textarea style={{ minHeight: 160 }} value={form.bodyTh ?? ""} onChange={(e) => setForm({ ...form, bodyTh: e.target.value })} />
-              </div>
-              <div>
-                <label>เนื้อหาเต็ม (อังกฤษ)</label>
-                <textarea style={{ minHeight: 160 }} value={form.bodyEn ?? ""} onChange={(e) => setForm({ ...form, bodyEn: e.target.value })} />
-              </div>
+            <div>
+              <label>เนื้อหาเต็ม (ไทย)</label>
+              <RichText
+                value={form.bodyTh ?? ""}
+                onChange={(html) => setForm({ ...form, bodyTh: html })}
+                placeholder="เขียนเนื้อหาโพสต์ จัดหัวข้อ ใส่รายการ แทรกรูปจากคลังสื่อได้"
+              />
+            </div>
+            <div>
+              <label>เนื้อหาเต็ม (อังกฤษ)</label>
+              <RichText
+                value={form.bodyEn ?? ""}
+                onChange={(html) => setForm({ ...form, bodyEn: html })}
+                placeholder="English content (optional)"
+              />
             </div>
             <div>
               <label>รูปปก</label>

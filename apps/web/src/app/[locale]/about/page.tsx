@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageBanner from "@/components/PageBanner";
-import { getContent, getPageMedia, type AboutContent } from "@/lib/api";
+import RichContent, { blockText } from "@/components/RichContent";
+import { getBlocks, getContent, getPageMedia, type AboutContent } from "@/lib/api";
 import { dict, isLocale } from "@/lib/i18n";
 
 /* Timeline mock — จะย้ายเข้า DB/admin ในเฟส 4 */
@@ -40,8 +41,24 @@ export default async function AboutPage({
   if (!isLocale(locale)) notFound();
   const t = dict(locale);
   const base = `/${locale}`;
-  const about = await getContent<AboutContent>("about.main", locale);
-  const pageMedia = await getPageMedia("about");
+  const [about, pageMedia, blocks] = await Promise.all([
+    getContent<AboutContent>("about.main", locale),
+    getPageMedia("about"),
+    getBlocks(["about.timeline", "about.story"]),
+  ]);
+
+  /* ใช้ข้อมูลจาก admin ถ้ามี ไม่มีก็ใช้ค่าเริ่มต้นที่ฝังมากับระบบ */
+  const tlBlocks = blocks["about.timeline"] ?? [];
+  const timeline = tlBlocks.length
+    ? tlBlocks.map((b) => ({
+        year: blockText(b, "subtitle", locale),
+        title: blockText(b, "title", locale),
+        body: blockText(b, "body", locale),
+        html: true,
+      }))
+    : TIMELINE[locale].map((x) => ({ ...x, html: false }));
+
+  const storyBlocks = blocks["about.story"] ?? [];
 
   return (
     <main>
@@ -106,9 +123,11 @@ export default async function AboutPage({
               <h2>{t.about.storyTitle1} <span className="grad">SMC</span></h2>
             </div>
             <div className="reveal d1">
-              {STORY[locale].map((p) => (
-                <p key={p.slice(0, 20)}>{p}</p>
-              ))}
+              {storyBlocks.length
+                ? storyBlocks.map((b) => (
+                    <RichContent key={b.id} html={blockText(b, "body", locale)} className="prose-sm" />
+                  ))
+                : STORY[locale].map((p) => <p key={p.slice(0, 20)}>{p}</p>)}
             </div>
           </div>
         </div>
@@ -123,12 +142,12 @@ export default async function AboutPage({
             <p className="lead">{t.about.milestonesLead}</p>
           </div>
           <div className="timeline">
-            {TIMELINE[locale].map((item) => (
-              <div className="tl-item reveal" key={item.year}>
+            {timeline.map((item, i) => (
+              <div className="tl-item reveal" key={`${item.year}-${i}`}>
                 <div className="tl-year">{item.year}</div>
                 <div className="tl-card">
                   <h4>{item.title}</h4>
-                  <p>{item.body}</p>
+                  {item.html ? <RichContent html={item.body} className="prose-sm" /> : <p>{item.body}</p>}
                 </div>
               </div>
             ))}
