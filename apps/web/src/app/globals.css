@@ -48,7 +48,11 @@
   --fs-h4: 1.25rem;   --fs-h3: 1.5rem;   --fs-h2: 1.875rem; --fs-h1: 2.375rem;
   --fs-section: clamp(1.9rem, 4vw, 3rem);  /* หัวข้อ section ใหญ่ */
   --fs-display: clamp(3.2rem, 11vw, 10rem); /* ตัวอักษรยักษ์ใน hero (ฟอนต์ Anton ทรงแคบ ใช้ขนาดใหญ่ได้) */
-  --fs-ghost: clamp(3.5rem, 14vw, 12rem);  /* ตัวอักษรฉากหลัง */
+  --fs-ghost: clamp(2.6rem, 7.5vw, 7rem);  /* ตัวอักษรฉากหลัง */
+  /* พื้นที่ที่ section ต้องกันไว้ด้านบนให้ตัวอักษรฉากหลังแสดงได้เต็มคำ
+     ผูกกับ --fs-ghost ตัวเดียวกัน → ระยะห่างเท่ากันทุกขนาดจอ */
+  --ghost-space: calc(var(--fs-ghost) + var(--sp-16));
+  --fs-pb-ghost: clamp(2.4rem, 7vw, 6rem); /* ตัวอักษรฉากหลังใน banner หน้าใน */
 
   /* ฟอนต์ดิสเพลย์ทรงโปสเตอร์ — เฉพาะตัวอักษรยักษ์ภาษาอังกฤษ */
   --ff-display: var(--font-display), "Arial Narrow", Impact, sans-serif;
@@ -129,9 +133,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 /* section ที่มีตัวอักษรฉากหลัง ต้องตัดขอบเพื่อให้ตัวอักษรถูกครอบครึ่ง */
 .sec:has(> .ghost-head) { overflow: clip; }
 .sec > .container { position: relative; z-index: 1; }
-/* .sec มี padding บนน้อยกว่า .sec-x — ยกตัวอักษรฉากหลังขึ้น
-   (เผื่อระยะพารัลแลกซ์ +38px แล้วยังไม่ชนหัวข้อ) */
-.sec > .ghost-head { top: 8px; }
 .sec-tight { padding: 68px 0; }
 .sec-head { max-width: 720px; margin: 0 auto 52px; text-align: center; }
 .sec-head.left { margin-inline: 0; text-align: left; }
@@ -362,23 +363,25 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
    ใช้ overflow: clip (ไม่ใช่ hidden) — hidden จะสร้าง scroll container
    แล้วทำให้ animation-timeline: view() ของตัวอักษรฉากหลังหาจุดอ้างอิงไม่ได้ */
 .sec-x { position: relative; padding: var(--sp-24) 0; overflow: clip; }
-/* ตัวอักษรฉากหลัง — วางชิดขอบบนของ section แล้วให้ขอบตัดครึ่ง (overflow: clip)
-   เหลือแค่ครึ่งล่างของตัวอักษรโผล่เหนือหัวข้อ ไม่ทับข้อความ
-   ใช้เส้นขอบแทนตัวทึบ เพื่อให้อ่านออกว่าเป็นตัวอักษร ไม่ใช่รอยเปื้อน */
+/* section ที่มีตัวอักษรฉากหลัง — กันพื้นที่ด้านบนไว้ให้แสดงเต็มคำ
+   ตัวเลือก :has() มี specificity สูงกว่า .sec-x เดี่ยว ๆ จึงไม่ถูก media query ทับ */
+.sec-x:has(> .ghost-head), .sec:has(> .ghost-head) { padding-top: var(--ghost-space); }
+/* ตัวอักษรฉากหลัง — แสดงเต็มคำ ไม่ถูกขอบตัด
+   section จะกันพื้นที่ด้านบนไว้ให้ (--ghost-space) แล้วหัวข้อจึงเริ่มถัดจากนั้น */
 .ghost-head {
-  position: absolute; top: 0; left: 50%;
-  --gy: -56%; /* ระยะยกขึ้นให้ขอบบนตัด — พารัลแลกซ์บวกลบจากค่านี้ */
-  transform: translate(-50%, var(--gy));
+  position: absolute; top: var(--sp-6); left: 50%;
+  transform: translateX(-50%);
   z-index: 0; pointer-events: none; user-select: none; white-space: nowrap;
+  max-width: 100%; overflow: hidden; text-overflow: clip;
   font-family: var(--ff-display);
   font-size: var(--fs-ghost); font-weight: 400;
   letter-spacing: 0.02em; text-transform: uppercase; line-height: 1;
-  color: transparent; -webkit-text-stroke: 1.5px rgba(16, 32, 62, 0.1);
+  color: transparent; -webkit-text-stroke: 1.5px rgba(16, 32, 62, 0.13);
 }
-.dark-sec .ghost-head { -webkit-text-stroke-color: rgba(255, 255, 255, 0.12); }
-.soft-sec .ghost-head { -webkit-text-stroke-color: rgba(16, 32, 62, 0.09); }
+.dark-sec .ghost-head { -webkit-text-stroke-color: rgba(255, 255, 255, 0.15); }
+.soft-sec .ghost-head { -webkit-text-stroke-color: rgba(16, 32, 62, 0.11); }
 /* พารัลแลกซ์: ตัวอักษรฉากหลังไหลช้ากว่าเนื้อหา (scroll-driven ล้วน ไม่ใช้ JS)
-   ขยับแค่ ±38px เพื่อไม่ให้ไหลลงมาทับหัวข้อที่ปลายช่วง */
+   ขยับ ±20px — น้อยกว่าระยะเผื่อ 40px จึงไม่มีทางไหลไปชนหัวข้อ */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .ghost-head {
@@ -387,8 +390,8 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
       animation-range: entry 0% exit 100%;
     }
     @keyframes ghost-drift {
-      from { transform: translate(-50%, calc(var(--gy) + 38px)); }
-      to   { transform: translate(-50%, calc(var(--gy) - 38px)); }
+      from { transform: translate(-50%, 20px); }
+      to   { transform: translate(-50%, -20px); }
     }
   }
 }
@@ -439,9 +442,10 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   box-shadow: 0 -30px 80px rgba(11, 23, 48, 0.35);
   padding-top: var(--sp-6);
 }
-/* section นี้มีแถบตัววิ่งอยู่บนสุด — เริ่มนับตำแหน่งตัวอักษรฉากหลังใต้แถบนั้น
-   (96px เผื่อระยะพารัลแลกซ์ +38px แล้วยังไม่ชนป้ายหัวข้อ) */
-.curtain .ghost-head { top: 96px; }
+/* section นี้มีแถบตัววิ่งกินพื้นที่ด้านบนอยู่แล้ว — ย้ายตัวอักษรฉากหลังไปไว้ด้านล่างแทน
+   แล้วกันพื้นที่ท้าย section ให้แสดงเต็มคำเช่นกัน */
+.sec-x.curtain { padding-top: var(--sp-6); padding-bottom: var(--ghost-space); }
+.curtain .ghost-head { top: auto; bottom: var(--sp-6); }
 
 /* ---------- แถบตัววิ่ง (marquee) — ฟอนต์โปสเตอร์ สลับตัวทึบ/ตัวเส้นขอบ ---------- */
 .marq {
@@ -681,7 +685,8 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 /* ---------- Banner หน้าใน ---------- */
 .page-banner {
   position: relative; color: #fff;
-  padding: calc(var(--nav-h) + var(--sp-16)) 0 var(--sp-16);
+  /* ระยะล่างกันพื้นที่ให้ตัวอักษรฉากหลังมุมขวาล่างแสดงเต็มคำ ไม่ทับข้อความ */
+  padding: calc(var(--nav-h) + var(--sp-16)) 0 calc(var(--fs-pb-ghost) + var(--sp-12));
   background:
     radial-gradient(900px 420px at 12% 120%, rgba(242, 107, 33, 0.38), transparent 60%),
     linear-gradient(160deg, var(--navy-950), var(--navy-800));
@@ -691,14 +696,16 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 /* orb ใน banner เล็กกว่าใน hero */
 .page-banner .orb-a { width: 420px; height: 420px; left: -120px; top: -100px; }
 .page-banner .orb-b { width: 460px; height: 460px; right: -140px; bottom: -160px; }
-/* ตัวอักษรเส้นขอบเป็นฉากหลัง มุมขวาล่าง */
+/* ตัวอักษรเส้นขอบเป็นฉากหลัง มุมขวาล่าง — แสดงเต็มคำ ไม่ถูกขอบตัด */
 .pb-ghost {
-  position: absolute; right: -0.5%; bottom: -0.08em; z-index: 0;
-  font-family: var(--ff-display); font-size: clamp(3.4rem, 11vw, 9rem);
+  position: absolute; right: var(--sp-6); bottom: var(--sp-5); z-index: 0;
+  font-family: var(--ff-display); font-size: var(--fs-pb-ghost);
   line-height: 1; letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap;
-  color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.08);
+  color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.12);
   pointer-events: none; user-select: none;
 }
+/* จอแคบ พื้นที่ไม่พอวางข้าง ๆ ข้อความ — ซ่อนไปเลยดีกว่าให้ทับกัน */
+@media (max-width: 860px) { .pb-ghost { display: none; } }
 .pb-inner { position: relative; z-index: 1; }
 /* คำอังกฤษยักษ์ + ชื่อหน้าภาษาไทยด้านล่าง (ลำดับเดียวกับ hero หน้าแรก) */
 .pb-en {
@@ -1154,7 +1161,8 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
   .tl-item, .tl-item:nth-child(even) { width: 100%; margin-left: 0; padding: 0 0 40px 40px; }
   .tl-item::before, .tl-item:nth-child(even)::before { left: 2px; right: auto; }
   .cta-band { padding: 40px 28px; }
-  .page-banner { padding: 124px 0 56px; }
+  /* จอแคบซ่อนตัวอักษรฉากหลังอยู่แล้ว จึงไม่ต้องกันพื้นที่ล่าง */
+  .page-banner { padding: calc(var(--nav-h) + var(--sp-10)) 0 var(--sp-12); }
   .video-card { aspect-ratio: 4 / 3; }
   .play-btn { width: 64px; height: 64px; }
   .play-btn svg { width: 24px; height: 24px; }
