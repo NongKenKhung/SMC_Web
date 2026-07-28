@@ -48,8 +48,6 @@ export default function SiteFooter({
   return (
     <footer className="site-footer">
       <div className="container">
-        {/* ตัวอักษรยักษ์แบบเส้นขอบ ปิดท้ายเว็บ (สไตล์เว็บงานนิทรรศการ) */}
-        <div className="foot-word" aria-hidden="true">Smart City</div>
         <div className="footer-top">
           <div>
             <span className="logo-chip"><img src="/logo.png" alt="SMC" /></span>

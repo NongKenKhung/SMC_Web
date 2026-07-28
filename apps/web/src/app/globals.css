@@ -1030,16 +1030,6 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 
 /* ---------- Footer ---------- */
 .site-footer { background: var(--navy-950); color: #a9b6ce; margin-top: 0; overflow: hidden; }
-/* ตัวอักษรยักษ์เส้นขอบปิดท้ายเว็บ — ไล่จางจากบนลงล่าง */
-.foot-word {
-  font-family: var(--ff-display); text-transform: uppercase; text-align: center;
-  font-size: clamp(3.4rem, 13vw, 11.5rem); line-height: 0.9; letter-spacing: 0.01em;
-  padding-top: var(--sp-16); margin-bottom: calc(-1 * var(--sp-2));
-  white-space: nowrap; pointer-events: none; user-select: none;
-  color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.13);
-  background: linear-gradient(180deg, rgba(249, 200, 70, 0.22), rgba(255, 255, 255, 0) 80%);
-  -webkit-background-clip: text; background-clip: text;
-}
 .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.4fr; gap: 44px; padding: 72px 0 48px; }
 .site-footer .logo-chip { margin-bottom: 18px; }
 .site-footer .logo-chip img { height: 52px; }
@@ -1158,7 +1148,6 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
   .sol-x-go { display: none; }
   .sec-head-x { margin-bottom: var(--sp-8); }
   .marq { padding-block: var(--sp-3); margin-bottom: var(--sp-6); }
-  .foot-word { padding-top: var(--sp-10); }
   .orb-a { width: 380px; height: 380px; }
   .orb-b { width: 420px; height: 420px; }
   .timeline::before { left: 10px; }
