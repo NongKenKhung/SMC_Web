@@ -147,14 +147,6 @@ const th = {
     next: "รูปถัดไป",
   },
   categories: { ACTIVITY: "กิจกรรม", NEWS: "ข่าว", WORK: "ผลงาน" } as Record<string, string>,
-  notFound: {
-    eyebrow: "Error 404",
-    title: "ไม่พบหน้าที่คุณกำลังหา",
-    lead: "หน้านี้อาจถูกย้าย เปลี่ยนชื่อ หรือลบไปแล้ว ลองเริ่มจากลิงก์ด้านล่างดูครับ",
-    backHome: "กลับหน้าแรก",
-    contact: "แจ้งปัญหากับเรา",
-    quickLinks: "ไปยังหน้าที่คนดูบ่อย",
-  },
 };
 
 const en: typeof th = {
@@ -281,14 +273,6 @@ const en: typeof th = {
     next: "Next image",
   },
   categories: { ACTIVITY: "Activity", NEWS: "News", WORK: "Works" } as Record<string, string>,
-  notFound: {
-    eyebrow: "Error 404",
-    title: "We couldn't find that page",
-    lead: "It may have been moved, renamed or removed. Try one of the links below.",
-    backHome: "Back to home",
-    contact: "Report a problem",
-    quickLinks: "Popular pages",
-  },
 };
 
 const dicts: Record<Locale, typeof th> = { th, en };
