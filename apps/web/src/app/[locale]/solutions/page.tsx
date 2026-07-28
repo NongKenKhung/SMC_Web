@@ -50,7 +50,7 @@ export default async function SolutionsHub({
           <div className="sec-head reveal">
             <span className="eyebrow">Our Solutions</span>
             <h2>
-              {locale === "th" ? <>โซลูชันและผลิตภัณฑ์ <span className="grad">ของแลป</span></> : <>Our <span className="grad">solutions &amp; products</span></>}
+              {locale === "th" ? <>โซลูชันและผลิตภัณฑ์ <span className="grad">ของศูนย์</span></> : <>Our <span className="grad">solutions &amp; products</span></>}
             </h2>
             <p className="lead">{t.solutions.lead}</p>
           </div>

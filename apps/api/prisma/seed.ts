@@ -92,8 +92,8 @@ async function main() {
     {
       slug: "smart-traffic-demo",
       category: "ACTIVITY",
-      titleTh: "ทีม SML สาธิตระบบจราจรอัจฉริยะให้เทศบาลตัวอย่าง พร้อมทดสอบในพื้นที่จริง",
-      titleEn: "SML team demonstrates the intelligent traffic system to a partner municipality",
+      titleTh: "ทีม SMC สาธิตระบบจราจรอัจฉริยะให้เทศบาลตัวอย่าง พร้อมทดสอบในพื้นที่จริง",
+      titleEn: "SMC team demonstrates the intelligent traffic system to a partner municipality",
       publishedAt: new Date("2026-03-12"),
     },
     {
@@ -118,10 +118,10 @@ async function main() {
       publishedAt: new Date("2025-12-20"),
     },
     {
-      slug: "lab-visit",
+      slug: "center-visit",
       category: "ACTIVITY",
-      titleTh: "ต้อนรับคณะศึกษาดูงานจากมหาวิทยาลัยพันธมิตร เยี่ยมชมห้องปฏิบัติการ",
-      titleEn: "Welcoming a study visit from partner universities to the laboratory",
+      titleTh: "ต้อนรับคณะศึกษาดูงานจากมหาวิทยาลัยพันธมิตร เยี่ยมชมศูนย์วิจัย",
+      titleEn: "Welcoming a study visit from partner universities to the research center",
       publishedAt: new Date("2025-11-02"),
     },
     {
@@ -156,7 +156,7 @@ async function main() {
         titleLine1: "ขับเคลื่อนเมืองอัจฉริยะ",
         titleLine2: "ด้วยงานวิจัยและนวัตกรรม",
         lead:
-          "แลปวิจัย Smart City แห่งสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง พัฒนาโซลูชันจากงานวิจัยสู่การใช้งานจริง ร่วมกับหน่วยงานภาครัฐและเอกชน",
+          "ศูนย์วิจัย Smart City แห่งสถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง พัฒนาโซลูชันจากงานวิจัยสู่การใช้งานจริง ร่วมกับหน่วยงานภาครัฐและเอกชน",
         stats: [
           { value: "12+", label: "โครงการที่ส่งมอบ" },
           { value: "8", label: "หน่วยงานพาร์ทเนอร์" },
@@ -168,7 +168,7 @@ async function main() {
         titleLine1: "Driving smart cities",
         titleLine2: "with research & innovation",
         lead:
-          "The smart-city research lab of King Mongkut's Institute of Technology Ladkrabang — turning research into real-world solutions with government and private partners.",
+          "The smart-city research center of King Mongkut's Institute of Technology Ladkrabang — turning research into real-world solutions with government and private partners.",
         stats: [
           { value: "12+", label: "Projects delivered" },
           { value: "8", label: "Partner organizations" },
@@ -195,7 +195,7 @@ async function main() {
       "about.main",
       {
         vision:
-          "เป็นแลปวิจัยชั้นนำด้านเมืองอัจฉริยะของประเทศ ที่เปลี่ยนงานวิจัยให้กลายเป็นโซลูชันที่ใช้งานได้จริง",
+          "เป็นศูนย์วิจัยชั้นนำด้านเมืองอัจฉริยะของประเทศ ที่เปลี่ยนงานวิจัยให้กลายเป็นโซลูชันที่ใช้งานได้จริง",
         missions: [
           "วิจัยและพัฒนาเทคโนโลยี Smart City ที่เหมาะกับบริบทเมืองไทย",
           "ร่วมมือกับหน่วยงานรัฐและเอกชน นำนวัตกรรมไปติดตั้งใช้งานจริงในพื้นที่",
@@ -204,7 +204,7 @@ async function main() {
       },
       {
         vision:
-          "To be Thailand's leading smart-city research lab, turning research into solutions that work in the real world.",
+          "To be Thailand's leading smart-city research center, turning research into solutions that work in the real world.",
         missions: [
           "Research and develop smart-city technology suited to the Thai urban context",
           "Partner with government and industry to deploy innovation in real areas",
@@ -301,8 +301,8 @@ async function main() {
   await seedBlocks("about.story", [
     {
       titleTh: "ย่อหน้าที่ 1", titleEn: "Paragraph 1",
-      bodyTh: "<p>Smart City Research Center (SMC) ก่อตั้งขึ้นโดยทีมอาจารย์และนักวิจัย คณะวิศวกรรมศาสตร์ สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง จากความตั้งใจที่จะนำงานวิจัยด้าน AI, IoT และข้อมูลเมือง ออกจากห้องแลปไปสู่การใช้งานจริง</p>",
-      bodyEn: "<p>Smart City Research Center (SMC) was founded by faculty and researchers of the Faculty of Engineering, KMITL, with the intent of taking AI, IoT and urban-data research out of the lab and into the real world.</p>",
+      bodyTh: "<p>Smart City Research Center (SMC) ก่อตั้งขึ้นโดยทีมอาจารย์และนักวิจัย คณะวิศวกรรมศาสตร์ สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง จากความตั้งใจที่จะนำงานวิจัยด้าน AI, IoT และข้อมูลเมือง ออกจากห้องวิจัยไปสู่การใช้งานจริง</p>",
+      bodyEn: "<p>Smart City Research Center (SMC) was founded by faculty and researchers of the Faculty of Engineering, KMITL, with the intent of taking AI, IoT and urban-data research out of the research center and into the real world.</p>",
     },
     {
       titleTh: "ย่อหน้าที่ 2", titleEn: "Paragraph 2",

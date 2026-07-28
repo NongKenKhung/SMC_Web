@@ -35,7 +35,7 @@ export default function AdminLogin() {
       <div className="login-card">
         <span className="logo-chip"><img src="/logo.png" alt="SMC" /></span>
         <h1>SMC Admin</h1>
-        <p className="sub">ระบบจัดการเนื้อหาเว็บไซต์แลป</p>
+        <p className="sub">ระบบจัดการเนื้อหาเว็บไซต์ศูนย์</p>
         <form className="adm-form" onSubmit={onSubmit}>
           <div>
             <label htmlFor="email">อีเมล</label>

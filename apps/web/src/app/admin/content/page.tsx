@@ -126,9 +126,9 @@ export default function AdminContent() {
         </div>
       </div>
 
-      {/* เกี่ยวกับแลป */}
+      {/* เกี่ยวกับศูนย์ */}
       <div className="adm-card">
-        <h2>เกี่ยวกับแลป (วิสัยทัศน์ / พันธกิจ)</h2>
+        <h2>เกี่ยวกับศูนย์ (วิสัยทัศน์ / พันธกิจ)</h2>
         <div className="adm-form">
           <div>
             <label>วิสัยทัศน์</label>
@@ -145,7 +145,7 @@ export default function AdminContent() {
               className="adm-btn"
               onClick={() => save("about.main", { ...about, missions: about.missions.filter((m) => m.trim()) })}
             >
-              บันทึกเกี่ยวกับแลป
+              บันทึกเกี่ยวกับศูนย์
             </button>
           </div>
         </div>

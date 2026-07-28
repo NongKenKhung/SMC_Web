@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import SectionSnap from "@/components/SectionSnap";
 import { Accordion, Stat } from "@/components/Ux";
 import RichContent, { blockText } from "@/components/RichContent";
 import {
@@ -100,6 +101,9 @@ export default async function Home({
 
   return (
     <main>
+      {/* เลื่อนทีละส่วนบนจอใหญ่ */}
+      <SectionSnap />
+
       {/* ===== 1. Hero เต็มจอ — ตรึงจอไว้ให้ section ถัดไปเลื่อนทับแบบม่าน (เทคนิคจาก Expo) ===== */}
       <div className="hero-pin">
       <section className={`hero pin-fade${poster ? " has-poster" : ""}`}>

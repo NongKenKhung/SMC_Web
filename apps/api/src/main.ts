@@ -28,6 +28,6 @@ async function bootstrap() {
   );
   const port = Number(process.env.API_PORT ?? 4000);
   await app.listen(port);
-  console.log(`🚀 SML API: http://localhost:${port}/api`);
+  console.log(`🚀 SMC API: http://localhost:${port}/api`);
 }
 bootstrap();

@@ -26,7 +26,7 @@ export class CreateContactDto {
 export class ContactService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** เฟส 1: เก็บลง DB ก่อน — เฟส 2 จะต่อ Nodemailer ส่งเข้าอีเมลแลป + กันสแปม */
+  /** เฟส 1: เก็บลง DB ก่อน — เฟส 2 จะต่อ Nodemailer ส่งเข้าอีเมลศูนย์ + กันสแปม */
   async create(dto: CreateContactDto) {
     const saved = await this.prisma.contactMessage.create({ data: dto });
     return { ok: true, id: saved.id };

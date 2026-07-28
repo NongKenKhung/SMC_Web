@@ -23,12 +23,12 @@ const TIMELINE = {
 
 const STORY = {
   th: [
-    "Smart City Research Center (SMC) ก่อตั้งขึ้นโดยทีมอาจารย์และนักวิจัย คณะวิศวกรรมศาสตร์ สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง จากความตั้งใจที่จะนำงานวิจัยด้าน AI, IoT และข้อมูลเมือง ออกจากห้องแลปไปสู่การใช้งานจริง",
-    "ปัจจุบันแลปทำงานร่วมกับเทศบาล หน่วยงานภาครัฐ และภาคเอกชนหลายแห่ง ทั้งโครงการนำร่องและโครงการติดตั้งจริง ครอบคลุมระบบจราจร ความปลอดภัย สิ่งแวดล้อม และแพลตฟอร์มข้อมูลเมือง",
+    "Smart City Research Center (SMC) ก่อตั้งขึ้นโดยทีมอาจารย์และนักวิจัย คณะวิศวกรรมศาสตร์ สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง จากความตั้งใจที่จะนำงานวิจัยด้าน AI, IoT และข้อมูลเมือง ออกจากห้องวิจัยไปสู่การใช้งานจริง",
+    "ปัจจุบันศูนย์ทำงานร่วมกับเทศบาล หน่วยงานภาครัฐ และภาคเอกชนหลายแห่ง ทั้งโครงการนำร่องและโครงการติดตั้งจริง ครอบคลุมระบบจราจร ความปลอดภัย สิ่งแวดล้อม และแพลตฟอร์มข้อมูลเมือง",
   ],
   en: [
-    "Smart City Research Center (SMC) was founded by faculty and researchers of the Faculty of Engineering, KMITL, with the intent of taking AI, IoT and urban-data research out of the lab and into the real world.",
-    "Today the lab works with municipalities, government agencies and private partners on both pilots and production deployments — covering traffic, safety, environment and city data platforms.",
+    "Smart City Research Center (SMC) was founded by faculty and researchers of the Faculty of Engineering, KMITL, with the intent of taking AI, IoT and urban-data research out of the research center and into the real world.",
+    "Today the center works with municipalities, government agencies and private partners on both pilots and production deployments — covering traffic, safety, environment and city data platforms.",
   ],
 };
 
