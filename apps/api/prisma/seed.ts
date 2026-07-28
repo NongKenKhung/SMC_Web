@@ -152,7 +152,7 @@ async function main() {
     [
       "home.hero",
       {
-        eyebrow: "Smart City Research Center · KMITL",
+        eyebrow: "Smart City Research Center · School of Engineering · KMITL",
         titleLine1: "ขับเคลื่อนเมืองอัจฉริยะ",
         titleLine2: "ด้วยงานวิจัยและนวัตกรรม",
         lead:
@@ -164,7 +164,7 @@ async function main() {
         ],
       },
       {
-        eyebrow: "Smart City Research Center · KMITL",
+        eyebrow: "Smart City Research Center · School of Engineering · KMITL",
         titleLine1: "Driving smart cities",
         titleLine2: "with research & innovation",
         lead:

@@ -512,8 +512,15 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 .map-pin { width: 54px; height: 54px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--orange); display: grid; place-items: center; box-shadow: 0 12px 26px rgba(242, 107, 33, 0.4); }
 .map-pin svg { transform: rotate(45deg); }
 
+/* ---------- ปิดท้ายหน้าแรก (eyebrow bookend) ---------- */
+.closing { text-align: center; padding: 54px 0; border-top: 1px solid var(--line); }
+.closing-eyebrow { justify-content: center; margin: 0; }
+.closing-eyebrow::after {
+  content: ""; width: 26px; height: 2px; background: var(--yellow);
+}
+
 /* ---------- Footer ---------- */
-.site-footer { background: var(--navy-950); color: #a9b6ce; margin-top: 40px; }
+.site-footer { background: var(--navy-950); color: #a9b6ce; margin-top: 0; }
 .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.4fr; gap: 44px; padding: 72px 0 48px; }
 .site-footer .logo-chip { margin-bottom: 18px; }
 .site-footer .logo-chip img { height: 52px; }

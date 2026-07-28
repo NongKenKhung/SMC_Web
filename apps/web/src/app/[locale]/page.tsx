@@ -101,7 +101,7 @@ export default async function Home({
           </g>
         </svg>
         <div className="hero-inner">
-          <span className="eyebrow">{hero?.eyebrow ?? "Smart City Research Center · KMITL"}</span>
+          <span className="eyebrow">{hero?.eyebrow ?? "Smart City Research Center · School of Engineering · KMITL"}</span>
           <h1 className="reveal in">
             {hero?.titleLine1} <span className="grad">{hero?.titleLine2}</span>
           </h1>
@@ -278,6 +278,15 @@ export default async function Home({
           <p style={{ textAlign: "center", marginTop: 44 }} className="reveal">
             <Link className="btn btn-primary" href={`${base}/blog`}>{t.home.viewAllPosts}</Link>
           </p>
+        </div>
+      </section>
+
+      {/* ===== ปิดท้าย: eyebrow bookend (คู่กับหัว hero ด้านบน) ===== */}
+      <section className="closing">
+        <div className="container">
+          <span className="eyebrow closing-eyebrow">
+            {hero?.eyebrow ?? "Smart City Research Center · School of Engineering · KMITL"}
+          </span>
         </div>
       </section>
     </main>
