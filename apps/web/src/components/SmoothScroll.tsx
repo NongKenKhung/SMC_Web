@@ -9,21 +9,6 @@ import { useEffect } from "react";
 let lenisRef: Lenis | null = null;
 export const getLenis = () => lenisRef;
 
-/* React เรียก effect ของคอมโพเนนต์ลูกก่อนพ่อ — ตัวที่อยู่ในหน้า (เช่น SectionSnap)
-   จึงทำงานก่อน layout สร้าง Lenis เสร็จ ต้องมีช่องให้รอจนกว่าจะพร้อม */
-const waiting = new Set<(l: Lenis) => void>();
-
-/** เรียก cb เมื่อ Lenis พร้อม (ถ้าพร้อมอยู่แล้วจะเรียกทันที)
- *  คืนฟังก์ชันสำหรับยกเลิกการรอ */
-export function onLenisReady(cb: (l: Lenis) => void) {
-  if (lenisRef) {
-    cb(lenisRef);
-    return () => {};
-  }
-  waiting.add(cb);
-  return () => waiting.delete(cb);
-}
-
 /** การเลื่อนแบบนุ่ม (inertial scroll) — ให้ความรู้สึกเดียวกับเว็บ KMITL Expo
  *  ปิดอัตโนมัติเมื่อผู้ใช้ตั้งค่าระบบว่าลดการเคลื่อนไหว (prefers-reduced-motion)
  *  ถ้าไม่ทำงานด้วยเหตุใดก็ตาม หน้าเว็บจะกลับไปใช้การเลื่อนปกติของเบราว์เซอร์ */
@@ -50,10 +35,6 @@ export default function SmoothScroll() {
     if (process.env.NODE_ENV !== "production") {
       (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
     }
-    /* ปลุกตัวที่รออยู่ (เช่น SectionSnap ในหน้าแรก) */
-    waiting.forEach((cb) => cb(lenis));
-    waiting.clear();
-
     /* กลับมาที่แท็บนี้อีกครั้ง / ขนาดจอเปลี่ยน → คำนวณระยะใหม่ กันตำแหน่งเพี้ยน */
     const resync = () => lenis.resize();
     document.addEventListener("visibilitychange", resync);
