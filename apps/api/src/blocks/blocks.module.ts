@@ -6,15 +6,15 @@
      about.story               — ย่อหน้าความเป็นมา
      solution.features:<id>    — ฟีเจอร์ของ solution แต่ละตัว */
 import {
-  Body, Controller, Delete, Get, Injectable, Module, NotFoundException,
-  Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards,
+  BadRequestException, Body, Controller, Delete, Get, Injectable, Module,
+  NotFoundException, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards,
 } from "@nestjs/common";
 import { Type } from "class-transformer";
 import {
   IsArray, IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength,
 } from "class-validator";
 import { JwtAuthGuard } from "../auth/auth.module";
-import { cleanHtmlFields } from "../common/sanitize";
+import { cleanHtmlFields, cleanInternalUrl } from "../common/sanitize";
 import { PrismaService } from "../prisma/prisma.module";
 
 /** field ที่รับ HTML จาก editor — ต้อง sanitize ทุกครั้งก่อนบันทึก */
@@ -95,8 +95,15 @@ export class BlocksService {
     });
   }
 
+  /** ทำความสะอาดทุก field ที่ผู้ใช้ส่งมา (HTML + URL รูป) */
+  private clean<T extends { image?: string }>(dto: T) {
+    const out = cleanHtmlFields(dto, HTML_FIELDS as unknown as (keyof T & string)[]);
+    if (out.image !== undefined) out.image = cleanInternalUrl(out.image);
+    return out;
+  }
+
   async create(dto: BlockDto) {
-    const data = cleanHtmlFields(dto, HTML_FIELDS);
+    const data = this.clean(dto);
     const last = await this.prisma.block.findFirst({
       where: { group: dto.group },
       orderBy: { order: "desc" },
@@ -109,7 +116,7 @@ export class BlocksService {
   async update(id: number, dto: BlockPatchDto) {
     const found = await this.prisma.block.findUnique({ where: { id } });
     if (!found) throw new NotFoundException("ไม่พบรายการ");
-    return this.prisma.block.update({ where: { id }, data: cleanHtmlFields(dto, HTML_FIELDS) });
+    return this.prisma.block.update({ where: { id }, data: this.clean(dto) });
   }
 
   async reorder(ids: number[]) {
@@ -130,11 +137,16 @@ export class BlocksService {
 export class BlocksController {
   constructor(private readonly service: BlocksService) {}
 
-  /** GET /api/blocks?groups=home.pillars,home.techs */
+  /** GET /api/blocks?groups=home.pillars,home.techs
+   *  endpoint นี้เปิดสาธารณะ — จำกัดจำนวนกลุ่มและรูปแบบชื่อ กันยิงคิวรีขนาดใหญ่ */
   @Get()
   byGroups(@Query("groups") groups?: string) {
     const list = (groups ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-    return this.service.byGroups(list);
+    if (list.length > 20) {
+      throw new BadRequestException("ขอได้ไม่เกิน 20 กลุ่มต่อครั้ง");
+    }
+    const valid = list.filter((g) => /^[a-z][a-z0-9]*(\.[a-z0-9]+)*(:\d+)?$/i.test(g));
+    return this.service.byGroups(valid);
   }
 }
 

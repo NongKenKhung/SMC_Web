@@ -9,7 +9,7 @@ import {
   IsBoolean, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength,
 } from "class-validator";
 import { JwtAuthGuard } from "../auth/auth.module";
-import { cleanHtmlFields } from "../common/sanitize";
+import { cleanExternalUrl, cleanHtmlFields } from "../common/sanitize";
 import { PrismaService } from "../prisma/prisma.module";
 
 /** field ที่รับ HTML จาก rich text editor — ต้อง sanitize ก่อนบันทึกเสมอ (Phase 6B) */
@@ -177,14 +177,21 @@ export class AdminPartnersController {
     return this.prisma.partner.findMany({ orderBy: { order: "asc" } });
   }
 
+  /** ลิงก์เว็บพาร์ทเนอร์ถูกนำไปใช้เป็น href บนหน้าสาธารณะ — ยอมเฉพาะ http/https
+   *  (React กัน javascript: ตอนแสดงผลอยู่แล้ว แต่ไม่ควรเก็บค่าแบบนั้นไว้ตั้งแต่ต้น) */
+  private clean<T extends { websiteUrl?: string }>(dto: T): T {
+    if (dto.websiteUrl === undefined) return dto;
+    return { ...dto, websiteUrl: cleanExternalUrl(dto.websiteUrl) };
+  }
+
   @Post()
   create(@Body() dto: PartnerDto) {
-    return this.prisma.partner.create({ data: { ...dto } });
+    return this.prisma.partner.create({ data: { ...this.clean(dto) } });
   }
 
   @Patch(":id")
   update(@Param("id", ParseIntPipe) id: number, @Body() dto: PartnerPatchDto) {
-    return this.prisma.partner.update({ where: { id }, data: { ...dto } });
+    return this.prisma.partner.update({ where: { id }, data: { ...this.clean(dto) } });
   }
 
   @Delete(":id")

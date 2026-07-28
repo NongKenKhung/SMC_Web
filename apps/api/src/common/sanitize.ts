@@ -31,19 +31,25 @@ const OPTIONS: sanitizeHtml.IOptions = {
   // ตัดแท็กที่ไม่อยู่ในรายการทิ้งทั้งเนื้อหา (ไม่ใช่แค่ถอดแท็ก)
   nonTextTags: ["style", "script", "textarea", "option", "noscript", "iframe", "object", "embed"],
   transformTags: {
-    // ลิงก์ออกนอกเว็บต้องเปิดแท็บใหม่อย่างปลอดภัย (กัน tabnabbing)
-    a: (tagName, attribs) => {
-      const href = attribs.href ?? "";
+    /* ลิงก์: ประกอบ attribute ใหม่จากศูนย์เสมอ — ห้าม spread ของเดิม
+       เพราะผู้ส่งยัด target="_blank" rel="opener" มาเองได้ (tabnabbing)
+       และต้อง trim ก่อนตรวจ เพราะ " https://evil.com" เบราว์เซอร์ตัดช่องว่างแล้วไปจริง
+       แต่ regex จะไม่ match ทำให้ไม่ได้ rel ป้องกัน */
+    a: (_tagName, attribs) => {
+      const href = (attribs.href ?? "").trim();
       const external = /^https?:\/\//i.test(href);
       return {
         tagName: "a",
         attribs: {
-          ...attribs,
+          href,
+          ...(attribs.title ? { title: attribs.title } : {}),
           ...(external ? { target: "_blank", rel: "noopener noreferrer nofollow" } : {}),
         },
       };
     },
   },
+  // กัน payload ที่แอบใส่ </html> เพื่อหลอกให้ตัวแยกวิเคราะห์หยุดกรองกลางคัน
+  enforceHtmlBoundary: true,
   exclusiveFilter: (frame) => {
     // ทิ้ง <img> ที่ src ไม่ใช่ไฟล์ในคลังสื่อของเรา
     if (frame.tag === "img") {
@@ -53,6 +59,23 @@ const OPTIONS: sanitizeHtml.IOptions = {
     return false;
   },
 };
+
+/** URL รูปภายใน: ยอมเฉพาะไฟล์ในคลังสื่อของเราเอง (กัน tracking pixel / เนื้อหาที่ถูกเปลี่ยนภายหลัง)
+ *  คืน "" เมื่อค่าไม่ผ่าน เพื่อให้ผู้ใช้เห็นว่าไม่ถูกบันทึก แทนที่จะเงียบ ๆ เก็บของอันตราย */
+export function cleanInternalUrl(v?: string | null): string | undefined {
+  if (v === undefined || v === null) return undefined;
+  const s = v.trim();
+  if (s === "") return "";
+  return ALLOWED_IMG.test(s) ? s : "";
+}
+
+/** URL ภายนอก: ยอมเฉพาะ http/https — ตัด javascript:, data:, vbscript: และ //evil.com */
+export function cleanExternalUrl(v?: string | null): string | undefined {
+  if (v === undefined || v === null) return undefined;
+  const s = v.trim();
+  if (s === "") return "";
+  return /^https?:\/\/[^\s]+$/i.test(s) ? s : "";
+}
 
 /** คืน HTML ที่ปลอดภัยแล้ว (undefined/null → undefined เพื่อไม่ไปเขียนทับค่าเดิมโดยไม่ตั้งใจ) */
 export function cleanHtml(html?: string | null): string | undefined {
