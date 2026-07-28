@@ -33,7 +33,8 @@ body {
   background: var(--white);
   line-height: 1.65;
   overflow-x: hidden;
-  font-family: var(--font-prompt), "Segoe UI", Tahoma, sans-serif;
+  /* ฟอนต์ไทยแบบมีหัว (Sarabun) — ตัวสำรองเป็นฟอนต์ไทยมีหัวที่ติดมากับ Windows/Mac */
+  font-family: var(--font-thai), "Sarabun", "Leelawadee UI", "Thonburi", Tahoma, sans-serif;
   /* ล็อกความกว้างต่ำสุดของ layout — จอแคบกว่านี้ให้เลื่อนแนวนอนแทนการบีบจนแตก */
   min-width: 320px;
 }

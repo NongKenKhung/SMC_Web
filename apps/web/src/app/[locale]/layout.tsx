@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Prompt } from "next/font/google";
+import { Sarabun } from "next/font/google";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import SiteFooter from "@/components/SiteFooter";
@@ -9,10 +9,11 @@ import { getContent, getSolutionsTree, type ContactContent } from "@/lib/api";
 import { isLocale, LOCALES } from "@/lib/i18n";
 import "../globals.css";
 
-const prompt = Prompt({
+/* ฟอนต์ไทยแบบมีหัว — Sarabun (มาตรฐานเอกสารราชการไทย อ่านง่าย มีน้ำหนักครบ) */
+const thaiFont = Sarabun({
   subsets: ["thai", "latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-prompt",
+  variable: "--font-thai",
   display: "swap",
 });
 
@@ -54,7 +55,7 @@ export default async function LocaleLayout({
   ]);
 
   return (
-    <html lang={locale} className={prompt.variable}>
+    <html lang={locale} className={thaiFont.variable}>
       <body>
         <SiteHeader locale={locale} tree={tree ?? []} />
         {children}
