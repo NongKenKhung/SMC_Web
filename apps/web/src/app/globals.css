@@ -125,7 +125,13 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .btn[disabled] { opacity: 0.6; pointer-events: none; }
 
 /* ---------- หัว section ---------- */
-.sec { padding: 92px 0; }
+.sec { position: relative; padding: 92px 0; }
+/* section ที่มีตัวอักษรฉากหลัง ต้องตัดขอบเพื่อให้ตัวอักษรถูกครอบครึ่ง */
+.sec:has(> .ghost-head) { overflow: clip; }
+.sec > .container { position: relative; z-index: 1; }
+/* .sec มี padding บนน้อยกว่า .sec-x — ยกตัวอักษรฉากหลังขึ้น
+   (เผื่อระยะพารัลแลกซ์ +38px แล้วยังไม่ชนหัวข้อ) */
+.sec > .ghost-head { top: 8px; }
 .sec-tight { padding: 68px 0; }
 .sec-head { max-width: 720px; margin: 0 auto 52px; text-align: center; }
 .sec-head.left { margin-inline: 0; text-align: left; }
@@ -352,18 +358,27 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 }
 @keyframes scrollpulse { 0%, 100% { opacity: .25; transform: scaleY(.6); } 50% { opacity: 1; transform: scaleY(1); } }
 
-/* ---------- section แบบใหม่ (มีตัวอักษรฉากหลัง) ---------- */
-.sec-x { position: relative; padding: var(--sp-24) 0; overflow: hidden; }
+/* ---------- section แบบใหม่ (มีตัวอักษรฉากหลัง) ----------
+   ใช้ overflow: clip (ไม่ใช่ hidden) — hidden จะสร้าง scroll container
+   แล้วทำให้ animation-timeline: view() ของตัวอักษรฉากหลังหาจุดอ้างอิงไม่ได้ */
+.sec-x { position: relative; padding: var(--sp-24) 0; overflow: clip; }
+/* ตัวอักษรฉากหลัง — วางชิดขอบบนของ section แล้วให้ขอบตัดครึ่ง (overflow: clip)
+   เหลือแค่ครึ่งล่างของตัวอักษรโผล่เหนือหัวข้อ ไม่ทับข้อความ
+   ใช้เส้นขอบแทนตัวทึบ เพื่อให้อ่านออกว่าเป็นตัวอักษร ไม่ใช่รอยเปื้อน */
 .ghost-head {
-  position: absolute; top: var(--sp-6); left: 50%; transform: translateX(-50%);
+  position: absolute; top: 0; left: 50%;
+  --gy: -56%; /* ระยะยกขึ้นให้ขอบบนตัด — พารัลแลกซ์บวกลบจากค่านี้ */
+  transform: translate(-50%, var(--gy));
   z-index: 0; pointer-events: none; user-select: none; white-space: nowrap;
   font-family: var(--ff-display);
   font-size: var(--fs-ghost); font-weight: 400;
   letter-spacing: 0.02em; text-transform: uppercase; line-height: 1;
-  color: rgba(16, 32, 62, 0.05);
+  color: transparent; -webkit-text-stroke: 1.5px rgba(16, 32, 62, 0.1);
 }
-.dark-sec .ghost-head { color: rgba(255, 255, 255, 0.055); }
-/* พารัลแลกซ์: ตัวอักษรฉากหลังไหลช้ากว่าเนื้อหา (scroll-driven ล้วน ไม่ใช้ JS) */
+.dark-sec .ghost-head { -webkit-text-stroke-color: rgba(255, 255, 255, 0.12); }
+.soft-sec .ghost-head { -webkit-text-stroke-color: rgba(16, 32, 62, 0.09); }
+/* พารัลแลกซ์: ตัวอักษรฉากหลังไหลช้ากว่าเนื้อหา (scroll-driven ล้วน ไม่ใช้ JS)
+   ขยับแค่ ±38px เพื่อไม่ให้ไหลลงมาทับหัวข้อที่ปลายช่วง */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .ghost-head {
@@ -372,8 +387,8 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
       animation-range: entry 0% exit 100%;
     }
     @keyframes ghost-drift {
-      from { transform: translate(-50%, 90px); }
-      to { transform: translate(-50%, -90px); }
+      from { transform: translate(-50%, calc(var(--gy) + 38px)); }
+      to   { transform: translate(-50%, calc(var(--gy) - 38px)); }
     }
   }
 }
@@ -424,6 +439,9 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   box-shadow: 0 -30px 80px rgba(11, 23, 48, 0.35);
   padding-top: var(--sp-6);
 }
+/* section นี้มีแถบตัววิ่งอยู่บนสุด — เริ่มนับตำแหน่งตัวอักษรฉากหลังใต้แถบนั้น
+   (96px เผื่อระยะพารัลแลกซ์ +38px แล้วยังไม่ชนป้ายหัวข้อ) */
+.curtain .ghost-head { top: 96px; }
 
 /* ---------- แถบตัววิ่ง (marquee) — ฟอนต์โปสเตอร์ สลับตัวทึบ/ตัวเส้นขอบ ---------- */
 .marq {
@@ -598,7 +616,7 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow-sm); padding: 30px; transition: 0.3s;
 }
-.card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+.card:hover { transform: translateY(-6px); box-shadow: var(--shadow-2); border-color: var(--orange); }
 .sol-icon {
   width: 62px; height: 62px; border-radius: 18px; margin-bottom: 20px;
   background: linear-gradient(135deg, var(--navy), var(--navy-800));
@@ -623,7 +641,10 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
   color: #a6b0c6; transition: 0.3s; text-align: center; padding: 8px;
 }
-.logo-card:hover { border-color: var(--orange); color: var(--orange); box-shadow: var(--shadow-sm); }
+.logo-card:hover { border-color: var(--orange); color: var(--orange); box-shadow: var(--shadow-2); transform: translateY(-4px); }
+/* โลโก้เป็นขาวดำ แล้วคืนสีตอน hover — ทำให้แถวโลโก้ดูสงบ ไม่ตีกัน */
+.logo-card img { filter: grayscale(1); opacity: .75; transition: filter var(--dur) var(--ease), opacity var(--dur) var(--ease); }
+.logo-card:hover img { filter: none; opacity: 1; }
 .logo-card b { font-size: 0.95rem; letter-spacing: 0.12em; font-weight: 700; }
 .logo-card span { font-size: 0.72rem; }
 .logo-card img { max-height: 60px; width: auto; object-fit: contain; }
@@ -659,15 +680,47 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 
 /* ---------- Banner หน้าใน ---------- */
 .page-banner {
-  position: relative; padding: 148px 0 76px; text-align: center; color: #fff;
+  position: relative; color: #fff;
+  padding: calc(var(--nav-h) + var(--sp-16)) 0 var(--sp-16);
   background:
-    radial-gradient(700px 320px at 50% 130%, rgba(242, 107, 33, 0.35), transparent 60%),
-    linear-gradient(180deg, var(--navy-950), var(--navy-800));
-  overflow: hidden;
+    radial-gradient(900px 420px at 12% 120%, rgba(242, 107, 33, 0.38), transparent 60%),
+    linear-gradient(160deg, var(--navy-950), var(--navy-800));
+  overflow: clip;
 }
 .page-banner .dots { position: absolute; inset: 0; opacity: 0.4; background-image: radial-gradient(rgba(249, 200, 70, 0.35) 1.2px, transparent 1.3px); background-size: 32px 32px; }
-.page-banner h1 { position: relative; font-size: clamp(1.9rem, 4vw, 2.7rem); font-weight: 700; }
-.crumb { position: relative; margin-top: 10px; font-size: 0.85rem; color: #a9b6ce; }
+/* orb ใน banner เล็กกว่าใน hero */
+.page-banner .orb-a { width: 420px; height: 420px; left: -120px; top: -100px; }
+.page-banner .orb-b { width: 460px; height: 460px; right: -140px; bottom: -160px; }
+/* ตัวอักษรเส้นขอบเป็นฉากหลัง มุมขวาล่าง */
+.pb-ghost {
+  position: absolute; right: -0.5%; bottom: -0.08em; z-index: 0;
+  font-family: var(--ff-display); font-size: clamp(3.4rem, 11vw, 9rem);
+  line-height: 1; letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap;
+  color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.08);
+  pointer-events: none; user-select: none;
+}
+.pb-inner { position: relative; z-index: 1; }
+/* คำอังกฤษยักษ์ + ชื่อหน้าภาษาไทยด้านล่าง (ลำดับเดียวกับ hero หน้าแรก) */
+.pb-en {
+  display: block; margin-top: var(--sp-4);
+  font-family: var(--ff-display); font-size: clamp(2.6rem, 7vw, 5.5rem);
+  line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; color: #fff;
+  text-shadow: 0 10px 50px rgba(242, 107, 33, 0.28);
+}
+.page-banner h1 {
+  position: relative; margin-top: var(--sp-3);
+  font-size: clamp(1.45rem, 2.8vw, 1.9rem); font-weight: var(--fw-strong);
+  color: var(--on-dark-1); line-height: var(--lh-heading);
+}
+/* หน้าไม่ได้ส่งคำอังกฤษมา — ให้ h1 เป็นพระเอกเหมือนเดิม */
+.pb-inner > h1:first-of-type:nth-child(2) { font-size: clamp(1.9rem, 4vw, 2.7rem); color: #fff; }
+@media (prefers-reduced-motion: no-preference) {
+  .page-banner .dots { animation: dots-pan 80s linear infinite; }
+  .pb-en { animation: rise 0.7s var(--ease) both 0.08s; }
+  .page-banner h1 { animation: rise 0.7s var(--ease) both 0.2s; }
+  .page-banner .crumb { animation: rise 0.7s var(--ease) both 0.02s; }
+}
+.crumb { position: relative; font-size: 0.85rem; color: #a9b6ce; }
 .crumb a:hover { color: var(--yellow); }
 .crumb b { color: var(--yellow); font-weight: 500; }
 
@@ -682,9 +735,22 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 .vm-card li { display: flex; gap: 12px; margin-bottom: 12px; color: var(--muted); font-size: 0.95rem; }
 .vm-card li .tick { flex: none; width: 22px; height: 22px; margin-top: 3px; border-radius: 50%; background: var(--orange-soft); color: var(--orange); display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; }
 
-.marquee { overflow: hidden; padding: 26px 0; background: var(--soft); border-block: 1px solid var(--line); }
-.marquee-track { display: inline-flex; gap: 56px; white-space: nowrap; animation: slide 22s linear infinite; }
-.marquee-track span { font-size: clamp(2rem, 4.6vw, 3.2rem); font-weight: 800; letter-spacing: 0.02em; color: var(--navy); }
+/* แถบตัววิ่งบนพื้นอ่อน (หน้า about) — ชุดเดียวกับ .marq ในหน้าแรก */
+.marquee {
+  overflow: hidden; padding: var(--sp-6) 0;
+  background: var(--soft); border-block: 1px solid var(--line);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track { display: inline-flex; gap: var(--sp-14); white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track { animation: slide 26s linear infinite; }
+}
+.marquee-track span {
+  font-family: var(--ff-display); font-weight: 400;
+  font-size: clamp(2rem, 4.6vw, 3.2rem); letter-spacing: 0.02em;
+  text-transform: uppercase; color: var(--navy);
+}
 .marquee-track span.o { color: transparent; -webkit-text-stroke: 1.6px var(--orange); }
 @keyframes slide { to { transform: translateX(-50%); } }
 
@@ -707,8 +773,19 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   background: var(--orange); border: 4px solid #fff; box-shadow: 0 0 0 2px var(--orange);
 }
 .tl-item:nth-child(even)::before { right: auto; left: -9px; }
-.tl-year { font-size: 1.05rem; font-weight: 700; color: var(--orange); margin-bottom: 8px; }
-.tl-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); padding: 22px; }
+/* ปีใช้ฟอนต์โปสเตอร์ ให้เข้าชุดกับเลขในหน้าแรก */
+.tl-year {
+  font-family: var(--ff-display); font-weight: 400;
+  font-size: 1.7rem; letter-spacing: 0.03em; color: var(--orange); margin-bottom: 8px;
+}
+.tl-card {
+  background: #fff; border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: var(--shadow-sm); padding: 22px;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.tl-item:hover .tl-card { transform: translateY(-4px); box-shadow: var(--shadow-2); border-color: var(--orange); }
+.tl-item::before { transition: transform var(--dur) var(--ease); }
+.tl-item:hover::before { transform: scale(1.25); }
 .tl-card h4 { font-size: 1.02rem; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
 .tl-card p { font-size: 0.9rem; color: var(--muted); }
 

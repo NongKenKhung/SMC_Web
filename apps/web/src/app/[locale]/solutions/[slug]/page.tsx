@@ -51,6 +51,7 @@ export default async function SolutionDetail({
     <main>
       <PageBanner
         title={name}
+        en="Solution"
         crumbs={[
           { label: t.common.home, href: base },
           { label: t.solutions.title, href: `${base}/solutions` },
@@ -102,7 +103,7 @@ export default async function SolutionDetail({
             </div>
             <div className="sol-grid">
               {sol.children.map((c, i) => (
-                <article className={`card reveal${i ? ` d${i}` : ""}`} key={c.slug}>
+                <article className={`card glow reveal${i ? ` d${i}` : ""}`} key={c.slug}>
                   <h3>{pick(c, "name", locale)}</h3>
                   <p>{pick(c, "summary", locale)}</p>
                   <Link className="more" href={`${base}/solutions/${c.slug}`}>
@@ -122,7 +123,7 @@ export default async function SolutionDetail({
             </div>
             <div className="feature-grid">
               {features.map((f, i) => (
-                <article className={`card feat reveal${i % 3 ? ` d${i % 3}` : ""}`} key={`${f.title}-${i}`}>
+                <article className={`card feat glow reveal${i % 3 ? ` d${i % 3}` : ""}`} key={`${f.title}-${i}`}>
                   <div className="num">{i + 1}</div>
                   <h4>{f.title}</h4>
                   {f.html ? <RichContent html={f.body} className="prose-sm" /> : <p>{f.body}</p>}

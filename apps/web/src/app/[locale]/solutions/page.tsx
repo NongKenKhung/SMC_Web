@@ -33,10 +33,12 @@ export default async function SolutionsHub({
       <PageBanner
         poster={pageMedia?.poster}
         title={t.solutions.title}
+        en="Solutions"
         crumbs={[{ label: t.common.home, href: base }, { label: t.solutions.title }]}
       />
 
       <section className="sec">
+        <span className="ghost-head">Products</span>
         <div className="container">
           <div className="notice reveal">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,7 +57,7 @@ export default async function SolutionsHub({
 
           <div className="cat-grid">
             {tree.map((cat, i) => (
-              <article className={`card cat-card reveal${i ? ` d${i}` : ""}`} key={cat.id}>
+              <article className={`card cat-card glow reveal${i ? ` d${i}` : ""}`} key={cat.id}>
                 <div className="cat-circle">{CIRCLE_ICONS[i % CIRCLE_ICONS.length]}</div>
                 <h3>{pick(cat, "name", locale)}</h3>
                 <p>{pick(cat, "summary", locale)}</p>

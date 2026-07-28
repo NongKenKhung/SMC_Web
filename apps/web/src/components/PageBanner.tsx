@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { mediaUrl, type AttachmentItem } from "@/lib/api";
 
-/** Banner หัวหน้าใน — ถ้ามี poster จะใช้รูปเป็นพื้นหลัง (ไม่มีก็ใช้ gradient เดิม) */
+/** Banner หัวหน้าใน — โทนเดียวกับ hero หน้าแรก:
+ *  คำอังกฤษยักษ์ฟอนต์โปสเตอร์ + ชื่อหน้าภาษาไทย + ตัวอักษรเส้นขอบเป็นฉากหลัง + แสงออโรรา
+ *  ถ้ามี poster จะใช้รูปเป็นพื้นหลังแทนลายจุด */
 export default function PageBanner({
   title,
+  en,
   crumbs,
   poster,
 }: {
   title: string;
+  /** คำภาษาอังกฤษสั้น ๆ สำหรับตัวอักษรยักษ์ (เช่น "About Us") */
+  en?: string;
   crumbs: { label: string; href?: string }[];
   poster?: AttachmentItem | null;
 }) {
@@ -21,15 +26,21 @@ export default function PageBanner({
       ) : (
         <div className="dots" />
       )}
-      <h1>{title}</h1>
-      <p className="crumb">
-        {crumbs.map((c, i) => (
-          <span key={i}>
-            {i > 0 && " · "}
-            {c.href ? <Link href={c.href}>{c.label}</Link> : <b>{c.label}</b>}
-          </span>
-        ))}
-      </p>
+      <span className="orb orb-a" aria-hidden="true" />
+      <span className="orb orb-b" aria-hidden="true" />
+      {en && <span className="pb-ghost" aria-hidden="true">{en}</span>}
+      <div className="container pb-inner">
+        <p className="crumb">
+          {crumbs.map((c, i) => (
+            <span key={i}>
+              {i > 0 && " · "}
+              {c.href ? <Link href={c.href}>{c.label}</Link> : <b>{c.label}</b>}
+            </span>
+          ))}
+        </p>
+        {en && <span className="pb-en">{en}</span>}
+        <h1>{title}</h1>
+      </div>
     </section>
   );
 }

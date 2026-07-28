@@ -65,22 +65,24 @@ export default async function AboutPage({
       <PageBanner
         poster={pageMedia?.poster}
         title={t.about.title}
+        en="About Us"
         crumbs={[{ label: t.common.home, href: base }, { label: t.about.title }]}
       />
 
       {/* วิสัยทัศน์ / พันธกิจ */}
       <section className="sec">
+        <span className="ghost-head">Vision</span>
         <div className="container">
           <div className="sec-head reveal">
             <span className="eyebrow">{t.about.vmEyebrow}</span>
             <h2>{t.about.vmTitle}</h2>
           </div>
           <div className="vm-grid">
-            <div className="vm-card vision reveal">
+            <div className="vm-card vision glow reveal">
               <h3>{t.about.vision}</h3>
               <p>{about?.vision}</p>
             </div>
-            <div className="vm-card mission reveal d1">
+            <div className="vm-card mission glow reveal d1">
               <h3>{t.about.mission}</h3>
               <ul>
                 {about?.missions?.map((m) => (

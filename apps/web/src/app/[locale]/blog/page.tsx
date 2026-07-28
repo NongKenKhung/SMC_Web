@@ -28,10 +28,12 @@ export default async function BlogPage({
       <PageBanner
         poster={pageMedia?.poster}
         title={t.blog.title}
+        en="Activities"
         crumbs={[{ label: t.common.home, href: base }, { label: t.nav.blog }]}
       />
 
       <section className="sec">
+        <span className="ghost-head">News</span>
         <div className="container">
           <div className="filter-row reveal">
             <Link href={`${base}/blog`} className={`filter-chip${!active ? " active" : ""}`}>
@@ -50,7 +52,7 @@ export default async function BlogPage({
 
           <div className="post-grid">
             {posts.map((p, i) => (
-              <Link href={`${base}/blog/${p.slug}`} key={p.id} className={`post-card reveal${i % 3 ? ` d${i % 3}` : ""}`}>
+              <Link href={`${base}/blog/${p.slug}`} key={p.id} className={`post-card glow reveal${i % 3 ? ` d${i % 3}` : ""}`}>
                 <div className={`thumb t${p.id % 6}`}>
                   {p.coverImage ? (
                     <img src={mediaUrl(p.coverImage)!} alt="" />

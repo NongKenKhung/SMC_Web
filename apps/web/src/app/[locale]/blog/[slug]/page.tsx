@@ -25,6 +25,7 @@ export default async function PostPage({
     <main>
       <PageBanner
         title={t.blog.title}
+        en="Story"
         crumbs={[
           { label: t.common.home, href: base },
           { label: t.nav.blog, href: `${base}/blog` },

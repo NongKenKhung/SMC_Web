@@ -21,10 +21,12 @@ export default async function PartnersPage({
       <PageBanner
         poster={pageMedia?.poster}
         title={t.partners.title}
+        en="Partners"
         crumbs={[{ label: t.common.home, href: base }, { label: t.nav.partners }]}
       />
 
       <section className="sec">
+        <span className="ghost-head">Network</span>
         <div className="container">
           <div className="sec-head reveal">
             <span className="eyebrow">Our Partners</span>
@@ -36,7 +38,7 @@ export default async function PartnersPage({
           <div className="logo-row wide reveal">
             {partners.map((p) => {
               const card = (
-                <div className="logo-card" key={p.id}>
+                <div className="logo-card glow" key={p.id}>
                   {p.logoUrl ? <img src={mediaUrl(p.logoUrl)!} alt={p.name} /> : <b>{p.name}</b>}
                   <span>{p.caption}</span>
                 </div>

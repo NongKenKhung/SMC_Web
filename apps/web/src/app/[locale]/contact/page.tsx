@@ -44,10 +44,12 @@ export default async function ContactPage({
       <PageBanner
         poster={pageMedia?.poster}
         title={t.contact.title}
+        en="Contact"
         crumbs={[{ label: t.common.home, href: base }, { label: t.nav.contact }]}
       />
 
       <section className="sec">
+        <span className="ghost-head">Message</span>
         <div className="container contact-grid">
           <div>
             <div className="sec-head left reveal">
