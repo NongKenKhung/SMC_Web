@@ -89,8 +89,8 @@ export default async function Home({
 
   return (
     <main>
-      {/* ===== 1. Hero เต็มจอ — ตัวอักษรยักษ์ ชิดซ้าย ===== */}
-      <section className={`hero${poster ? " has-poster" : ""}`}>
+      {/* ===== 1. Hero เต็มจอ — ตัวอักษรยักษ์ ชิดซ้าย + ตรึงจอตอนเลื่อนผ่าน ===== */}
+      <section className={`hero pin-fade${poster ? " has-poster" : ""}`}>
         {poster ? (
           <>
             <img className="poster-img" src={mediaUrl(poster.url)!} alt={poster.altTh ?? ""} />

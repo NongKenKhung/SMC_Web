@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { getLenis } from "@/components/SmoothScroll";
 
 /** ปุ่มกลับขึ้นบนสุด */
 export function ToTop() {
@@ -16,7 +17,12 @@ export function ToTop() {
     <button
       className={`to-top${show ? " show" : ""}`}
       aria-label="กลับขึ้นด้านบน"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={() => {
+        /* ถ้าเปิด smooth scroll อยู่ ต้องสั่งผ่านมัน ไม่งั้นจะกระตุก */
+        const lenis = getLenis();
+        if (lenis) lenis.scrollTo(0);
+        else window.scrollTo({ top: 0, behavior: "smooth" });
+      }}
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 19V5M5 12l7-7 7 7" />
@@ -40,14 +46,17 @@ export function RevealInit() {
     }
     const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            io.unobserve(e.target);
-          }
+        /* ทยอยขึ้นทีละชิ้นตามลำดับที่โผล่เข้าจอ (stagger) — ดูมีจังหวะกว่าขึ้นพร้อมกันทั้งแถว */
+        const shown = entries.filter((e) => e.isIntersecting);
+        shown.forEach((e, i) => {
+          const el = e.target as HTMLElement;
+          el.style.transitionDelay = `${Math.min(i, 5) * 90}ms`;
+          el.classList.add("in");
+          io.unobserve(el);
         });
       },
-      { threshold: 0.12 },
+      /* rootMargin ติดลบด้านล่าง = รอให้ชิ้นงานเข้ามาในจอจริง ๆ ก่อนค่อยเล่น */
+      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
     );
     els.forEach((el) => {
       /* อยู่ในจออยู่แล้ว → โชว์ทันที (กันค้างตอนเปลี่ยน filter และลดกระพริบ)

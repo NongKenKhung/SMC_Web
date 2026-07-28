@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
+import SmoothScroll from "@/components/SmoothScroll";
 import { RevealInit, ToTop } from "@/components/Ux";
 import { getContent, getSolutionsTree, type ContactContent } from "@/lib/api";
 import { isLocale, LOCALES } from "@/lib/i18n";
@@ -57,6 +58,10 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={thaiFont.variable}>
       <body>
+        {/* การเลื่อนแบบนุ่ม — ใช้เฉพาะหน้าเว็บผู้เข้าชม ไม่ใช้ในหน้า admin ที่ต้องกรอกข้อมูล */}
+        <Suspense fallback={null}>
+          <SmoothScroll />
+        </Suspense>
         <SiteHeader locale={locale} tree={tree ?? []} />
         {children}
         <SiteFooter locale={locale} tree={tree ?? []} contact={contact} />
