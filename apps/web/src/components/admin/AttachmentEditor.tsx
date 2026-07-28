@@ -1,29 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import MediaPicker from "@/components/admin/MediaPicker";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { adminFetch, fileSize, mediaUrl, type AdminAttachment } from "@/lib/admin";
 
 type Role = "GALLERY" | "DOWNLOAD" | "POSTER";
 
-const LABEL: Record<Role, { title: string; hint: string; add: string; kind: "IMAGE" | "FILE" }> = {
+const IMAGE_ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
+const FILE_ACCEPT =
+  ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip";
+
+const LABEL: Record<Role, { title: string; hint: string; add: string; accept: string }> = {
   POSTER: {
     title: "รูปหลัก (poster)",
     hint: "ใช้เป็นภาพพื้นหลัง/ภาพเปิดของรายการนี้ — มีได้รูปเดียว ใส่ใหม่จะแทนที่ของเดิม",
-    add: "เลือกรูปหลัก",
-    kind: "IMAGE",
+    add: "อัปโหลดรูปหลัก",
+    accept: IMAGE_ACCEPT,
   },
   GALLERY: {
     title: "แกลเลอรีรูป",
     hint: "ใส่ได้หลายรูป จัดลำดับได้ — แสดงเป็นแกลเลอรีในหน้าเว็บ",
-    add: "+ เพิ่มรูป",
-    kind: "IMAGE",
+    add: "+ อัปโหลดรูป",
+    accept: IMAGE_ACCEPT,
   },
   DOWNLOAD: {
     title: "ไฟล์ดาวน์โหลด",
     hint: "เอกสารให้ผู้เข้าชมดาวน์โหลด (pdf, doc/docx, xls/xlsx, ppt/pptx, zip)",
-    add: "+ แนบไฟล์",
-    kind: "FILE",
+    add: "+ อัปโหลดไฟล์",
+    accept: FILE_ACCEPT,
   },
 };
 
@@ -39,8 +42,9 @@ export default function AttachmentEditor({
 }) {
   const meta = LABEL[role];
   const [items, setItems] = useState<AdminAttachment[]>([]);
-  const [picking, setPicking] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     try {
@@ -57,20 +61,30 @@ export default function AttachmentEditor({
     if (ownerId) load();
   }, [ownerId, load]);
 
-  async function add(mediaId: number) {
+  /** อัปโหลดแล้วแนบเข้ารายการนี้ในคำขอเดียว — ไฟล์ผูกกับรายการโดยตรง ไม่มีคลังกลาง */
+  async function upload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
     setErr("");
+    setBusy(true);
     try {
-      await adminFetch("/admin/attachments", {
-        method: "POST",
-        body: JSON.stringify({ mediaId, ownerType, ownerId, role }),
-      });
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("ownerType", ownerType);
+      fd.append("ownerId", ownerId);
+      fd.append("role", role);
+      await adminFetch("/admin/attachments/upload", { method: "POST", body: fd });
       load();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "เพิ่มไฟล์ไม่สำเร็จ");
+      setErr(e instanceof Error ? e.message : "อัปโหลดไม่สำเร็จ");
+    } finally {
+      setBusy(false);
+      if (fileInput.current) fileInput.current.value = "";
     }
   }
 
   async function remove(id: number) {
+    if (!confirm("ลบไฟล์นี้? ไฟล์จะถูกลบออกจากเครื่องด้วย")) return;
     await adminFetch(`/admin/attachments/${id}`, { method: "DELETE" });
     load();
   }
@@ -108,9 +122,21 @@ export default function AttachmentEditor({
     <div className="att-box">
       <div className="att-head">
         <b>{meta.title}</b>
-        <button type="button" className="adm-btn ghost sm" onClick={() => setPicking(true)}>
-          {meta.add}
+        <button
+          type="button"
+          className="adm-btn ghost sm"
+          disabled={busy}
+          onClick={() => fileInput.current?.click()}
+        >
+          {busy ? "กำลังอัปโหลด…" : meta.add}
         </button>
+        <input
+          ref={fileInput}
+          type="file"
+          accept={meta.accept}
+          hidden
+          onChange={upload}
+        />
       </div>
       <p className="sub" style={{ margin: "0 0 10px" }}>{meta.hint}</p>
       {err && <p className="adm-msg-err" style={{ margin: "0 0 10px" }}>{err}</p>}
@@ -149,13 +175,6 @@ export default function AttachmentEditor({
           ))}
         </ul>
       )}
-
-      <MediaPicker
-        open={picking}
-        kind={meta.kind}
-        onClose={() => setPicking(false)}
-        onPick={(m) => add(m.id)}
-      />
     </div>
   );
 }

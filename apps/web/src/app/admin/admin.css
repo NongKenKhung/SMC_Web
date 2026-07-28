@@ -277,3 +277,9 @@ body { background: var(--a-soft); }
   .qr-sheet { margin: 0; grid-template-columns: repeat(3, 1fr); gap: 10mm; }
   .qr-sheet figure { border-color: #ccc; }
 }
+
+/* ข้อความระหว่างอัปโหลดรูปในตัวแก้ไขเนื้อหา */
+.rt-uploading {
+  margin: 0; padding: 8px 12px; font-size: .8rem; color: var(--a-orange);
+  border-top: 1px solid var(--a-line); background: var(--a-soft);
+}

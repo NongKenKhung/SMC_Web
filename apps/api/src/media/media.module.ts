@@ -1,8 +1,9 @@
-/* คลังสื่อ + ไฟล์แนบ (Phase 6A)
-   - อัปโหลด/ลิสต์/ลบไฟล์ในคลังกลาง (รูป + เอกสาร)
-   - ผูกไฟล์เข้ากับ solution/post/หน้า ผ่านตาราง Attachment (role = GALLERY | DOWNLOAD | POSTER)
+/* ไฟล์แนบของแต่ละรายการ
+   ไม่มีคลังสื่อกลางแล้ว — อัปโหลดไฟล์แล้วผูกเข้ากับ solution/post/หน้า นั้น ๆ ทันที
+   ผ่านตาราง Attachment (role = GALLERY | DOWNLOAD | POSTER)
+   พอไม่มีรายการไหนอ้างถึง ไฟล์จะถูกลบทั้งแถว Media และไฟล์บนดิสก์อัตโนมัติ
    ความปลอดภัย: ตรวจนามสกุล+mimetype+magic bytes, ไม่รับ SVG, บังคับดาวน์โหลดไฟล์ที่ไม่ใช่รูป,
-   ลบไฟล์บนดิสก์เมื่อลบ media, กัน path traversal */
+   กัน path traversal */
 import {
   BadRequestException, Body, Controller, DefaultValuePipe, Delete, Get, Injectable,
   Module, NotFoundException, Param, ParseIntPipe, Patch, Post, Put, Query, Res,
@@ -111,6 +112,18 @@ class MediaPatchDto {
   filename?: string;
 }
 
+/** ข้อมูลปลายทางตอนอัปโหลดแนบเข้ารายการ (มากับ multipart จึงไม่มี mediaId) */
+class AttachmentUploadDto {
+  @IsIn(["SOLUTION", "POST", "PAGE"])
+  ownerType!: string;
+
+  @IsString() @IsNotEmpty() @MaxLength(120)
+  ownerId!: string;
+
+  @IsIn(["GALLERY", "DOWNLOAD", "POSTER"])
+  role!: string;
+}
+
 class AttachmentCreateDto {
   @Type(() => Number) @IsInt()
   mediaId!: number;
@@ -151,21 +164,46 @@ class ReorderDto {
 export class MediaService {
   constructor(private readonly prisma: PrismaService) {}
 
-  list(kind?: string, q?: string, take = 60) {
-    return this.prisma.media.findMany({
-      where: {
-        ...(kind === "IMAGE" || kind === "FILE" ? { kind } : {}),
-        ...(q ? { filename: { contains: q, mode: "insensitive" as const } } : {}),
-      },
-      orderBy: { createdAt: "desc" },
-      take,
-    });
-  }
-
   async update(id: number, dto: MediaPatchDto) {
     const found = await this.prisma.media.findUnique({ where: { id } });
     if (!found) throw new NotFoundException("ไม่พบไฟล์");
     return this.prisma.media.update({ where: { id }, data: { ...dto } });
+  }
+
+  /** รับไฟล์ที่ multer วางลงดิสก์แล้ว ตรวจซ้ำอีกชั้น แล้วบันทึกเป็นแถว Media
+   *  ใช้ร่วมกันทั้งอัปโหลดเดี่ยว (รูปปก/รูปในเนื้อหา) และอัปโหลดแนบเข้ารายการ */
+  async saveUpload(file?: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException(
+        "อัปโหลดไม่สำเร็จ — รับเฉพาะรูป (jpg, png, webp, gif) และเอกสาร (pdf, doc/docx, xls/xlsx, ppt/pptx, zip)",
+      );
+    }
+    const ext = extOf(file.originalname);
+    const kind = kindOfExt(ext);
+    const stored = file.filename;
+    const path = safeUploadPath(stored);
+    const fail = async (msg: string) => {
+      await rm(path, { force: true }).catch(() => undefined);
+      throw new BadRequestException(msg);
+    };
+
+    if (kind === "IMAGE" && file.size > MAX_IMAGE) {
+      await fail("ไฟล์รูปต้องไม่เกิน 5 MB");
+    }
+    if (!(await magicMatches(path, ext))) {
+      await fail("เนื้อไฟล์ไม่ตรงกับนามสกุล — ไฟล์อาจถูกเปลี่ยนชื่อหรือเสียหาย");
+    }
+
+    return this.prisma.media.create({
+      data: {
+        filename: decodeOriginalName(file.originalname),
+        storedName: stored,
+        url: `/uploads/${stored}`,
+        mime: file.mimetype,
+        size: file.size,
+        kind,
+      },
+    });
   }
 
   /** ลบทั้งแถวและไฟล์บนดิสก์ (attachment ที่อ้างถึงถูกลบตาม onDelete: Cascade) */
@@ -228,11 +266,16 @@ export class AttachmentsService {
         throw new BadRequestException("แกลเลอรีและ poster ต้องเป็นไฟล์รูปเท่านั้น");
       }
     }
-    // poster มีได้ตัวเดียวต่อรายการ — ใส่ใหม่แทนที่ของเดิม
+    // poster มีได้ตัวเดียวต่อรายการ — ใส่ใหม่แทนที่ของเดิม (รูปเก่าต้องถูกลบทิ้งด้วย)
     if (dto.role === "POSTER") {
-      await this.prisma.attachment.deleteMany({
+      const old = await this.prisma.attachment.findMany({
         where: { ownerType: dto.ownerType, ownerId: dto.ownerId, role: "POSTER" },
+        select: { id: true, mediaId: true },
       });
+      if (old.length) {
+        await this.prisma.attachment.deleteMany({ where: { id: { in: old.map((o) => o.id) } } });
+        for (const o of old) await this.dropOrphanMedia(o.mediaId);
+      }
     }
     const last = await this.prisma.attachment.findFirst({
       where: { ownerType: dto.ownerType, ownerId: dto.ownerId, role: dto.role },
@@ -257,8 +300,24 @@ export class AttachmentsService {
   }
 
   async remove(id: number) {
+    const att = await this.prisma.attachment.findUnique({ where: { id } });
+    if (!att) throw new NotFoundException("ไม่พบไฟล์แนบ");
     await this.prisma.attachment.delete({ where: { id } });
+    await this.dropOrphanMedia(att.mediaId);
     return { ok: true };
+  }
+
+  /** ไฟล์ผูกกับรายการโดยตรง ไม่มีคลังกลางให้เก็บกวาดแล้ว
+   *  พอไม่มีรายการไหนอ้างถึง ต้องลบทั้งแถว Media และไฟล์บนดิสก์ทิ้ง
+   *  ไม่งั้นไฟล์จะค้างสะสมโดยไม่มีหน้าไหนมองเห็น */
+  private async dropOrphanMedia(mediaId: number) {
+    const left = await this.prisma.attachment.count({ where: { mediaId } });
+    if (left > 0) return;
+    const media = await this.prisma.media.findUnique({ where: { id: mediaId } });
+    if (!media) return;
+    const stored = media.storedName ?? media.url.split("/").pop() ?? "";
+    await this.prisma.media.delete({ where: { id: mediaId } });
+    if (stored) await rm(safeUploadPath(stored), { force: true }).catch(() => undefined);
   }
 }
 
@@ -291,6 +350,24 @@ function shape(rows: AttachmentRow[]) {
   };
 }
 
+/* ตัวเลือกรับไฟล์อัปโหลด — ใช้ร่วมกันทั้งอัปโหลดเดี่ยวและอัปโหลดแนบเข้ารายการ */
+const UPLOAD_OPTS = {
+  storage: diskStorage({
+    destination: UPLOAD_DIR,
+    filename: (_req: unknown, file: Express.Multer.File, cb: (e: Error | null, name: string) => void) => {
+      const ext = extOf(file.originalname);
+      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+    },
+  }),
+  limits: { fileSize: MAX_FILE, files: 1 },
+  fileFilter: (_req: unknown, file: Express.Multer.File, cb: (e: Error | null, ok: boolean) => void) => {
+    const ext = extOf(file.originalname);
+    const rule = IMAGE_RULES[ext] ?? FILE_RULES[ext];
+    // ต้องผ่านทั้งนามสกุลและ mimetype
+    cb(null, !!rule && rule.includes(file.mimetype));
+  },
+};
+
 /* ================= Controllers: admin ================= */
 @UseGuards(JwtAuthGuard)
 @Controller("admin/media")
@@ -300,67 +377,10 @@ export class AdminMediaController {
     private readonly service: MediaService,
   ) {}
 
-  @Get()
-  list(
-    @Query("kind") kind?: string,
-    @Query("q") q?: string,
-    @Query("take", new DefaultValuePipe(60), ParseIntPipe) take?: number,
-  ) {
-    return this.service.list(kind, q, take);
-  }
-
   @Post()
-  @UseInterceptors(
-    FileInterceptor("file", {
-      storage: diskStorage({
-        destination: UPLOAD_DIR,
-        filename: (_req, file, cb) => {
-          const ext = extOf(file.originalname);
-          cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-        },
-      }),
-      limits: { fileSize: MAX_FILE, files: 1 },
-      fileFilter: (_req, file, cb) => {
-        const ext = extOf(file.originalname);
-        const rule = IMAGE_RULES[ext] ?? FILE_RULES[ext];
-        // ต้องผ่านทั้งนามสกุลและ mimetype
-        cb(null, !!rule && rule.includes(file.mimetype));
-      },
-    }),
-  )
-  async upload(@UploadedFile() file?: Express.Multer.File) {
-    if (!file) {
-      throw new BadRequestException(
-        "อัปโหลดไม่สำเร็จ — รับเฉพาะรูป (jpg, png, webp, gif) และเอกสาร (pdf, doc/docx, xls/xlsx, ppt/pptx, zip)",
-      );
-    }
-    const ext = extOf(file.originalname);
-    const kind = kindOfExt(ext);
-    const stored = file.filename;
-    const path = safeUploadPath(stored);
-    const fail = async (msg: string) => {
-      await rm(path, { force: true }).catch(() => undefined);
-      throw new BadRequestException(msg);
-    };
-
-    if (kind === "IMAGE" && file.size > MAX_IMAGE) {
-      await fail("ไฟล์รูปต้องไม่เกิน 5 MB");
-    }
-    if (!(await magicMatches(path, ext))) {
-      await fail("เนื้อไฟล์ไม่ตรงกับนามสกุล — ไฟล์อาจถูกเปลี่ยนชื่อหรือเสียหาย");
-    }
-
-    const media = await this.prisma.media.create({
-      data: {
-        filename: decodeOriginalName(file.originalname),
-        storedName: stored,
-        url: `/uploads/${stored}`,
-        mime: file.mimetype,
-        size: file.size,
-        kind,
-      },
-    });
-    return media;
+  @UseInterceptors(FileInterceptor("file", UPLOAD_OPTS))
+  upload(@UploadedFile() file?: Express.Multer.File) {
+    return this.service.saveUpload(file);
   }
 
   @Patch(":id")
@@ -377,11 +397,31 @@ export class AdminMediaController {
 @UseGuards(JwtAuthGuard)
 @Controller("admin/attachments")
 export class AdminAttachmentsController {
-  constructor(private readonly service: AttachmentsService) {}
+  constructor(
+    private readonly service: AttachmentsService,
+    private readonly media: MediaService,
+  ) {}
 
   @Get()
   list(@Query("ownerType") ownerType: string, @Query("ownerId") ownerId: string) {
     return this.service.listFor(ownerType, ownerId);
+  }
+
+  /** อัปโหลดแล้วแนบเข้ารายการในคำขอเดียว — ไม่มีคลังกลางให้เลือกไฟล์เก่าแล้ว
+   *  ทำสองขั้นในคำขอเดียวเพื่อไม่ให้เหลือไฟล์ค้างเมื่อขั้นแนบล้มเหลว */
+  @Post("upload")
+  @UseInterceptors(FileInterceptor("file", UPLOAD_OPTS))
+  async uploadAndAttach(
+    @Body() dto: AttachmentUploadDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const media = await this.media.saveUpload(file);
+    try {
+      return await this.service.add({ ...dto, mediaId: media.id });
+    } catch (e) {
+      await this.media.remove(media.id).catch(() => undefined);
+      throw e;
+    }
   }
 
   @Post()

@@ -4,8 +4,8 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useState } from "react";
-import MediaPicker from "@/components/admin/MediaPicker";
+import { useRef, useState } from "react";
+import { adminFetch } from "@/lib/admin";
 
 /* ปุ่มบนแถบเครื่องมือ — ต้องเป็น type="button" เสมอ
    เพราะ editor นี้ถูกวางในฟอร์ม ถ้าไม่ระบุจะกลายเป็นปุ่ม submit */
@@ -55,7 +55,7 @@ function Toolbar({ editor, onPickImage }: { editor: Editor; onPickImage: () => v
       <Btn title="ข้อความอ้างอิง" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>❝</Btn>
       <span className="rt-sep" />
       <Btn title="ลิงก์" active={editor.isActive("link")} onClick={setLink}>🔗</Btn>
-      <Btn title="แทรกรูปจากคลังสื่อ" onClick={onPickImage}>🖼 รูป</Btn>
+      <Btn title="แทรกรูปในเนื้อหา" onClick={onPickImage}>🖼 รูป</Btn>
       <span className="rt-sep" />
       <Btn title="ล้างรูปแบบ" onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}>ล้างรูปแบบ</Btn>
     </div>
@@ -73,7 +73,8 @@ export default function RichText({
   onChange: (html: string) => void;
   placeholder?: string;
 }) {
-  const [picking, setPicking] = useState(false);
+  const imgInput = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const editor = useEditor({
     /* ต้องปิด เพราะ Next.js render ฝั่งเซิร์ฟเวอร์ก่อน — ถ้าไม่ปิดจะ hydration mismatch */
@@ -100,18 +101,36 @@ export default function RichText({
     return <div className="rt-wrap"><div className="rt-content rt-loading">กำลังโหลดตัวแก้ไข...</div></div>;
   }
 
+  /* อัปโหลดรูปแล้วแทรกลงเนื้อหาทันที — เก็บ path /uploads/.. ไว้ใน HTML
+     (sanitizer ฝั่งเซิร์ฟเวอร์อนุญาตเฉพาะรูปที่อยู่ใต้ /uploads/) */
+  async function insertImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !editor) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const media = await adminFetch<{ url: string }>("/admin/media", { method: "POST", body: fd });
+      editor.chain().focus().setImage({ src: media.url, alt: "" }).run();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "อัปโหลดรูปไม่สำเร็จ");
+    } finally {
+      setUploading(false);
+      if (imgInput.current) imgInput.current.value = "";
+    }
+  }
+
   return (
     <div className="rt-wrap">
-      <Toolbar editor={editor} onPickImage={() => setPicking(true)} />
+      <Toolbar editor={editor} onPickImage={() => imgInput.current?.click()} />
       <EditorContent editor={editor} />
-      <MediaPicker
-        open={picking}
-        kind="IMAGE"
-        onClose={() => setPicking(false)}
-        onPick={(m) => {
-          /* ใช้ path ของคลังสื่อ (/uploads/..) — เซิร์ฟเวอร์อนุญาตเฉพาะรูปจากคลังตัวเอง */
-          editor.chain().focus().setImage({ src: m.url, alt: m.altTh ?? "" }).run();
-        }}
+      {uploading && <p className="rt-uploading">กำลังอัปโหลดรูป…</p>}
+      <input
+        ref={imgInput}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        hidden
+        onChange={insertImage}
       />
     </div>
   );
