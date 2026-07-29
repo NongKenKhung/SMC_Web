@@ -31,6 +31,12 @@ export default function ContactForm({ locale }: { locale: Locale }) {
     <div className="card form-card reveal d1">
       <h3>{t.formTitle}</h3>
       <form onSubmit={onSubmit}>
+        {/* กับดักบอท — คนจริงมองไม่เห็นและ tab ไม่ถึง ถ้าช่องนี้มีค่าแปลว่าเป็นบอท
+            ใช้ตำแหน่งนอกจอแทน display:none เพราะบอทบางตัวข้ามช่องที่ซ่อนแบบนั้น */}
+        <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: 0 }}>
+          <label htmlFor="f-website">อย่ากรอกช่องนี้</label>
+          <input id="f-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+        </div>
         <div className="f-row">
           <div className="field">
             <label htmlFor="f-name">{t.fName}</label>
