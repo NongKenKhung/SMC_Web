@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DownloadList, Gallery } from "@/components/Attachments";
@@ -5,6 +6,38 @@ import PageBanner from "@/components/PageBanner";
 import RichContent, { blockText } from "@/components/RichContent";
 import { getBlocks, getSolution, mediaUrl } from "@/lib/api";
 import { dict, isLocale, pick } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
+
+/* ชื่อโซลูชัน/สรุปย่อ ใช้เป็น title กับการ์ดแชร์โซเชียล */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  if (!isLocale(locale)) return {};
+  const sol = await getSolution(slug);
+  if (!sol) return {};
+  const title = pick(sol, "name", locale);
+  const description = pick(sol, "summary", locale);
+  const cover = mediaUrl(sol.coverImage);
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/solutions/${slug}`,
+      languages: { th: `/th/solutions/${slug}`, en: `/en/solutions/${slug}` },
+    },
+    openGraph: {
+      type: "article",
+      url: `${SITE_URL}/${locale}/solutions/${slug}`,
+      title,
+      description,
+      images: [{ url: cover ?? "/og.png" }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [cover ?? "/og.png"] },
+  };
+}
 
 /* ฟีเจอร์ mock 6 ข้อ — เนื้อหาจริงของแต่ละระบบจะมาจาก bodyTh/bodyEn (แก้ผ่าน admin เฟส 4) */
 const FEATURES = {

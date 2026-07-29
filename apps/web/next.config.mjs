@@ -14,6 +14,7 @@ const nextConfig = {
   reactStrictMode: true,
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
   /* รูปที่แทรกใน rich text ถูกเก็บเป็น path สัมพัทธ์ "/uploads/xxx"
      (ตัว sanitize ฝั่งเซิร์ฟเวอร์บังคับรูปแบบนี้เพื่อกันรูปจากเว็บนอก)
