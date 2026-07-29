@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin/blocks", label: "เนื้อหาในหน้าเว็บ" },
   { href: "/admin/content", label: "ข้อความหลัก" },
   { href: "/admin/messages", label: "กล่องข้อความ" },
+  { href: "/admin/account", label: "บัญชีของฉัน" },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {

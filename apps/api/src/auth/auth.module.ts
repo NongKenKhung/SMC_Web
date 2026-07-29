@@ -1,5 +1,5 @@
 import {
-  Body, CanActivate, Controller, ExecutionContext, Get, Injectable,
+  BadRequestException, Body, CanActivate, Controller, ExecutionContext, Get, Injectable,
   Module, Post, Req, UnauthorizedException, UseGuards,
 } from "@nestjs/common";
 import { JwtModule, JwtService } from "@nestjs/jwt";
@@ -13,6 +13,15 @@ export class LoginDto {
 
   @IsString() @MinLength(6)
   password!: string;
+}
+
+export class ChangePasswordDto {
+  @IsString() @MinLength(1)
+  currentPassword!: string;
+
+  /* 10 ตัวขึ้นไป — ยาวกว่าตอน login เพราะนี่คือรหัสที่จะใช้จริงหลังเลิกใช้ค่าเริ่มต้น */
+  @IsString() @MinLength(10, { message: "รหัสผ่านใหม่ต้องยาวอย่างน้อย 10 ตัวอักษร" })
+  newPassword!: string;
 }
 
 export interface JwtPayload {
@@ -61,6 +70,25 @@ export class AuthService {
       user: payload,
     };
   }
+
+  /** เปลี่ยนรหัสผ่านของตัวเอง — ต้องยืนยันรหัสเดิมก่อนเสมอ
+   *  (กันกรณีมีคนมานั่งที่เครื่องที่เปิด admin ค้างไว้แล้วเปลี่ยนรหัสยึดบัญชี) */
+  async changePassword(userId: number, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException("ไม่พบบัญชีผู้ใช้");
+    if (!(await bcrypt.compare(dto.currentPassword, user.passwordHash))) {
+      throw new BadRequestException("รหัสผ่านปัจจุบันไม่ถูกต้อง");
+    }
+    if (await bcrypt.compare(dto.newPassword, user.passwordHash)) {
+      throw new BadRequestException("รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสเดิม");
+    }
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: await bcrypt.hash(dto.newPassword, 10) },
+    });
+    /* token เดิมยังใช้ได้จนหมดอายุ — ฝั่งหน้าเว็บจะให้เข้าสู่ระบบใหม่เอง */
+    return { ok: true };
+  }
 }
 
 @Controller("auth")
@@ -76,6 +104,12 @@ export class AuthController {
   @Get("me")
   me(@Req() req: { user: JwtPayload }) {
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post("change-password")
+  changePassword(@Req() req: { user: JwtPayload }, @Body() dto: ChangePasswordDto) {
+    return this.service.changePassword(req.user.sub, dto);
   }
 }
 
