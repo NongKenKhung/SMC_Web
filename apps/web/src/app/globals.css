@@ -345,20 +345,6 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 }
 .hero-stats span { font-size: var(--fs-sm); color: var(--on-dark-3); }
 
-/* บอกให้เลื่อนลง */
-.scroll-hint {
-  position: absolute; left: 50%; bottom: var(--sp-6); transform: translateX(-50%);
-  z-index: 2; display: flex; flex-direction: column; align-items: center; gap: var(--sp-2);
-  font-size: var(--fs-xs); letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--on-dark-3); pointer-events: none;
-}
-.scroll-hint i {
-  width: 1px; height: 42px;
-  background: linear-gradient(180deg, transparent, var(--yellow));
-  animation: scrollpulse 1.8s var(--ease) infinite;
-}
-@keyframes scrollpulse { 0%, 100% { opacity: .25; transform: scaleY(.6); } 50% { opacity: 1; transform: scaleY(1); } }
-
 /* ---------- section แบบใหม่ (มีตัวอักษรฉากหลัง) ----------
    ใช้ overflow: clip (ไม่ใช่ hidden) — hidden จะสร้าง scroll container
    แล้วทำให้ animation-timeline: view() ของตัวอักษรฉากหลังหาจุดอ้างอิงไม่ได้ */
@@ -1123,7 +1109,6 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
 /* ผู้ใช้ที่ตั้งค่าระบบให้ลดการเคลื่อนไหว — แสดงทันที ไม่มีอนิเมชัน */
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
-  .scroll-hint i { animation: none; }
   html { scroll-behavior: auto; }
 }
 
@@ -1147,7 +1132,6 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
   .hero-stats { gap: var(--sp-8); margin-top: var(--sp-10); }
   .hero-cta { margin-top: var(--sp-8); }
   .hero-cta .btn { width: 100%; justify-content: center; }
-  .scroll-hint { display: none; }
   .sec-x { padding: var(--sp-16) 0; }
   .ghost-head { top: var(--sp-2); opacity: .7; }
   .sol-x-item { grid-template-columns: auto 1fr; gap: var(--sp-4); padding: var(--sp-5); }

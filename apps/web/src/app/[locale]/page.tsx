@@ -177,8 +177,6 @@ export default async function Home({
             ))}
           </div>
         </div>
-
-        <span className="scroll-hint" aria-hidden="true">Scroll<i /></span>
       </section>
       </div>
 
