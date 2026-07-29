@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageBanner from "@/components/PageBanner";
 import RichContent, { blockText } from "@/components/RichContent";
-import { getBlocks, getContent, getPageMedia, type AboutContent } from "@/lib/api";
+import { getBlocks, getContent, getPageMedia, mediaUrl, type AboutContent } from "@/lib/api";
 import { dict, isLocale } from "@/lib/i18n";
 
 const STORY = {
@@ -28,7 +28,7 @@ export default async function AboutPage({
   const [about, pageMedia, blocks] = await Promise.all([
     getContent<AboutContent>("about.main", locale),
     getPageMedia("about"),
-    getBlocks(["about.timeline", "about.story"]),
+    getBlocks(["about.timeline", "about.story", "about.team", "about.publications"]),
   ]);
 
   /* ใช้ข้อมูลจาก admin ถ้ามี ไม่มีก็ใช้ค่าเริ่มต้นที่ฝังมากับระบบ */
@@ -42,6 +42,9 @@ export default async function AboutPage({
   }));
 
   const storyBlocks = blocks["about.story"] ?? [];
+  /* ทีมงาน / ผลงานตีพิมพ์ — ไม่มีค่าเริ่มต้นฝังในโค้ด กรอกที่ admin ถ้าว่างก็ไม่แสดง section */
+  const team = blocks["about.team"] ?? [];
+  const publications = blocks["about.publications"] ?? [];
 
   return (
     <main>
@@ -140,6 +143,62 @@ export default async function AboutPage({
           </div>
         </div>
       </section>
+      )}
+
+      {/* ทีมงาน */}
+      {team.length > 0 && (
+        <section className="sec">
+          <span className="ghost-head">Team</span>
+          <div className="container">
+            <div className="sec-head reveal">
+              <span className="eyebrow">Our Team</span>
+              <h2>{t.about.teamTitle}</h2>
+              <p className="lead">{t.about.teamLead}</p>
+            </div>
+            <div className="team-grid">
+              {team.map((m, i) => (
+                <article className={`team-card glow reveal${i % 3 ? ` d${i % 3}` : ""}`} key={m.id}>
+                  {m.image ? (
+                    <img className="team-photo" src={mediaUrl(m.image)!} alt="" />
+                  ) : (
+                    <span className="team-photo ph" aria-hidden="true">
+                      {blockText(m, "title", locale).trim().charAt(0)}
+                    </span>
+                  )}
+                  <h3>{blockText(m, "title", locale)}</h3>
+                  <span className="team-role">{blockText(m, "subtitle", locale)}</span>
+                  <RichContent html={blockText(m, "body", locale)} className="prose-sm" />
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ผลงานตีพิมพ์ */}
+      {publications.length > 0 && (
+        <section className="sec soft-sec">
+          <span className="ghost-head">Research</span>
+          <div className="container">
+            <div className="sec-head reveal">
+              <span className="eyebrow">Publications</span>
+              <h2>{t.about.pubTitle}</h2>
+              <p className="lead">{t.about.pubLead}</p>
+            </div>
+            <ol className="pub-list">
+              {publications.map((b, i) => (
+                <li className={`pub-item reveal${i % 3 ? ` d${i % 3}` : ""}`} key={b.id}>
+                  <span className="pub-num">{String(i + 1).padStart(2, "0")}</span>
+                  <div>
+                    <h3>{blockText(b, "title", locale)}</h3>
+                    <span className="pub-src">{blockText(b, "subtitle", locale)}</span>
+                    <RichContent html={blockText(b, "body", locale)} className="prose-sm" />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
       )}
 
       {/* CTA */}

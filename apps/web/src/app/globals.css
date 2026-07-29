@@ -1248,3 +1248,50 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
 @media (max-width: 640px) {
   .embed-frame.map { aspect-ratio: 4 / 3; }
 }
+
+/* ---------- ทีมงาน (6D) ---------- */
+.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.team-card {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: var(--sp-6); text-align: center;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.team-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-2); }
+.team-photo {
+  width: 116px; height: 116px; border-radius: 50%; object-fit: cover;
+  margin: 0 auto var(--sp-4); display: block; border: 3px solid var(--navy-soft);
+}
+.team-photo.ph {
+  display: grid; place-items: center;
+  background: linear-gradient(140deg, var(--navy), var(--navy-800));
+  color: var(--yellow); font-family: var(--ff-display); font-size: 2.6rem; line-height: 1;
+}
+.team-card h3 { font-size: var(--fs-lg); font-weight: var(--fw-strong); color: var(--navy); }
+.team-role {
+  display: block; margin: 4px 0 var(--sp-3);
+  font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--orange);
+}
+.team-card .prose-sm { color: var(--text-3); font-size: var(--fs-sm); }
+
+/* ---------- ผลงานตีพิมพ์ (6D) ---------- */
+.pub-list { display: grid; gap: var(--sp-4); list-style: none; counter-reset: none; }
+.pub-item {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--sp-5);
+  padding: var(--sp-6); background: #fff;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.pub-item:hover { border-color: var(--orange); box-shadow: var(--shadow-1); }
+.pub-num {
+  font-family: var(--ff-display); font-size: 1.9rem; line-height: 1;
+  color: transparent; -webkit-text-stroke: 1.2px var(--line);
+}
+.pub-item h3 { font-size: var(--fs-base); font-weight: var(--fw-strong); color: var(--navy); line-height: var(--lh-heading); }
+.pub-src { display: block; margin: 4px 0 var(--sp-2); font-size: var(--fs-sm); color: var(--orange); }
+.pub-item .prose-sm { color: var(--text-3); font-size: var(--fs-sm); }
+
+@media (max-width: 1024px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) {
+  .team-grid { grid-template-columns: 1fr; }
+  .pub-item { grid-template-columns: 1fr; gap: var(--sp-2); padding: var(--sp-5); }
+}
