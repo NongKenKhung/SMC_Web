@@ -55,6 +55,8 @@ export default async function SolutionsHub({
             <p className="lead">{t.solutions.lead}</p>
           </div>
 
+          {tree.length === 0 && <p className="empty-note reveal">{t.empty.solutions}</p>}
+
           <div className="cat-grid">
             {tree.map((cat, i) => (
               <article className={`card cat-card glow reveal${i ? ` d${i}` : ""}`} key={cat.id}>

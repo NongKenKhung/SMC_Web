@@ -171,11 +171,14 @@ export default async function Home({
             </Link>
             <Link href={`${base}/contact`} className="btn btn-ghost">{t.common.contactLab}</Link>
           </div>
-          <div className="hero-stats">
-            {hero?.stats?.map((s) => (
-              <div key={s.label}><Stat value={s.value} /><span>{s.label}</span></div>
-            ))}
-          </div>
+          {/* ไม่มีตัวเลขก็ไม่ต้องขึ้นแถบ — ไม่งั้นเหลือเส้นคั่นลอยอยู่เฉย ๆ */}
+          {hero?.stats && hero.stats.length > 0 && (
+            <div className="hero-stats">
+              {hero.stats.map((s) => (
+                <div key={s.label}><Stat value={s.value} /><span>{s.label}</span></div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
       </div>
@@ -250,7 +253,8 @@ export default async function Home({
         </div>
       </section>
 
-      {/* ===== 4. โซลูชัน (รายการแถวใหญ่ กดได้ทั้งใบ) ===== */}
+      {/* ===== 4. โซลูชัน (รายการแถวใหญ่ กดได้ทั้งใบ) — ซ่อนทั้ง section ถ้ายังไม่มีข้อมูล ===== */}
+      {(tree ?? []).length > 0 && (
       <section className="sec-x soft-sec">
         <span className="ghost-head">Solutions</span>
         <div className="container">
@@ -282,8 +286,10 @@ export default async function Home({
           </div>
         </div>
       </section>
+      )}
 
       {/* ===== 5. พาร์ทเนอร์ ===== */}
+      {(partners ?? []).length > 0 && (
       <section className="sec-x">
         <span className="ghost-head">Partners</span>
         <div className="container">
@@ -305,8 +311,10 @@ export default async function Home({
           </p>
         </div>
       </section>
+      )}
 
       {/* ===== 6. กิจกรรมล่าสุด ===== */}
+      {(posts ?? []).length > 0 && (
       <section className="sec-x soft-sec">
         <span className="ghost-head">News</span>
         <div className="container">
@@ -339,6 +347,7 @@ export default async function Home({
           </p>
         </div>
       </section>
+      )}
 
       {/* ===== 7. ปิดท้าย ===== */}
       <section className="closing">

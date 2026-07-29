@@ -151,6 +151,11 @@ const th = {
     eyebrow: "Error 404",
     title: "ไม่พบหน้าที่คุณกำลังหา",
   },
+  empty: {
+    solutions: "ยังไม่มีโซลูชันในระบบ — เพิ่มได้ที่หน้าผู้ดูแลระบบ",
+    partners: "ยังไม่มีหน่วยงานพาร์ทเนอร์ในระบบ",
+    posts: "ยังไม่มีกิจกรรมหรือข่าวสาร",
+  },
 };
 
 const en: typeof th = {
@@ -280,6 +285,11 @@ const en: typeof th = {
   notFound: {
     eyebrow: "Error 404",
     title: "We couldn't find that page",
+  },
+  empty: {
+    solutions: "No solutions yet — add them from the admin area",
+    partners: "No partner organizations yet",
+    posts: "No activities or news yet",
   },
 };
 

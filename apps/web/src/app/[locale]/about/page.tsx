@@ -5,22 +5,6 @@ import RichContent, { blockText } from "@/components/RichContent";
 import { getBlocks, getContent, getPageMedia, type AboutContent } from "@/lib/api";
 import { dict, isLocale } from "@/lib/i18n";
 
-/* Timeline mock — จะย้ายเข้า DB/admin ในเฟส 4 */
-const TIMELINE = {
-  th: [
-    { year: "2564", title: "ก่อตั้งศูนย์วิจัย SMC", body: "รวมทีมวิจัยด้าน AI / IoT ก่อตั้งศูนย์วิจัยเมืองอัจฉริยะที่ สจล." },
-    { year: "2565", title: "โครงการนำร่องแรก", body: "ทดลองระบบจราจรอัจฉริยะร่วมกับเทศบาลตัวอย่าง เก็บข้อมูลและปรับปรุงระบบจากการใช้งานจริง" },
-    { year: "2566", title: "ขยายเครือข่ายความร่วมมือ", body: "ลงนาม MOU กับหน่วยงาน 3 แห่ง และเปิดตัว City Data Platform เวอร์ชันแรก" },
-    { year: "2567–ปัจจุบัน", title: "ขยายผลสู่ 5 จังหวัด", body: "นำโซลูชัน Smart CCTV และระบบตรวจวัดสิ่งแวดล้อมไปติดตั้งใช้งานจริงในหลายพื้นที่" },
-  ],
-  en: [
-    { year: "2021", title: "SMC founded", body: "AI / IoT researchers founded the smart-city research center at KMITL." },
-    { year: "2022", title: "First pilot project", body: "Piloted an intelligent traffic system with a partner municipality, iterating from real usage." },
-    { year: "2023", title: "Growing partnerships", body: "Signed MOUs with 3 organizations and launched the first City Data Platform." },
-    { year: "2024–present", title: "Scaling to 5 provinces", body: "Deployed Smart CCTV and environmental monitoring solutions across multiple areas." },
-  ],
-};
-
 const STORY = {
   th: [
     "Smart City Research Center (SMC) ก่อตั้งขึ้นโดยทีมอาจารย์และนักวิจัย คณะวิศวกรรมศาสตร์ สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง จากความตั้งใจที่จะนำงานวิจัยด้าน AI, IoT และข้อมูลเมือง ออกจากห้องวิจัยไปสู่การใช้งานจริง",
@@ -48,15 +32,14 @@ export default async function AboutPage({
   ]);
 
   /* ใช้ข้อมูลจาก admin ถ้ามี ไม่มีก็ใช้ค่าเริ่มต้นที่ฝังมากับระบบ */
-  const tlBlocks = blocks["about.timeline"] ?? [];
-  const timeline = tlBlocks.length
-    ? tlBlocks.map((b) => ({
-        year: blockText(b, "subtitle", locale),
-        title: blockText(b, "title", locale),
-        body: blockText(b, "body", locale),
-        html: true,
-      }))
-    : TIMELINE[locale].map((x) => ({ ...x, html: false }));
+  /* ไทม์ไลน์ไม่มีค่าเริ่มต้นฝังในโค้ด — ปี/เหตุการณ์ต้องเป็นของจริง กรอกที่ admin
+     ถ้ายังไม่มีข้อมูล section นี้จะไม่แสดงเลย */
+  const timeline = (blocks["about.timeline"] ?? []).map((b) => ({
+    year: blockText(b, "subtitle", locale),
+    title: blockText(b, "title", locale),
+    body: blockText(b, "body", locale),
+    html: true,
+  }));
 
   const storyBlocks = blocks["about.story"] ?? [];
 
@@ -135,7 +118,8 @@ export default async function AboutPage({
         </div>
       </section>
 
-      {/* Timeline */}
+      {/* Timeline — ซ่อนทั้ง section ถ้ายังไม่มีข้อมูล */}
+      {timeline.length > 0 && (
       <section className="sec soft-sec">
         <div className="container">
           <div className="sec-head reveal">
@@ -156,6 +140,7 @@ export default async function AboutPage({
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA */}
       <section className="sec-tight">

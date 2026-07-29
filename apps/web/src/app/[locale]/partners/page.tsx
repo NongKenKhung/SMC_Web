@@ -35,6 +35,8 @@ export default async function PartnersPage({
             </h2>
             <p className="lead">{t.partners.lead}</p>
           </div>
+          {partners.length === 0 && <p className="empty-note reveal">{t.empty.partners}</p>}
+
           <div className="logo-row wide reveal">
             {partners.map((p) => {
               const card = (

@@ -9,6 +9,9 @@
     "dev:web": "pnpm --filter @sml/web dev",
     "db:up": "docker compose up -d",
     "db:stop": "docker compose stop",
+    "db:seed": "pnpm --filter @sml/api seed",
+    "db:seed:demo": "pnpm --filter @sml/api seed:demo",
+    "db:seed:demo:clear": "pnpm --filter @sml/api seed:demo:clear",
     "build": "pnpm -r build"
   }
 }
