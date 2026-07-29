@@ -25,7 +25,6 @@ export default function NotFoundView() {
           <span className="nf-eyebrow">{t.notFound.eyebrow}</span>
           <p className="nf-code" aria-hidden="true">404</p>
           <h1>{t.notFound.title}</h1>
-          <p className="nf-lead">{t.notFound.lead}</p>
         </div>
       </section>
     </main>

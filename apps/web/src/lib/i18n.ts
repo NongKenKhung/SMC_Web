@@ -150,7 +150,6 @@ const th = {
   notFound: {
     eyebrow: "Error 404",
     title: "ไม่พบหน้าที่คุณกำลังหา",
-    lead: "หน้านี้อาจถูกย้าย เปลี่ยนชื่อ หรือลบไปแล้ว เลือกหน้าที่ต้องการจากเมนูด้านบนได้เลยครับ",
   },
 };
 
@@ -281,7 +280,6 @@ const en: typeof th = {
   notFound: {
     eyebrow: "Error 404",
     title: "We couldn't find that page",
-    lead: "It may have been moved, renamed or removed. Pick a page from the menu above.",
   },
 };
 
