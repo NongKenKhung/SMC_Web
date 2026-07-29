@@ -113,6 +113,16 @@ export interface AboutContent {
   missions: string[];
 }
 
+/** ลิงก์ฝังจากภายนอก (แก้ได้ที่ admin) — ปล่อยว่าง = ไม่แสดงส่วนนั้นเลย */
+export interface EmbedContent {
+  /** ลิงก์ YouTube หรือ Vimeo */
+  videoUrl: string;
+  /** หัวข้อเหนือวิดีโอบนหน้าแรก */
+  videoTitle: string;
+  /** พิกัด "13.7276,100.7791" หรือชื่อสถานที่ สำหรับแผนที่หน้า Contact */
+  mapQuery: string;
+}
+
 async function get<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`${API}${path}`, { cache: "no-store" });

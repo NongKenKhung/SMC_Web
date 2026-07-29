@@ -9,11 +9,13 @@ interface Hero {
 }
 interface Contact { address: string; phone: string; email: string; hours: string }
 interface About { vision: string; missions: string[] }
+interface Embed { videoUrl: string; videoTitle: string; mapQuery: string }
 
 export default function AdminContent() {
   const [hero, setHero] = useState<Hero | null>(null);
   const [contact, setContact] = useState<Contact | null>(null);
   const [about, setAbout] = useState<About | null>(null);
+  const [embed, setEmbed] = useState<Embed | null>(null);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
 
   useEffect(() => {
@@ -22,6 +24,7 @@ export default function AdminContent() {
       setHero((find("home.hero") as Hero) ?? { eyebrow: "", titleLine1: "", titleLine2: "", lead: "", stats: [] });
       setContact((find("site.contact") as Contact) ?? { address: "", phone: "", email: "", hours: "" });
       setAbout((find("about.main") as About) ?? { vision: "", missions: [] });
+      setEmbed((find("site.embed") as Embed) ?? { videoUrl: "", videoTitle: "", mapQuery: "" });
     }).catch(() => {});
   }, []);
 
@@ -35,7 +38,7 @@ export default function AdminContent() {
     }
   }
 
-  if (!hero || !contact || !about) return null;
+  if (!hero || !contact || !about || !embed) return null;
 
   return (
     <>
@@ -146,6 +149,49 @@ export default function AdminContent() {
               onClick={() => save("about.main", { ...about, missions: about.missions.filter((m) => m.trim()) })}
             >
               บันทึกเกี่ยวกับศูนย์
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* วิดีโอ + แผนที่ */}
+      <div className="adm-card" style={{ marginTop: 18 }}>
+        <h2>วิดีโอ &amp; แผนที่</h2>
+        <p className="sub" style={{ margin: "0 0 14px" }}>
+          เว้นว่างไว้ = ไม่แสดงส่วนนั้นในหน้าเว็บ
+        </p>
+        <div className="adm-form">
+          <div>
+            <label>ลิงก์วิดีโอแนะนำศูนย์ (แสดงหน้าแรก)</label>
+            <input
+              value={embed.videoUrl}
+              onChange={(e) => setEmbed({ ...embed, videoUrl: e.target.value })}
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+            <p className="qr-note">รองรับ YouTube และ Vimeo — วางลิงก์จากช่องที่อยู่ของเบราว์เซอร์ได้เลย</p>
+          </div>
+          <div>
+            <label>หัวข้อเหนือวิดีโอ</label>
+            <input
+              value={embed.videoTitle}
+              onChange={(e) => setEmbed({ ...embed, videoTitle: e.target.value })}
+              placeholder="รู้จักศูนย์วิจัยเมืองอัจฉริยะ"
+            />
+          </div>
+          <div>
+            <label>ตำแหน่งแผนที่ (แสดงหน้าติดต่อเรา)</label>
+            <input
+              value={embed.mapQuery}
+              onChange={(e) => setEmbed({ ...embed, mapQuery: e.target.value })}
+              placeholder="13.7276,100.7791 หรือ สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง"
+            />
+            <p className="qr-note">
+              ใส่พิกัด (ละติจูด,ลองจิจูด) จะแม่นที่สุด — เปิด Google Maps คลิกขวาที่จุดที่ต้องการแล้วคัดลอกตัวเลขมาวาง
+            </p>
+          </div>
+          <div className="adm-actions">
+            <button className="adm-btn" onClick={() => save("site.embed", embed)}>
+              บันทึกวิดีโอ &amp; แผนที่
             </button>
           </div>
         </div>

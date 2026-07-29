@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import ContactForm from "@/components/ContactForm";
+import { MapEmbed } from "@/components/Embeds";
 import PageBanner from "@/components/PageBanner";
-import { getContent, getPageMedia, type ContactContent } from "@/lib/api";
+import { getContent, getPageMedia, type ContactContent, type EmbedContent } from "@/lib/api";
 import { dict, isLocale } from "@/lib/i18n";
 
 const Icon = {
@@ -36,7 +37,10 @@ export default async function ContactPage({
   if (!isLocale(locale)) notFound();
   const t = dict(locale);
   const base = `/${locale}`;
-  const contact = await getContent<ContactContent>("site.contact", locale);
+  const [contact, embed] = await Promise.all([
+    getContent<ContactContent>("site.contact", locale),
+    getContent<EmbedContent>("site.embed", locale),
+  ]);
   const pageMedia = await getPageMedia("contact");
 
   return (
@@ -87,13 +91,8 @@ export default async function ContactPage({
         </div>
 
         <div className="container">
-          <div className="map-ph reveal">
-            <div className="map-pin">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="5" /></svg>
-            </div>
-            <b style={{ color: "var(--navy)" }}>{t.contact.mapTitle}</b>
-            <span style={{ fontSize: ".85rem" }}>{t.contact.mapLead}</span>
-          </div>
+          {/* แผนที่จริง — ตั้งพิกัด/ชื่อสถานที่ได้ที่ admin ไม่ใส่ก็ไม่แสดง */}
+          <MapEmbed query={embed?.mapQuery} locale={locale} title={t.contact.mapTitle} />
         </div>
       </section>
     </main>

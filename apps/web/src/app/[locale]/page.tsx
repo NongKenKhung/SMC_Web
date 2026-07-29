@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { VideoEmbed } from "@/components/Embeds";
 import { Accordion, Stat } from "@/components/Ux";
 import RichContent, { blockText } from "@/components/RichContent";
 import {
   getBlocks, getContent, getPageMedia, getPartners, getPosts, getSolutionsTree, mediaUrl,
-  type HeroContent,
+  type EmbedContent, type HeroContent,
 } from "@/lib/api";
 import { dict, fmtDate, isLocale, pick } from "@/lib/i18n";
 
@@ -72,13 +73,14 @@ export default async function Home({
   const t = dict(locale);
   const base = `/${locale}`;
 
-  const [hero, tree, partners, posts, pageMedia, blocks] = await Promise.all([
+  const [hero, tree, partners, posts, pageMedia, blocks, embed] = await Promise.all([
     getContent<HeroContent>("home.hero", locale),
     getSolutionsTree(),
     getPartners(),
     getPosts({ take: 3 }),
     getPageMedia("home"),
     getBlocks(["home.pillars", "home.techs"]),
+    getContent<EmbedContent>("site.embed", locale),
   ]);
   const poster = pageMedia?.poster ?? null;
 
@@ -252,6 +254,19 @@ export default async function Home({
           </div>
         </div>
       </section>
+
+      {/* ===== วิดีโอแนะนำศูนย์ — ขึ้นเฉพาะเมื่อใส่ลิงก์ไว้ที่ admin ===== */}
+      {embed?.videoUrl && (
+        <section className="sec-x">
+          <div className="container">
+            <div className="sec-head-x center reveal">
+              <span className="sec-label">Video</span>
+              <h2>{embed.videoTitle || t.home.coreTech}</h2>
+            </div>
+            <VideoEmbed url={embed.videoUrl} title={embed.videoTitle || "SMC"} />
+          </div>
+        </section>
+      )}
 
       {/* ===== 4. โซลูชัน (รายการแถวใหญ่ กดได้ทั้งใบ) — ซ่อนทั้ง section ถ้ายังไม่มีข้อมูล ===== */}
       {(tree ?? []).length > 0 && (
