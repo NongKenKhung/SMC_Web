@@ -83,7 +83,16 @@ function FragmentRow({
           <td colSpan={5} style={{ background: "var(--a-soft)" }}>
             <p style={{ whiteSpace: "pre-wrap", marginBottom: 8 }}>{m.message}</p>
             <p style={{ fontSize: ".82rem", color: "var(--a-muted)" }}>
-              ตอบกลับ: <a href={`mailto:${m.email}`} style={{ color: "var(--a-orange)" }}>{m.email}</a>
+              {/* เปิดหน้าเขียนเมลของ Gmail บนเว็บ แทนที่จะไปเรียกโปรแกรมเมลในเครื่อง */}
+              ตอบกลับ:{" "}
+              <a
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(m.email)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "var(--a-orange)" }}
+              >
+                {m.email}
+              </a>
               {m.phone ? ` · โทร ${m.phone}` : ""}
             </p>
           </td>
