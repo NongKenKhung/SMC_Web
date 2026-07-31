@@ -114,7 +114,6 @@ export default async function SolutionDetail({
                   <rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" />
                   <path d="M6 9l3 3 3-4 3 3 3-2" stroke="#F26B21" strokeWidth="1.6" />
                 </svg>
-                <span className="ph-label">{t.solutions.imgPlaceholder}</span>
               </>
             )}
           </div>

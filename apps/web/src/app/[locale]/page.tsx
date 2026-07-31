@@ -238,7 +238,6 @@ export default async function Home({
               <rect x="90" y="230" width="120" height="14" rx="7" fill="#D9E1EF" />
               <rect x="70" y="256" width="160" height="10" rx="5" fill="#E8EDF6" />
             </svg>
-            <span className="ph-label">{t.home.imgPlaceholder}</span>
           </div>
           <div>
             <div className="sec-head-x reveal">

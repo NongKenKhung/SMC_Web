@@ -98,7 +98,6 @@ export default function SiteFooter({
         </div>
         <div className="footer-bottom">
           <span>{t.footer.rights}</span>
-          <span className="mock-tag">{t.footer.mockTag}</span>
         </div>
       </div>
     </footer>

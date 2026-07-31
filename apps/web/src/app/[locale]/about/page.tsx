@@ -103,7 +103,6 @@ export default async function AboutPage({
               <circle cx="40" cy="70" r="5" fill="#F26B21" /><circle cx="110" cy="40" r="5" fill="#F26B21" />
               <circle cx="180" cy="66" r="5" fill="#F26B21" /><circle cx="250" cy="36" r="5" fill="#F26B21" />
             </svg>
-            <span className="ph-label">{t.about.imgPlaceholder}</span>
           </div>
           <div>
             <div className="sec-head left reveal">
