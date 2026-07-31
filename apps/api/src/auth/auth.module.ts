@@ -1,6 +1,6 @@
 import {
-  BadRequestException, Body, CanActivate, Controller, ExecutionContext, Get, Injectable,
-  Module, Post, Req, UnauthorizedException, UseGuards,
+  BadRequestException, Body, CanActivate, Controller, Delete, ExecutionContext, Get, Injectable,
+  Module, NotFoundException, Param, ParseIntPipe, Post, Req, UnauthorizedException, UseGuards,
 } from "@nestjs/common";
 import { JwtModule, JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcryptjs";
@@ -12,6 +12,17 @@ export class LoginDto {
   email!: string;
 
   @IsString() @MinLength(6)
+  password!: string;
+}
+
+export class CreateUserDto {
+  @IsEmail()
+  email!: string;
+
+  @IsString() @MinLength(1, { message: "ต้องใส่ชื่อผู้ใช้" })
+  name!: string;
+
+  @IsString() @MinLength(10, { message: "รหัสผ่านต้องยาวอย่างน้อย 10 ตัวอักษร" })
   password!: string;
 }
 
@@ -89,6 +100,44 @@ export class AuthService {
     /* token เดิมยังใช้ได้จนหมดอายุ — ฝั่งหน้าเว็บจะให้เข้าสู่ระบบใหม่เอง */
     return { ok: true };
   }
+
+  /* ---------- จัดการผู้ใช้ ---------- */
+
+  listUsers() {
+    return this.prisma.user.findMany({
+      select: { id: true, email: true, name: true, role: true, createdAt: true },
+      orderBy: { id: "asc" },
+    });
+  }
+
+  async createUser(dto: CreateUserDto) {
+    const exists = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    if (exists) throw new BadRequestException("มีผู้ใช้อีเมลนี้อยู่แล้ว");
+    const user = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        name: dto.name,
+        passwordHash: await bcrypt.hash(dto.password, 10),
+        role: "ADMIN",
+      },
+      select: { id: true, email: true, name: true, role: true, createdAt: true },
+    });
+    return user;
+  }
+
+  /** ลบผู้ใช้ — กันสองกรณีที่จะทำให้เข้าระบบไม่ได้อีก:
+   *  ลบตัวเอง (ยังใช้งานอยู่) และลบคนสุดท้ายที่เหลือ */
+  async removeUser(id: number, currentUserId: number) {
+    if (id === currentUserId) {
+      throw new BadRequestException("ลบบัญชีที่กำลังใช้งานอยู่ไม่ได้ — ให้ผู้ดูแลคนอื่นลบให้");
+    }
+    const total = await this.prisma.user.count();
+    if (total <= 1) throw new BadRequestException("ต้องเหลือผู้ดูแลอย่างน้อย 1 คน");
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException("ไม่พบผู้ใช้");
+    await this.prisma.user.delete({ where: { id } });
+    return { ok: true };
+  }
 }
 
 @Controller("auth")
@@ -113,6 +162,28 @@ export class AuthController {
   }
 }
 
+/** จัดการผู้ดูแลระบบ — ต้องเข้าสู่ระบบก่อนทุก endpoint */
+@UseGuards(JwtAuthGuard)
+@Controller("admin/users")
+export class AdminUsersController {
+  constructor(private readonly service: AuthService) {}
+
+  @Get()
+  list() {
+    return this.service.listUsers();
+  }
+
+  @Post()
+  create(@Body() dto: CreateUserDto) {
+    return this.service.createUser(dto);
+  }
+
+  @Delete(":id")
+  remove(@Param("id", ParseIntPipe) id: number, @Req() req: { user: JwtPayload }) {
+    return this.service.removeUser(id, req.user.sub);
+  }
+}
+
 @Module({
   imports: [
     JwtModule.register({
@@ -122,7 +193,7 @@ export class AuthController {
     }),
   ],
   providers: [AuthService, JwtAuthGuard],
-  controllers: [AuthController],
+  controllers: [AuthController, AdminUsersController],
   exports: [JwtAuthGuard],
 })
 export class AuthModule {}

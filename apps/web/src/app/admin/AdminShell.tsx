@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin/content", label: "ข้อความหลัก" },
   { href: "/admin/messages", label: "กล่องข้อความ" },
   { href: "/admin/account", label: "บัญชีของฉัน" },
+  { href: "/admin/users", label: "ผู้ดูแลระบบ" },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
