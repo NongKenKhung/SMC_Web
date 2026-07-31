@@ -67,7 +67,8 @@ export interface SolutionDetail extends WithAttachments {
 export interface Partner {
   id: number;
   name: string;
-  caption: string | null;
+  captionTh: string | null;
+  captionEn: string | null;
   logoUrl: string | null;
   websiteUrl: string | null;
 }

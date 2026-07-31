@@ -63,7 +63,7 @@ export interface AdminSolution {
   coverImage: string | null;
 }
 export interface AdminPartner {
-  id: number; name: string; caption: string | null; logoUrl: string | null;
+  id: number; name: string; captionTh: string | null; captionEn: string | null; logoUrl: string | null;
   websiteUrl: string | null; order: number; published: boolean;
 }
 export interface AdminPost {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageBanner from "@/components/PageBanner";
 import { getPageMedia, getPartners, mediaUrl } from "@/lib/api";
-import { dict, isLocale } from "@/lib/i18n";
+import { dict, isLocale, pick } from "@/lib/i18n";
 
 export default async function PartnersPage({
   params,
@@ -42,7 +42,7 @@ export default async function PartnersPage({
               const card = (
                 <div className="logo-card glow" key={p.id}>
                   {p.logoUrl ? <img src={mediaUrl(p.logoUrl)!} alt={p.name} /> : <b>{p.name}</b>}
-                  <span>{p.caption}</span>
+                  <span>{pick(p, "caption", locale)}</span>
                 </div>
               );
               return p.websiteUrl ? (

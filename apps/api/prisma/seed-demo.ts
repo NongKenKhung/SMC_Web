@@ -71,7 +71,7 @@ async function main() {
   ];
   if ((await prisma.partner.count()) === 0) {
     await prisma.partner.createMany({
-      data: partners.map(([name, caption], i) => ({ name, caption, order: i + 1 })),
+      data: partners.map(([name, captionTh], i) => ({ name, captionTh, order: i + 1 })),
     });
   }
 

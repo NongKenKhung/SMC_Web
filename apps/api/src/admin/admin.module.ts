@@ -63,7 +63,10 @@ class PartnerDto {
   name!: string;
 
   @IsOptional() @IsString() @MaxLength(160)
-  caption?: string;
+  captionTh?: string;
+
+  @IsOptional() @IsString() @MaxLength(160)
+  captionEn?: string;
 
   @IsOptional() @IsString() @MaxLength(300)
   logoUrl?: string;

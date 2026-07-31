@@ -249,3 +249,15 @@ body { background: var(--a-soft); }
   margin: 0; padding: 8px 12px; font-size: .8rem; color: var(--a-orange);
   border-top: 1px solid var(--a-line); background: var(--a-soft);
 }
+
+/* ---------- สลับภาษาในหน้าแก้ข้อความ ---------- */
+.lang-switch { display: inline-flex; gap: 4px; margin-bottom: 16px; padding: 4px; background: var(--a-soft); border-radius: 10px; }
+.lang-switch button {
+  padding: 7px 18px; border: 0; border-radius: 7px; background: transparent;
+  font-family: inherit; font-size: .84rem; font-weight: 600; color: var(--a-ink); cursor: pointer;
+}
+.lang-switch button.on { background: #fff; color: var(--a-navy); box-shadow: 0 1px 4px rgba(16,32,62,.14); }
+.lang-tag {
+  margin-left: 8px; padding: 2px 9px; border-radius: 999px;
+  background: var(--a-soft); color: #7c879b; font-size: .7rem; font-weight: 600; vertical-align: middle;
+}

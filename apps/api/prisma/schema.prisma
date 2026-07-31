@@ -46,7 +46,8 @@ model Solution {
 model Partner {
   id         Int     @id @default(autoincrement())
   name       String
-  caption    String?
+  captionTh  String? @map("caption") // คำกำกับใต้โลโก้ (ไทย)
+  captionEn  String? // คำกำกับใต้โลโก้ (อังกฤษ) — ว่างแล้วจะ fallback เป็นไทย
   logoUrl    String?
   websiteUrl String?
   order      Int     @default(0)

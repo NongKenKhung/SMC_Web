@@ -316,7 +316,7 @@ export default async function Home({
             {(partners ?? []).slice(0, 5).map((p) => (
               <div className="logo-card" key={p.id}>
                 {p.logoUrl ? <img src={mediaUrl(p.logoUrl)!} alt={p.name} /> : <b>{p.name}</b>}
-                <span>{p.caption}</span>
+                <span>{pick(p, "caption", locale)}</span>
               </div>
             ))}
           </div>

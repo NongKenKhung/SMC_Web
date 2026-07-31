@@ -6,7 +6,7 @@ import { adminFetch, mediaUrl, type AdminPartner } from "@/lib/admin";
 
 type FormState = Partial<AdminPartner> & { name: string };
 
-const EMPTY: FormState = { name: "", caption: "", logoUrl: "", websiteUrl: "", order: 0, published: true };
+const EMPTY: FormState = { name: "", captionTh: "", captionEn: "", logoUrl: "", websiteUrl: "", order: 0, published: true };
 
 export default function AdminPartners() {
   const [rows, setRows] = useState<AdminPartner[]>([]);
@@ -23,7 +23,7 @@ export default function AdminPartners() {
     e.preventDefault();
     if (!form) return;
     const payload = {
-      name: form.name, caption: form.caption ?? "", logoUrl: form.logoUrl ?? "",
+      name: form.name, captionTh: form.captionTh ?? "", captionEn: form.captionEn ?? "", logoUrl: form.logoUrl ?? "",
       websiteUrl: form.websiteUrl ?? "", order: Number(form.order ?? 0), published: !!form.published,
     };
     try {
@@ -73,7 +73,7 @@ export default function AdminPartners() {
                     : <span className="pill off">ไม่มีรูป</span>}
                 </td>
                 <td>{r.name}</td>
-                <td>{r.caption}</td>
+                <td>{r.captionTh}</td>
                 <td>{r.order}</td>
                 <td><span className={`pill ${r.published ? "on" : "off"}`}>{r.published ? "แสดง" : "ซ่อน"}</span></td>
                 <td>
@@ -98,8 +98,16 @@ export default function AdminPartners() {
                 <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
               </div>
               <div>
-                <label>คำอธิบายสั้น</label>
-                <input value={form.caption ?? ""} onChange={(e) => setForm({ ...form, caption: e.target.value })} />
+                <label>คำอธิบายสั้น (ไทย)</label>
+                <input value={form.captionTh ?? ""} onChange={(e) => setForm({ ...form, captionTh: e.target.value })} />
+              </div>
+              <div>
+                <label>คำอธิบายสั้น (อังกฤษ)</label>
+                <input
+                  value={form.captionEn ?? ""}
+                  onChange={(e) => setForm({ ...form, captionEn: e.target.value })}
+                  placeholder="เว้นว่างได้ — หน้าอังกฤษจะใช้ข้อความไทยแทน"
+                />
               </div>
               <div>
                 <label>ลำดับ</label>
