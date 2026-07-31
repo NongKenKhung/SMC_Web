@@ -73,7 +73,7 @@ export default function AdminAccount() {
               required
             />
             {usingDefault && (
-              <p className="qr-warn">
+              <p className="adm-warn">
                 นี่คือรหัสผ่านที่มากับระบบตอนติดตั้ง — ควรเปลี่ยนก่อนเปิดเว็บให้คนภายนอกเข้าถึง
               </p>
             )}
@@ -89,7 +89,7 @@ export default function AdminAccount() {
               onChange={(e) => setNext(e.target.value)}
               required
             />
-            {tooShort && <p className="qr-warn">ต้องยาวอย่างน้อย 10 ตัวอักษร</p>}
+            {tooShort && <p className="adm-warn">ต้องยาวอย่างน้อย 10 ตัวอักษร</p>}
           </div>
 
           <div>
@@ -102,7 +102,7 @@ export default function AdminAccount() {
               onChange={(e) => setConfirm(e.target.value)}
               required
             />
-            {mismatch && <p className="qr-warn">รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน</p>}
+            {mismatch && <p className="adm-warn">รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน</p>}
           </div>
 
           <div className="adm-actions">
@@ -110,7 +110,7 @@ export default function AdminAccount() {
               {busy ? "กำลังเปลี่ยน…" : "เปลี่ยนรหัสผ่าน"}
             </button>
           </div>
-          <p className="qr-note">
+          <p className="adm-note">
             เปลี่ยนเสร็จแล้วระบบจะให้เข้าสู่ระบบใหม่ด้วยรหัสผ่านใหม่
           </p>
         </form>

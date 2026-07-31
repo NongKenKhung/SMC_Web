@@ -12,6 +12,7 @@
     "db:seed": "pnpm --filter @sml/api seed",
     "db:seed:demo": "pnpm --filter @sml/api seed:demo",
     "db:seed:demo:clear": "pnpm --filter @sml/api seed:demo:clear",
+    "db:clean:uploads": "pnpm --filter @sml/api clean:uploads",
     "build": "pnpm -r build"
   }
 }

@@ -11,7 +11,8 @@
     "prisma:studio": "dotenv -e ../../.env -- prisma studio",
     "seed": "ts-node prisma/seed.ts",
     "seed:demo": "ts-node prisma/seed-demo.ts",
-    "seed:demo:clear": "ts-node prisma/seed-demo-clear.ts"
+    "seed:demo:clear": "ts-node prisma/seed-demo-clear.ts",
+    "clean:uploads": "ts-node prisma/clean-uploads.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

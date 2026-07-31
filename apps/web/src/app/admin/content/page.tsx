@@ -168,7 +168,7 @@ export default function AdminContent() {
               onChange={(e) => setEmbed({ ...embed, videoUrl: e.target.value })}
               placeholder="https://www.youtube.com/watch?v=..."
             />
-            <p className="qr-note">รองรับ YouTube และ Vimeo — วางลิงก์จากช่องที่อยู่ของเบราว์เซอร์ได้เลย</p>
+            <p className="adm-note">รองรับ YouTube และ Vimeo — วางลิงก์จากช่องที่อยู่ของเบราว์เซอร์ได้เลย</p>
           </div>
           <div>
             <label>หัวข้อเหนือวิดีโอ</label>
@@ -185,7 +185,7 @@ export default function AdminContent() {
               onChange={(e) => setEmbed({ ...embed, mapQuery: e.target.value })}
               placeholder="13.7276,100.7791 หรือ สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง"
             />
-            <p className="qr-note">
+            <p className="adm-note">
               ใส่พิกัด (ละติจูด,ลองจิจูด) จะแม่นที่สุด — เปิด Google Maps คลิกขวาที่จุดที่ต้องการแล้วคัดลอกตัวเลขมาวาง
             </p>
           </div>

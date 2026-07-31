@@ -10,7 +10,6 @@ const NAV = [
   { href: "/admin/solutions", label: "Solutions" },
   { href: "/admin/posts", label: "กิจกรรม & ข่าว" },
   { href: "/admin/partners", label: "พาร์ทเนอร์" },
-  { href: "/admin/qr", label: "QR Code" },
   { href: "/admin/blocks", label: "เนื้อหาในหน้าเว็บ" },
   { href: "/admin/content", label: "ข้อความหลัก" },
   { href: "/admin/messages", label: "กล่องข้อความ" },

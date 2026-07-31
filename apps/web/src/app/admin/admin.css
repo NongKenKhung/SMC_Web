@@ -239,44 +239,10 @@ body { background: var(--a-soft); }
   .login-card { padding: 28px 22px; }
 }
 
-/* ---------- หน้า QR Code ---------- */
-.qr-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; align-items: start; }
-.qr-preview {
-  display: grid; place-items: center; min-height: 240px;
-  background: var(--a-soft); border: 1px solid var(--a-line); border-radius: 12px; padding: 18px;
-}
-.qr-preview canvas { max-width: 340px; border-radius: 6px; }
-.qr-preview:empty::after { content: "ใส่ลิงก์ให้ถูกต้องก่อน จึงจะเห็นตัวอย่าง"; font-size: .84rem; color: #7c879b; }
-.qr-url { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; background: var(--a-soft); }
-.qr-note { font-size: .78rem; color: #7c879b; line-height: 1.65; }
-.qr-warn { font-size: .78rem; color: #b3261e; margin-top: 6px; line-height: 1.6; }
+/* ---------- ข้อความช่วยเหลือในฟอร์ม admin ---------- */
+.adm-note { font-size: .78rem; color: #7c879b; line-height: 1.65; }
+.adm-warn { font-size: .78rem; color: #b3261e; margin-top: 6px; line-height: 1.6; }
 .adm-form input[type="color"] { height: 40px; padding: 4px; cursor: pointer; }
-
-.qr-sheet {
-  margin-top: 18px; display: grid; gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-}
-.qr-sheet figure {
-  border: 1px solid var(--a-line); border-radius: 12px; padding: 12px;
-  background: #fff; text-align: center; break-inside: avoid;
-}
-.qr-sheet img { width: 100%; height: auto; display: block; }
-.qr-sheet figcaption {
-  margin-top: 8px; font-size: .8rem; font-weight: 600; color: var(--a-navy); line-height: 1.45;
-}
-
-@media (max-width: 1024px) {
-  .qr-layout { grid-template-columns: 1fr; }
-}
-
-/* ตอนสั่งพิมพ์ — เอาเฉพาะแผ่นป้าย ตัดเมนูและปุ่มทิ้ง */
-@media print {
-  .adm-side, .adm-actions, .qr-layout, .sub, h1, .adm-card h2, .qr-note { display: none !important; }
-  .adm-wrap, .adm-main { display: block; padding: 0; margin: 0; background: #fff; }
-  .adm-card { border: 0; box-shadow: none; padding: 0; margin: 0; }
-  .qr-sheet { margin: 0; grid-template-columns: repeat(3, 1fr); gap: 10mm; }
-  .qr-sheet figure { border-color: #ccc; }
-}
 
 /* ข้อความระหว่างอัปโหลดรูปในตัวแก้ไขเนื้อหา */
 .rt-uploading {
