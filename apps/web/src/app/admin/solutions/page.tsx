@@ -59,11 +59,20 @@ export default function AdminSolutions() {
     try {
       if (editingId) {
         await adminFetch(`/admin/solutions/${editingId}`, { method: "PATCH", body: JSON.stringify(payload) });
+        setMsg({ ok: "บันทึกแล้ว — หน้าเว็บและเมนู dropdown อัปเดตทันที" });
+        setForm(null);
       } else {
-        await adminFetch("/admin/solutions", { method: "POST", body: JSON.stringify(payload) });
+        /* เพิ่งสร้างใหม่ — ยังไม่ปิดฟอร์ม แต่สลับเป็นโหมดแก้ไขของรายการที่เพิ่งได้
+           เพราะการแนบไฟล์ต้องรู้ id ก่อน ถ้าปิดไปผู้ใช้ต้องมาเปิดแก้ไขเองอีกรอบ */
+        const created = await adminFetch<AdminSolution>("/admin/solutions", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        setEditingId(created.id);
+        setSlugTouched(true);
+        setForm({ ...created });
+        setMsg({ ok: "บันทึกแล้ว — ตอนนี้แนบรูปและไฟล์ด้านล่างได้เลย" });
       }
-      setMsg({ ok: "บันทึกแล้ว — หน้าเว็บและเมนู dropdown อัปเดตทันที" });
-      setForm(null);
       load();
     } catch (e) {
       setMsg({ err: e instanceof Error ? e.message : "บันทึกไม่สำเร็จ" });

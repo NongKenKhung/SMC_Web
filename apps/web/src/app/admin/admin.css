@@ -261,3 +261,8 @@ body { background: var(--a-soft); }
   margin-left: 8px; padding: 2px 9px; border-radius: 999px;
   background: var(--a-soft); color: #7c879b; font-size: .7rem; font-weight: 600; vertical-align: middle;
 }
+
+/* กล่องแนบไฟล์ตอนยังไม่ได้บันทึกรายการ — บอกให้ชัดว่าติดอะไรอยู่ */
+.att-box.att-locked { background: var(--a-soft); border-style: dashed; }
+.att-box.att-locked b { color: #7c879b; }
+.att-hint { margin: 6px 0 0; font-size: .8rem; color: #7c879b; line-height: 1.6; }

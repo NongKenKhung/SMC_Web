@@ -55,11 +55,20 @@ export default function AdminPosts() {
     try {
       if (editingId) {
         await adminFetch(`/admin/posts/${editingId}`, { method: "PATCH", body: JSON.stringify(payload) });
+        setMsg({ ok: "บันทึกแล้ว" });
+        setForm(null);
       } else {
-        await adminFetch("/admin/posts", { method: "POST", body: JSON.stringify(payload) });
+        /* เพิ่งสร้างใหม่ — ยังไม่ปิดฟอร์ม แต่สลับเป็นโหมดแก้ไขของโพสต์ที่เพิ่งได้
+           เพราะการแนบไฟล์ต้องรู้ id ก่อน ถ้าปิดไปผู้ใช้ต้องมาเปิดแก้ไขเองอีกรอบ */
+        const created = await adminFetch<AdminPost>("/admin/posts", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        setEditingId(created.id);
+        setSlugTouched(true);
+        setForm({ ...created, publishedAt: created.publishedAt.slice(0, 10) });
+        setMsg({ ok: "บันทึกแล้ว — ตอนนี้แนบรูปและไฟล์ด้านล่างได้เลย" });
       }
-      setMsg({ ok: "บันทึกแล้ว" });
-      setForm(null);
       load();
     } catch (e) {
       setMsg({ err: e instanceof Error ? e.message : "บันทึกไม่สำเร็จ" });

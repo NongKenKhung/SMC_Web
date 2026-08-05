@@ -109,11 +109,15 @@ export default function AttachmentEditor({
     });
   }
 
+  /* ยังไม่มี id = ยังไม่ได้บันทึกครั้งแรก ผูกไฟล์เข้ากับอะไรไม่ได้
+     บอกให้ชัดว่าต้องทำอะไรต่อ ไม่ใช่ปล่อยกล่องว่างให้งง */
   if (!ownerId) {
     return (
-      <div className="att-box">
+      <div className="att-box att-locked">
         <b>{meta.title}</b>
-        <p className="sub" style={{ margin: "4px 0 0" }}>บันทึกรายการนี้ก่อน แล้วจึงแนบไฟล์ได้</p>
+        <p className="att-hint">
+          กด “บันทึก” ด้านล่างก่อน แล้วช่องนี้จะเปิดให้แนบไฟล์ทันที (ฟอร์มจะไม่ปิด)
+        </p>
       </div>
     );
   }
