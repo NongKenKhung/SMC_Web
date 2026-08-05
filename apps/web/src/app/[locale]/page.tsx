@@ -166,7 +166,7 @@ export default async function Home({
               {hero?.titleLine1} {hero?.titleLine2}
             </span>
           </h1>
-          <p className="hero-lead">{hero?.lead}</p>
+          {hero?.lead && <p className="hero-lead">{hero.lead}</p>}
           <div className="hero-cta">
             <Link href={`${base}/solutions`} className="btn btn-primary">
               {t.common.getStarted} <ArrowR />
@@ -316,7 +316,7 @@ export default async function Home({
             {(partners ?? []).slice(0, 5).map((p) => (
               <div className="logo-card" key={p.id}>
                 {p.logoUrl ? <img src={mediaUrl(p.logoUrl)!} alt={p.name} /> : <b>{p.name}</b>}
-                <span>{pick(p, "caption", locale)}</span>
+                {pick(p, "caption", locale) && <span>{pick(p, "caption", locale)}</span>}
               </div>
             ))}
           </div>
@@ -351,7 +351,7 @@ export default async function Home({
                     <span>{fmtDate(p.publishedAt, locale)}</span>
                   </div>
                   <h3>{pick(p, "title", locale)}</h3>
-                  <p className="post-x">{pick(p, "excerpt", locale)}</p>
+                  {pick(p, "excerpt", locale) && <p className="post-x">{pick(p, "excerpt", locale)}</p>}
                 </div>
               </Link>
             ))}

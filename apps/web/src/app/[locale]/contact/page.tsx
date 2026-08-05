@@ -63,27 +63,22 @@ export default async function ContactPage({
               </h2>
               <p className="lead">{t.contact.lead}</p>
             </div>
+            {/* ช่องไหนไม่ได้กรอกก็ไม่ต้องขึ้นการ์ดหัวข้อลอย ๆ */}
             <div className="info-grid reveal d1">
-              <div className="info-item">
-                <div className="i-icon">{Icon.phone}</div>
-                <h4>{t.contact.phone}</h4>
-                <p>{contact?.phone}</p>
-              </div>
-              <div className="info-item">
-                <div className="i-icon">{Icon.mail}</div>
-                <h4>{t.contact.email}</h4>
-                <p>{contact?.email}</p>
-              </div>
-              <div className="info-item">
-                <div className="i-icon">{Icon.pin}</div>
-                <h4>{t.contact.address}</h4>
-                <p>{contact?.address}</p>
-              </div>
-              <div className="info-item">
-                <div className="i-icon">{Icon.clock}</div>
-                <h4>{t.contact.hours}</h4>
-                <p>{contact?.hours}</p>
-              </div>
+              {[
+                { icon: Icon.phone, label: t.contact.phone, value: contact?.phone },
+                { icon: Icon.mail, label: t.contact.email, value: contact?.email },
+                { icon: Icon.pin, label: t.contact.address, value: contact?.address },
+                { icon: Icon.clock, label: t.contact.hours, value: contact?.hours },
+              ]
+                .filter((i) => i.value?.trim())
+                .map((i) => (
+                  <div className="info-item" key={i.label}>
+                    <div className="i-icon">{i.icon}</div>
+                    <h4>{i.label}</h4>
+                    <p>{i.value}</p>
+                  </div>
+                ))}
             </div>
           </div>
 

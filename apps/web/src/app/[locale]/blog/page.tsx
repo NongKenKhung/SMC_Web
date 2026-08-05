@@ -70,7 +70,7 @@ export default async function BlogPage({
                     <span>{fmtDate(p.publishedAt, locale)}</span>
                   </div>
                   <h3>{pick(p, "title", locale)}</h3>
-                  <p className="post-x">{pick(p, "excerpt", locale)}</p>
+                  {pick(p, "excerpt", locale) && <p className="post-x">{pick(p, "excerpt", locale)}</p>}
                 </div>
               </Link>
             ))}

@@ -42,7 +42,7 @@ export default async function PartnersPage({
               const card = (
                 <div className="logo-card glow" key={p.id}>
                   {p.logoUrl ? <img src={mediaUrl(p.logoUrl)!} alt={p.name} /> : <b>{p.name}</b>}
-                  <span>{pick(p, "caption", locale)}</span>
+                  {pick(p, "caption", locale) && <span>{pick(p, "caption", locale)}</span>}
                 </div>
               );
               return p.websiteUrl ? (

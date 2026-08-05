@@ -88,14 +88,16 @@ export default function SiteFooter({
           <div>
             <h5>{t.footer.contact}</h5>
             <ul className="f-contact">
-              {contact && (
-                <>
-                  <li>{Icon.pin} {contact.address}</li>
-                  <li>{Icon.phone} {contact.phone}</li>
-                  <li>{Icon.mail} {contact.email}</li>
-                  <li>{Icon.clock} {contact.hours}</li>
-                </>
-              )}
+              {[
+                { icon: Icon.pin, value: contact?.address },
+                { icon: Icon.phone, value: contact?.phone },
+                { icon: Icon.mail, value: contact?.email },
+                { icon: Icon.clock, value: contact?.hours },
+              ]
+                .filter((i) => i.value?.trim())
+                .map((i) => (
+                  <li key={i.value}>{i.icon} {i.value}</li>
+                ))}
             </ul>
           </div>
         </div>

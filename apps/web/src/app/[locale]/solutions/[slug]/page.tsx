@@ -39,18 +39,6 @@ export async function generateMetadata({
   };
 }
 
-/* ฟีเจอร์ mock 6 ข้อ — เนื้อหาจริงของแต่ละระบบจะมาจาก bodyTh/bodyEn (แก้ผ่าน admin เฟส 4) */
-const FEATURES = {
-  th: Array.from({ length: 6 }, (_, i) => ({
-    title: `ชื่อฟีเจอร์ที่${["หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก"][i]}`,
-    body: "คำอธิบายสั้น ๆ ว่าฟีเจอร์นี้ทำอะไร ให้ประโยชน์อย่างไรกับผู้ใช้งาน",
-  })),
-  en: Array.from({ length: 6 }, (_, i) => ({
-    title: `Feature ${i + 1}`,
-    body: "A short description of what this feature does and how it helps.",
-  })),
-};
-
 const ArrowR = () => (
   <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -73,9 +61,12 @@ export default async function SolutionDetail({
   /* ฟีเจอร์ของ solution นี้ — แก้ผ่าน admin ได้ (กลุ่ม solution.features:<id>)
      ยังไม่มีข้อมูลก็ใช้รายการเริ่มต้นที่ฝังมากับระบบ */
   const featBlocks = (await getBlocks([`solution.features:${sol.id}`]))[`solution.features:${sol.id}`] ?? [];
-  const features = featBlocks.length
-    ? featBlocks.map((b) => ({ title: blockText(b, "title", locale), body: blockText(b, "body", locale), html: true }))
-    : FEATURES[locale].map((f) => ({ ...f, html: false }));
+  /* ไม่มีค่าเริ่มต้นฝังในโค้ด — ไม่ได้กรอกก็ไม่ต้องแสดง section นี้ */
+  const features = featBlocks.map((b) => ({
+    title: blockText(b, "title", locale),
+    body: blockText(b, "body", locale),
+    html: true,
+  }));
 
   const name = pick(sol, "name", locale);
   const isCategory = sol.children.length > 0;
@@ -101,22 +92,20 @@ export default async function SolutionDetail({
           <div className="sec-head reveal">
             <span className="eyebrow">Solution &amp; Product</span>
             <h2><span className="grad">{name}</span></h2>
-            <p className="lead">{pick(sol, "summary", locale)}</p>
-          </div>
-          <div className="detail-hero reveal">
-            {sol.poster ? (
-              <img src={mediaUrl(sol.poster.url)!} alt={sol.poster.altTh ?? name} />
-            ) : sol.coverImage ? (
-              <img src={mediaUrl(sol.coverImage)!} alt={name} />
-            ) : (
-              <>
-                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#F9C846" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity=".9">
-                  <rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" />
-                  <path d="M6 9l3 3 3-4 3 3 3-2" stroke="#F26B21" strokeWidth="1.6" />
-                </svg>
-              </>
+            {pick(sol, "summary", locale) && (
+              <p className="lead">{pick(sol, "summary", locale)}</p>
             )}
           </div>
+          {/* ไม่ได้ใส่รูป = ไม่ต้องมีกรอบรูปเปล่า */}
+          {(sol.poster || sol.coverImage) && (
+            <div className="detail-hero reveal">
+              {sol.poster ? (
+                <img src={mediaUrl(sol.poster.url)!} alt={sol.poster.altTh ?? name} />
+              ) : (
+                <img src={mediaUrl(sol.coverImage)!} alt={name} />
+              )}
+            </div>
+          )}
           {pick(sol, "body", locale) && (
             <div className="reveal" style={{ marginTop: 42 }}>
               <RichContent html={pick(sol, "body", locale)} />
@@ -126,7 +115,7 @@ export default async function SolutionDetail({
       </section>
 
       {/* หมวด → รายการหัวข้อย่อย | หัวข้อย่อย → ฟีเจอร์ */}
-      {isCategory ? (
+      {isCategory && sol.children.length > 0 ? (
         <section className="sec soft-sec">
           <div className="container">
             <div className="sec-head reveal">
@@ -137,7 +126,7 @@ export default async function SolutionDetail({
               {sol.children.map((c, i) => (
                 <article className={`card glow reveal${i ? ` d${i}` : ""}`} key={c.slug}>
                   <h3>{pick(c, "name", locale)}</h3>
-                  <p>{pick(c, "summary", locale)}</p>
+                  {pick(c, "summary", locale) && <p>{pick(c, "summary", locale)}</p>}
                   <Link className="more" href={`${base}/solutions/${c.slug}`}>
                     {t.common.readMore} <ArrowR />
                   </Link>
@@ -146,7 +135,7 @@ export default async function SolutionDetail({
             </div>
           </div>
         </section>
-      ) : (
+      ) : !isCategory && features.length > 0 ? (
         <section className="sec soft-sec">
           <div className="container">
             <div className="sec-head reveal">
@@ -164,7 +153,7 @@ export default async function SolutionDetail({
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       {/* แกลเลอรี + ไฟล์ดาวน์โหลด (จัดการผ่าน admin) */}
       <Gallery items={sol.gallery ?? []} locale={locale} />
