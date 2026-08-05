@@ -5,6 +5,7 @@ import AttachmentEditor from "@/components/admin/AttachmentEditor";
 import RichText from "@/components/admin/RichText";
 import Upload from "@/components/admin/Upload";
 import { adminFetch, type AdminPost } from "@/lib/admin";
+import { slugFrom, slugify } from "@/lib/slug";
 
 const CATS = [
   { v: "ACTIVITY", label: "กิจกรรม" },
@@ -25,6 +26,8 @@ export default function AdminPosts() {
   const [rows, setRows] = useState<AdminPost[]>([]);
   const [form, setForm] = useState<FormState | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
+  /* ถ้าผู้ใช้พิมพ์ slug เองแล้ว หยุดสร้างอัตโนมัติ — ไม่ทับของที่ตั้งใจตั้ง */
+  const [slugTouched, setSlugTouched] = useState(false);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
 
   const load = useCallback(() => {
@@ -34,6 +37,7 @@ export default function AdminPosts() {
 
   function openEdit(r: AdminPost) {
     setEditingId(r.id);
+    setSlugTouched(true); // ของเดิมมี slug แล้ว ห้ามเขียนทับ
     setForm({ ...r, publishedAt: r.publishedAt.slice(0, 10) });
     setMsg({});
   }
@@ -78,7 +82,7 @@ export default function AdminPosts() {
 
       <div className="adm-card">
         <div className="adm-actions" style={{ marginBottom: 14 }}>
-          <button className="adm-btn" onClick={() => { setEditingId(null); setForm({ ...EMPTY }); setMsg({}); }}>
+          <button className="adm-btn" onClick={() => { setEditingId(null); setSlugTouched(false); setForm({ ...EMPTY }); setMsg({}); }}>
             + เขียนโพสต์ใหม่
           </button>
         </div>
@@ -112,17 +116,46 @@ export default function AdminPosts() {
             <div className="row2">
               <div>
                 <label>หัวข้อ (ไทย) *</label>
-                <input value={form.titleTh} onChange={(e) => setForm({ ...form, titleTh: e.target.value })} required />
+                <input
+                  value={form.titleTh}
+                  onChange={(e) => {
+                    const titleTh = e.target.value;
+                    const auto = !editingId && !slugTouched;
+                    setForm({ ...form, titleTh, ...(auto ? { slug: slugFrom(titleTh, form.titleEn) } : {}) });
+                  }}
+                  required
+                />
               </div>
               <div>
                 <label>หัวข้อ (อังกฤษ)</label>
-                <input value={form.titleEn ?? ""} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} />
+                <input
+                  value={form.titleEn ?? ""}
+                  onChange={(e) => {
+                    const titleEn = e.target.value;
+                    const auto = !editingId && !slugTouched;
+                    setForm({ ...form, titleEn, ...(auto ? { slug: slugFrom(form.titleTh, titleEn) } : {}) });
+                  }}
+                />
               </div>
             </div>
             <div className="row3">
               <div>
-                <label>slug (URL) *</label>
-                <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} required pattern="[a-z0-9-]+" />
+                <label>slug (ที่อยู่หน้าเว็บ)</label>
+                <input
+                  value={form.slug}
+                  onChange={(e) => {
+                    setSlugTouched(true);
+                    setForm({ ...form, slug: slugify(e.target.value) });
+                  }}
+                  required
+                  pattern="[a-z0-9-]+"
+                />
+                <p className="adm-note">
+                  {editingId
+                    ? "เปลี่ยนแล้วลิงก์เดิมที่เคยส่งให้คนอื่นจะเข้าไม่ได้"
+                    : "สร้างให้อัตโนมัติจากหัวข้อ — แก้เองได้ถ้าต้องการ"}
+                  {form.slug ? ` · /blog/${form.slug}` : ""}
+                </p>
               </div>
               <div>
                 <label>หมวด</label>
