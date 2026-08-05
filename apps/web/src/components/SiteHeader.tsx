@@ -46,9 +46,12 @@ export default function SiteHeader({
   const isActive = (href: string) =>
     href === base ? pathname === base : pathname.startsWith(href);
 
+  /* ยังไม่มีโซลูชันในระบบ = ไม่ต้องมีเมนูย่อย ไม่งั้นจะเปิดกล่องเปล่าออกมา */
+  const hasSolutions = tree.length > 0;
+
   const links = [
     { href: base, label: t.nav.home },
-    { href: `${base}/solutions`, label: t.nav.solutions, sub: true },
+    { href: `${base}/solutions`, label: t.nav.solutions, sub: hasSolutions },
     { href: `${base}/partners`, label: t.nav.partners },
     { href: `${base}/blog`, label: t.nav.blog },
     { href: `${base}/about`, label: t.nav.about },

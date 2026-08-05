@@ -72,16 +72,19 @@ export default function SiteFooter({
               ))}
             </ul>
           </div>
-          <div>
-            <h5>{t.footer.solutions}</h5>
-            <ul className="f-links">
-              {tree.map((s) => (
-                <li key={s.id}>
-                  <Link href={`${base}/solutions/${s.slug}`}>{pick(s, "name", locale)}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* ยังไม่มีโซลูชัน = ไม่ต้องขึ้นหัวข้อคอลัมน์เปล่า */}
+          {tree.length > 0 && (
+            <div>
+              <h5>{t.footer.solutions}</h5>
+              <ul className="f-links">
+                {tree.map((s) => (
+                  <li key={s.id}>
+                    <Link href={`${base}/solutions/${s.slug}`}>{pick(s, "name", locale)}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div>
             <h5>{t.footer.contact}</h5>
             <ul className="f-contact">
