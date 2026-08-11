@@ -50,8 +50,10 @@ const FILE_RULES: Record<string, string[]> = {
   ".zip": ["application/zip", "application/x-zip-compressed", "application/octet-stream"],
 };
 export const IMAGE_EXTS = new Set(Object.keys(IMAGE_RULES));
-const MAX_IMAGE = 5 * 1024 * 1024; // 5 MB
-const MAX_FILE = 20 * 1024 * 1024; // 20 MB
+const MAX_IMAGE = 5 * 1024 * 1024; // 5 MB — รูปทั่วไป (ปก/แกลเลอรี/รูปในเนื้อหา)
+/* โบรชัวเป็นหน้าสแกนความละเอียดสูง ใช้แทนเนื้อหาทั้งหน้า จึงต้องการเพดานสูงกว่า */
+const MAX_BROCHURE_IMAGE = 15 * 1024 * 1024; // 15 MB
+const MAX_FILE = 20 * 1024 * 1024; // 20 MB — เพดานที่ multer รับ (ครอบทุกชนิด)
 
 /** ลายเซ็นไบต์ต้นไฟล์ — กันเปลี่ยนนามสกุล/ปลอม mimetype (เช่น .exe เปลี่ยนชื่อเป็น .png) */
 const MAGIC: Array<{ exts: string[]; sig: number[] }> = [
@@ -172,7 +174,7 @@ export class MediaService {
 
   /** รับไฟล์ที่ multer วางลงดิสก์แล้ว ตรวจซ้ำอีกชั้น แล้วบันทึกเป็นแถว Media
    *  ใช้ร่วมกันทั้งอัปโหลดเดี่ยว (รูปปก/รูปในเนื้อหา) และอัปโหลดแนบเข้ารายการ */
-  async saveUpload(file?: Express.Multer.File) {
+  async saveUpload(file?: Express.Multer.File, maxImageBytes = MAX_IMAGE) {
     if (!file) {
       throw new BadRequestException(
         "อัปโหลดไม่สำเร็จ — รับเฉพาะรูป (jpg, png, webp, gif) และเอกสาร (pdf, doc/docx, xls/xlsx, ppt/pptx, zip)",
@@ -187,8 +189,8 @@ export class MediaService {
       throw new BadRequestException(msg);
     };
 
-    if (kind === "IMAGE" && file.size > MAX_IMAGE) {
-      await fail("ไฟล์รูปต้องไม่เกิน 5 MB");
+    if (kind === "IMAGE" && file.size > maxImageBytes) {
+      await fail(`ไฟล์รูปต้องไม่เกิน ${Math.round(maxImageBytes / 1024 / 1024)} MB`);
     }
     if (!(await magicMatches(path, ext))) {
       await fail("เนื้อไฟล์ไม่ตรงกับนามสกุล — ไฟล์อาจถูกเปลี่ยนชื่อหรือเสียหาย");
@@ -416,7 +418,11 @@ export class AdminAttachmentsController {
     @Body() dto: AttachmentUploadDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    const media = await this.media.saveUpload(file);
+    /* โบรชัวได้เพดานใหญ่กว่ารูปอื่น เพราะเป็นหน้าสแกนที่ต้องอ่านตัวหนังสือออก */
+    const media = await this.media.saveUpload(
+      file,
+      dto.role === "BROCHURE" ? MAX_BROCHURE_IMAGE : MAX_IMAGE,
+    );
     try {
       return await this.service.add({ ...dto, mediaId: media.id });
     } catch (e) {
