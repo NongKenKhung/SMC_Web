@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { adminFetch, fileSize, mediaUrl, type AdminAttachment } from "@/lib/admin";
 
-type Role = "GALLERY" | "DOWNLOAD" | "POSTER";
+type Role = "GALLERY" | "DOWNLOAD" | "POSTER" | "BROCHURE";
 
 const IMAGE_ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
 const FILE_ACCEPT =
@@ -14,6 +14,12 @@ const LABEL: Record<Role, { title: string; hint: string; add: string; accept: st
     title: "รูปหลัก (poster)",
     hint: "ใช้เป็นภาพพื้นหลัง/ภาพเปิดของรายการนี้ — มีได้รูปเดียว ใส่ใหม่จะแทนที่ของเดิม",
     add: "อัปโหลดรูปหลัก",
+    accept: IMAGE_ACCEPT,
+  },
+  BROCHURE: {
+    title: "หน้าโบรชัว",
+    hint: "รูปทั้งหน้าเรียงต่อกัน — ใช้แทนเนื้อหาแบบข้อความ ใส่ได้หลายหน้า จัดลำดับได้",
+    add: "+ อัปโหลดหน้าโบรชัว",
     accept: IMAGE_ACCEPT,
   },
   GALLERY: {

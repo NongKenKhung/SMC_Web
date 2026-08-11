@@ -49,6 +49,9 @@ class SolutionDto {
 
   @IsOptional() @IsBoolean()
   published?: boolean;
+
+  @IsOptional() @IsIn(["TEXT", "BROCHURE"])
+  layout?: string;
 }
 class SolutionPatchDto extends SolutionDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(80)

@@ -11,7 +11,7 @@ type FormState = Partial<AdminSolution> & { nameTh: string; slug: string };
 
 const EMPTY: FormState = {
   nameTh: "", nameEn: "", slug: "", summaryTh: "", summaryEn: "",
-  bodyTh: "", bodyEn: "", coverImage: "", parentId: null, order: 0, published: true,
+  bodyTh: "", bodyEn: "", coverImage: "", parentId: null, order: 0, published: true, layout: "TEXT",
 };
 
 export default function AdminSolutions() {
@@ -51,6 +51,7 @@ export default function AdminSolutions() {
       slug: form.slug, nameTh: form.nameTh, nameEn: form.nameEn ?? "",
       summaryTh: form.summaryTh ?? "", summaryEn: form.summaryEn ?? "",
       bodyTh: form.bodyTh ?? "", bodyEn: form.bodyEn ?? "",
+      layout: form.layout ?? "TEXT",
       coverImage: form.coverImage ?? "",
       parentId: form.parentId ?? undefined,
       order: Number(form.order ?? 0),
@@ -192,6 +193,35 @@ export default function AdminSolutions() {
                 <textarea value={form.summaryEn ?? ""} onChange={(e) => setForm({ ...form, summaryEn: e.target.value })} />
               </div>
             </div>
+            {/* รูปแบบหน้า — เลือกอย่างใดอย่างหนึ่ง ช่องที่ไม่เกี่ยวจะซ่อนให้ */}
+            <div>
+              <label>รูปแบบหน้ารายละเอียด</label>
+              <div className="layout-pick">
+                <label className={form.layout !== "BROCHURE" ? "on" : ""}>
+                  <input
+                    type="radio"
+                    name="layout"
+                    checked={form.layout !== "BROCHURE"}
+                    onChange={() => setForm({ ...form, layout: "TEXT" })}
+                  />
+                  <b>เนื้อหาแบบข้อความ</b>
+                  <span>เขียนเนื้อหาเอง แนบภาพประกอบได้</span>
+                </label>
+                <label className={form.layout === "BROCHURE" ? "on" : ""}>
+                  <input
+                    type="radio"
+                    name="layout"
+                    checked={form.layout === "BROCHURE"}
+                    onChange={() => setForm({ ...form, layout: "BROCHURE" })}
+                  />
+                  <b>โบรชัว (รูปล้วน)</b>
+                  <span>ใช้รูปเป็นทั้งหน้า ใส่ได้หลายหน้าเรียงต่อกัน</span>
+                </label>
+              </div>
+            </div>
+
+            {form.layout !== "BROCHURE" && (
+            <>
             <div>
               <label>เนื้อหา (ไทย)</label>
               <RichText
@@ -208,8 +238,10 @@ export default function AdminSolutions() {
                 placeholder="English content (optional)"
               />
             </div>
+            </>
+            )}
             <div>
-              <label>รูปประกอบ</label>
+              <label>รูปหน้าปก (ใช้ในการ์ดและลิงก์แชร์)</label>
               <Upload value={form.coverImage} onDone={(url) => setForm({ ...form, coverImage: url })} />
             </div>
             <label className="check">
@@ -219,8 +251,15 @@ export default function AdminSolutions() {
 
             {/* ไฟล์แนบ — บันทึกทันทีเมื่อกด ไม่ต้องรอ "บันทึก" ของฟอร์ม */}
             <div style={{ display: "grid", gap: 14 }}>
-              <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="POSTER" />
-              <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="GALLERY" />
+              {form.layout === "BROCHURE" ? (
+                <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="BROCHURE" />
+              ) : (
+                <>
+                  <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="POSTER" />
+                  <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="GALLERY" />
+                </>
+              )}
+              {/* ไฟล์ดาวน์โหลดมีได้ทุกแบบ */}
               <AttachmentEditor ownerType="SOLUTION" ownerId={editingId ? String(editingId) : ""} role="DOWNLOAD" />
             </div>
             <div className="adm-actions">

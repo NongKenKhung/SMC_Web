@@ -1,6 +1,6 @@
 /* ไฟล์แนบของแต่ละรายการ
    ไม่มีคลังสื่อกลางแล้ว — อัปโหลดไฟล์แล้วผูกเข้ากับ solution/post/หน้า นั้น ๆ ทันที
-   ผ่านตาราง Attachment (role = GALLERY | DOWNLOAD | POSTER)
+   ผ่านตาราง Attachment (role = GALLERY | DOWNLOAD | POSTER | BROCHURE)
    พอไม่มีรายการไหนอ้างถึง ไฟล์จะถูกลบทั้งแถว Media และไฟล์บนดิสก์อัตโนมัติ
    ความปลอดภัย: ตรวจนามสกุล+mimetype+magic bytes, ไม่รับ SVG, บังคับดาวน์โหลดไฟล์ที่ไม่ใช่รูป,
    กัน path traversal */
@@ -120,7 +120,7 @@ class AttachmentUploadDto {
   @IsString() @IsNotEmpty() @MaxLength(120)
   ownerId!: string;
 
-  @IsIn(["GALLERY", "DOWNLOAD", "POSTER"])
+  @IsIn(["GALLERY", "DOWNLOAD", "POSTER", "BROCHURE"])
   role!: string;
 }
 
@@ -134,7 +134,7 @@ class AttachmentCreateDto {
   @IsString() @IsNotEmpty() @MaxLength(120)
   ownerId!: string;
 
-  @IsIn(["GALLERY", "DOWNLOAD", "POSTER"])
+  @IsIn(["GALLERY", "DOWNLOAD", "POSTER", "BROCHURE"])
   role!: string;
 
   @IsOptional() @IsString() @MaxLength(300)
@@ -261,9 +261,9 @@ export class AttachmentsService {
   async add(dto: AttachmentCreateDto) {
     const media = await this.prisma.media.findUnique({ where: { id: dto.mediaId } });
     if (!media) throw new NotFoundException("ไม่พบไฟล์ที่อ้างถึง");
-    if (dto.role === "GALLERY" || dto.role === "POSTER") {
+    if (dto.role === "GALLERY" || dto.role === "POSTER" || dto.role === "BROCHURE") {
       if (media.kind !== "IMAGE") {
-        throw new BadRequestException("แกลเลอรีและ poster ต้องเป็นไฟล์รูปเท่านั้น");
+        throw new BadRequestException("แกลเลอรี poster และโบรชัว ต้องเป็นไฟล์รูปเท่านั้น");
       }
     }
     // poster มีได้ตัวเดียวต่อรายการ — ใส่ใหม่แทนที่ของเดิม (รูปเก่าต้องถูกลบทิ้งด้วย)
@@ -346,6 +346,7 @@ function shape(rows: AttachmentRow[]) {
   return {
     poster: poster ? pickFields(poster) : null,
     gallery: rows.filter((r) => r.role === "GALLERY").map(pickFields),
+    brochure: rows.filter((r) => r.role === "BROCHURE").map(pickFields),
     downloads: rows.filter((r) => r.role === "DOWNLOAD").map(pickFields),
   };
 }

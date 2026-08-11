@@ -38,6 +38,7 @@ model Solution {
   summaryEn  String?
   bodyTh     String?
   bodyEn     String?
+  layout     String   @default("TEXT") // TEXT = หน้าเนื้อหาปกติ | BROCHURE = รูปโบรชัวเต็มหน้า
   coverImage String?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt

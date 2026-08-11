@@ -266,3 +266,16 @@ body { background: var(--a-soft); }
 .att-box.att-locked { background: var(--a-soft); border-style: dashed; }
 .att-box.att-locked b { color: #7c879b; }
 .att-hint { margin: 6px 0 0; font-size: .8rem; color: #7c879b; line-height: 1.6; }
+
+/* ---------- เลือกรูปแบบหน้ารายละเอียด ---------- */
+.layout-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.layout-pick label {
+  display: grid; gap: 2px; padding: 12px 14px; cursor: pointer; margin: 0;
+  border: 1px solid var(--a-line); border-radius: 11px; background: #fff;
+  transition: border-color .2s, background .2s;
+}
+.layout-pick label.on { border-color: var(--a-orange); background: #fff6f0; }
+.layout-pick input { width: auto; margin-bottom: 4px; }
+.layout-pick b { font-size: .88rem; color: var(--a-navy); font-weight: 600; }
+.layout-pick span { font-size: .76rem; color: #7c879b; line-height: 1.5; }
+@media (max-width: 700px) { .layout-pick { grid-template-columns: 1fr; } }

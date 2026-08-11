@@ -114,3 +114,49 @@ export function DownloadList({ items, locale }: { items: AttachmentItem[]; local
     </section>
   );
 }
+
+/** โบรชัว — รูปทั้งหน้าเรียงต่อกัน กดดูขนาดเต็มได้เหมือนแกลเลอรี
+ *  ใช้แทนเนื้อหาแบบข้อความ จึงกินความกว้างเต็มและไม่มีหัวข้อกำกับ */
+export function Brochure({ items, locale }: { items: AttachmentItem[]; locale: Locale }) {
+  const t = dict(locale);
+  const [open, setOpen] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (open === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(null);
+      if (e.key === "ArrowRight") setOpen((i) => (i === null ? null : (i + 1) % items.length));
+      if (e.key === "ArrowLeft") setOpen((i) => (i === null ? null : (i - 1 + items.length) % items.length));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, items.length]);
+
+  if (!items.length) return null;
+
+  return (
+    <section className="sec broch-sec">
+      <div className="container broch-wrap">
+        {items.map((b, i) => (
+          <figure className="broch-page reveal" key={b.id}>
+            <button type="button" onClick={() => setOpen(i)} aria-label={`${i + 1}`}>
+              <img src={mediaUrl(b.url) ?? ""} alt={pickText(b, "alt", locale)} loading={i < 2 ? "eager" : "lazy"} />
+            </button>
+            {pickText(b, "caption", locale) && <figcaption>{pickText(b, "caption", locale)}</figcaption>}
+          </figure>
+        ))}
+      </div>
+
+      {open !== null && (
+        <div className="gal-light" onClick={() => setOpen(null)}>
+          <button className="gal-close" aria-label={t.media.close} onClick={() => setOpen(null)}>&times;</button>
+          <img
+            src={mediaUrl(items[open].url) ?? ""}
+            alt={pickText(items[open], "alt", locale)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+    </section>
+  );
+}

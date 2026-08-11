@@ -48,11 +48,15 @@ export interface WithAttachments {
   poster?: AttachmentItem | null;
   gallery?: AttachmentItem[];
   downloads?: AttachmentItem[];
+  /** หน้าโบรชัว — รูปเต็มหน้าเรียงต่อกัน ใช้แทนเนื้อหาแบบข้อความ */
+  brochure?: AttachmentItem[];
 }
 
 export interface SolutionDetail extends WithAttachments {
   id: number;
   slug: string;
+  /** TEXT = หน้าเนื้อหาปกติ | BROCHURE = รูปโบรชัวเต็มหน้า */
+  layout: string;
   nameTh: string;
   nameEn: string | null;
   summaryTh: string | null;

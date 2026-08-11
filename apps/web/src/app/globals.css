@@ -1298,3 +1298,19 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
   .team-grid { grid-template-columns: 1fr; }
   .pub-item { grid-template-columns: 1fr; gap: var(--sp-2); padding: var(--sp-5); }
 }
+
+/* ---------- โบรชัว: รูปทั้งหน้าเรียงต่อกัน ---------- */
+.broch-sec { padding-top: var(--sp-8); }
+.broch-wrap { display: grid; gap: var(--sp-6); max-width: 940px; }
+.broch-page { margin: 0; }
+.broch-page button {
+  display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in;
+  border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-2);
+  transition: box-shadow var(--dur) var(--ease);
+}
+.broch-page button:hover { box-shadow: var(--shadow-3); }
+.broch-page img { display: block; width: 100%; height: auto; }
+.broch-page figcaption {
+  margin-top: var(--sp-3); text-align: center;
+  font-size: var(--fs-sm); color: var(--text-3);
+}

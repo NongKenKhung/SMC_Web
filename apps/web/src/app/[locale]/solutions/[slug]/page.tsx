@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DownloadList, Gallery } from "@/components/Attachments";
+import { Brochure, DownloadList, Gallery } from "@/components/Attachments";
 import PageBanner from "@/components/PageBanner";
 import RichContent, { blockText } from "@/components/RichContent";
 import { getBlocks, getSolution, mediaUrl } from "@/lib/api";
@@ -70,6 +70,10 @@ export default async function SolutionDetail({
 
   const name = pick(sol, "name", locale);
   const isCategory = sol.children.length > 0;
+  /* หน้าโบรชัว = ใช้รูปแทนเนื้อหาทั้งหมด จึงข้ามเนื้อหา/ฟีเจอร์/แกลเลอรี
+     เหลือแค่หัวเรื่อง รูปโบรชัว และไฟล์ดาวน์โหลด */
+  const brochure = sol.layout === "BROCHURE" ? (sol.brochure ?? []) : [];
+  const isBrochure = brochure.length > 0;
 
   return (
     <main>
@@ -96,8 +100,8 @@ export default async function SolutionDetail({
               <p className="lead">{pick(sol, "summary", locale)}</p>
             )}
           </div>
-          {/* ไม่ได้ใส่รูป = ไม่ต้องมีกรอบรูปเปล่า */}
-          {(sol.poster || sol.coverImage) && (
+          {/* ไม่ได้ใส่รูป = ไม่ต้องมีกรอบรูปเปล่า | โบรชัวไม่ต้องมีรูปเปิดซ้ำ */}
+          {!isBrochure && (sol.poster || sol.coverImage) && (
             <div className="detail-hero reveal">
               {sol.poster ? (
                 <img src={mediaUrl(sol.poster.url)!} alt={sol.poster.altTh ?? name} />
@@ -106,13 +110,16 @@ export default async function SolutionDetail({
               )}
             </div>
           )}
-          {pick(sol, "body", locale) && (
+          {!isBrochure && pick(sol, "body", locale) && (
             <div className="reveal" style={{ marginTop: 42 }}>
               <RichContent html={pick(sol, "body", locale)} />
             </div>
           )}
         </div>
       </section>
+
+      {/* โบรชัว — รูปทั้งหน้าเรียงต่อกัน */}
+      <Brochure items={brochure} locale={locale} />
 
       {/* หมวด → รายการหัวข้อย่อย | หัวข้อย่อย → ฟีเจอร์ */}
       {isCategory && sol.children.length > 0 ? (
@@ -135,7 +142,7 @@ export default async function SolutionDetail({
             </div>
           </div>
         </section>
-      ) : !isCategory && features.length > 0 ? (
+      ) : !isCategory && !isBrochure && features.length > 0 ? (
         <section className="sec soft-sec">
           <div className="container">
             <div className="sec-head reveal">
@@ -156,7 +163,8 @@ export default async function SolutionDetail({
       ) : null}
 
       {/* แกลเลอรี + ไฟล์ดาวน์โหลด (จัดการผ่าน admin) */}
-      <Gallery items={sol.gallery ?? []} locale={locale} />
+      {/* ภาพประกอบใช้กับหน้าแบบข้อความเท่านั้น */}
+      <Gallery items={isBrochure ? [] : (sol.gallery ?? [])} locale={locale} />
       <DownloadList items={sol.downloads ?? []} locale={locale} />
 
       {/* CTA */}
