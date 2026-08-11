@@ -569,7 +569,9 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 .pillar p { color: #a9b6ce; font-size: 0.93rem; }
 
 /* ---------- Split + Accordion ---------- */
-.split { display: grid; grid-template-columns: 1fr 1.15fr; gap: 60px; align-items: center; }
+/* align-items: start — ห้ามใช้ center เพราะคอลัมน์ขวา (accordion) สูงเปลี่ยนได้ตอนกดเปิด/ปิด
+   ถ้าจัดกึ่งกลาง รูปฝั่งซ้ายจะขยับตามทุกครั้งที่ความสูงเปลี่ยน */
+.split { display: grid; grid-template-columns: 1fr 1.15fr; gap: 60px; align-items: start; }
 .mock-visual {
   border-radius: 22px; box-shadow: var(--shadow-md); overflow: hidden;
   background: linear-gradient(160deg, var(--navy-soft), #fff);
@@ -596,7 +598,8 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 }
 .acc-item.open .acc-icon { background: var(--orange); color: #fff; transform: rotate(45deg); }
 .acc-panel { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
-.acc-item.open .acc-panel { max-height: 200px; }
+/* เผื่อไว้มาก ๆ กันเนื้อหายาวถูกตัดหาย (max-height เป็นแค่เพดาน ไม่ได้บังคับความสูง) */
+.acc-item.open .acc-panel { max-height: 60rem; }
 .acc-panel p, .acc-panel .acc-body { padding: 0 40px 18px 4px; color: var(--muted); font-size: 0.93rem; }
 
 /* ---------- การ์ด ---------- */
