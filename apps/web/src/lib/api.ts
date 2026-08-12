@@ -1,6 +1,11 @@
 /** Data layer — เรียก NestJS API ฝั่ง server component */
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+/* ฝั่งเซิร์ฟเวอร์ (server component) ต้องใช้ URL เต็มเพราะเรียกจากใน Node
+   ฝั่งเบราว์เซอร์ใช้เส้นทางสัมพัทธ์ "/api" แล้วให้ Next ส่งต่อไป API ให้
+   — เบราว์เซอร์จึงยิงมาที่ origin เดียวกับที่เปิดอยู่ ไม่ว่าจะเป็น localhost, IP ในวง LAN
+   หรือโดเมนจริง โดยไม่ต้อง build ใหม่ และไม่ติด CORS */
+const API_INTERNAL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+const API = typeof window === "undefined" ? API_INTERNAL : "/api";
 
 export interface SolutionNode {
   id: number;
@@ -157,8 +162,10 @@ export const getBlocks = async (groups: string[]) => {
 
 /** poster ของ banner/hero แต่ละหน้า (Phase 6A) */
 export const getPageMedia = (slug: string) => get<PageMedia>(`/pages/${slug}`);
-/** ลิงก์ดาวน์โหลดที่บังคับให้บันทึกไฟล์ + ใช้ชื่อไฟล์เดิม */
-export const downloadUrl = (mediaId: number) => `${API}/media/${mediaId}/download`;
+/** ลิงก์ดาวน์โหลดที่บังคับให้บันทึกไฟล์ + ใช้ชื่อไฟล์เดิม
+ *  ต้องเป็นเส้นทางสัมพัทธ์เสมอ — ลิงก์นี้ถูก render ฝั่งเซิร์ฟเวอร์ลงไปใน HTML
+ *  ถ้าใช้ตัวแปร API จะได้ origin ของเซิร์ฟเวอร์ติดไป แล้วคนที่เปิดจากเครื่องอื่นกดโหลดไม่ได้ */
+export const downloadUrl = (mediaId: number) => `/api/media/${mediaId}/download`;
 /** ดึง content ตามภาษา — ถ้าไม่มีคำแปลอังกฤษจะ fallback เป็นไทย */
 export const getContent = async <T,>(
   key: string,
@@ -169,8 +176,9 @@ export const getContent = async <T,>(
   return (locale === "en" && row.valueEn) ? row.valueEn : row.valueTh;
 };
 
-export const API_URL = API;
 
-/** แปลง path รูปจากระบบ admin (/uploads/..) เป็น URL เต็มของ API */
+/** path รูปจากระบบ admin — คงเป็นเส้นทางสัมพัทธ์ "/uploads/.." ไว้เสมอ
+ *  Next มี rewrite ส่งต่อไปยัง API ให้แล้ว การใส่ origin เต็มจะทำให้เปิดจากเครื่องอื่นไม่ได้
+ *  (HTML ที่ render ฝั่งเซิร์ฟเวอร์จะฝัง localhost ติดไปด้วย) */
 export const mediaUrl = (path?: string | null) =>
-  !path ? null : path.startsWith("http") ? path : `${API.replace(/\/api$/, "")}${path}`;
+  !path ? null : path.startsWith("http") ? path : path;

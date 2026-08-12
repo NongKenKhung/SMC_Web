@@ -45,6 +45,29 @@ pnpm dev        # รัน api (4000) + web (3100) พร้อมกัน
 - Admin: http://localhost:3100/admin
 - API ตัวอย่าง: http://localhost:4000/api/solutions
 
+## รันแบบ production (เปิดให้เครื่องอื่นในวง LAN เข้าได้)
+
+```bash
+pnpm build      # build ทั้ง api และ web
+pnpm start      # รัน api (4000) + web (3100) โหมด production
+```
+
+เปิดจากเครื่องอื่นด้วย `http://<ip ของเครื่องนี้>:3100` — ดู ip ด้วย `ipconfig`
+
+**ไม่ต้อง build ใหม่เมื่อเปลี่ยน ip** เพราะเบราว์เซอร์ยิง `/api` และ `/uploads`
+ไปที่ origin เดียวกับที่เปิดเว็บอยู่ แล้ว Next ส่งต่อไปยัง API ให้เอง
+จึงใช้ได้ทั้ง localhost, ip ในวง LAN และโดเมนจริง โดยไม่ติด CORS
+
+**เปิดพอร์ต 3100 พอ** — ไม่ต้องเปิดพอร์ต 4000 ให้เครื่องอื่นเห็น
+ถ้าเครื่องอื่นเข้าไม่ได้ ให้เปิด firewall ของ Windows ให้พอร์ต 3100:
+
+```bash
+netsh advfirewall firewall add rule name="SMC web 3100" dir=in action=allow protocol=TCP localport=3100
+```
+
+ค่าเดียวที่ควรแก้ตาม ip คือ `NEXT_PUBLIC_SITE_URL` ใน `.env`
+(มีผลกับ sitemap และลิงก์แชร์โซเชียลเท่านั้น)
+
 ## บัญชีทดสอบ (seed)
 
 - `admin@sml.local` / `ChangeMe123!`

@@ -2,8 +2,9 @@
 
 /** helpers ฝั่ง admin — token + fetch พร้อม Authorization */
 
-export const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
-export const API_ORIGIN = API.replace(/\/api$/, "");
+/* หน้า admin ทำงานในเบราว์เซอร์อย่างเดียว จึงยิงไปที่ origin เดียวกับที่เปิดอยู่
+   แล้วให้ Next ส่งต่อไป API — ใช้ได้ทั้ง localhost, IP ในวง LAN และโดเมนจริง */
+export const API = "/api";
 
 const TOKEN_KEY = "sml_admin_token";
 
@@ -51,7 +52,7 @@ export async function adminFetch<T>(
 
 /** แปลง path รูปจาก API (/uploads/..) เป็น URL เต็ม */
 export const mediaUrl = (path?: string | null) =>
-  !path ? null : path.startsWith("http") ? path : `${API_ORIGIN}${path}`;
+  !path ? null : path.startsWith("http") ? path : path;
 
 /* ---------- types ฝั่ง admin ---------- */
 export interface AdminSolution {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { API_URL } from "@/lib/api";
 import { dict, type Locale } from "@/lib/i18n";
 
 export default function ContactForm({ locale }: { locale: Locale }) {
@@ -14,7 +13,8 @@ export default function ContactForm({ locale }: { locale: Locale }) {
     const data = Object.fromEntries(new FormData(form).entries());
     setStatus("sending");
     try {
-      const res = await fetch(`${API_URL}/contact`, {
+      const res = /* เส้นทางสัมพัทธ์ — ยิงไปที่ origin เดียวกับที่ผู้ใช้เปิดเว็บอยู่ */
+      await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
