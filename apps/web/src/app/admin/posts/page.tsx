@@ -6,6 +6,7 @@ import RichText from "@/components/admin/RichText";
 import Upload from "@/components/admin/Upload";
 import { adminFetch, type AdminPost } from "@/lib/admin";
 import { slugFrom, slugify } from "@/lib/slug";
+import { useScrollToForm } from "@/components/admin/useScrollToForm";
 
 const CATS = [
   { v: "ACTIVITY", label: "กิจกรรม" },
@@ -29,6 +30,7 @@ export default function AdminPosts() {
   /* ถ้าผู้ใช้พิมพ์ slug เองแล้ว หยุดสร้างอัตโนมัติ — ไม่ทับของที่ตั้งใจตั้ง */
   const [slugTouched, setSlugTouched] = useState(false);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
+  const { formRef, focusForm } = useScrollToForm();
 
   const load = useCallback(() => {
     adminFetch<AdminPost[]>("/admin/posts").then(setRows).catch(() => {});
@@ -39,6 +41,7 @@ export default function AdminPosts() {
     setEditingId(r.id);
     setSlugTouched(true); // ของเดิมมี slug แล้ว ห้ามเขียนทับ
     setForm({ ...r, publishedAt: r.publishedAt.slice(0, 10) });
+    focusForm();
     setMsg({});
   }
 
@@ -91,7 +94,7 @@ export default function AdminPosts() {
 
       <div className="adm-card">
         <div className="adm-actions" style={{ marginBottom: 14 }}>
-          <button className="adm-btn" onClick={() => { setEditingId(null); setSlugTouched(false); setForm({ ...EMPTY }); setMsg({}); }}>
+          <button className="adm-btn" onClick={() => { setEditingId(null); setSlugTouched(false); setForm({ ...EMPTY }); focusForm(); setMsg({}); }}>
             + เขียนโพสต์ใหม่
           </button>
         </div>
@@ -119,7 +122,7 @@ export default function AdminPosts() {
       </div>
 
       {form && (
-        <div className="adm-card">
+        <div className="adm-card" ref={formRef}>
           <h2>{editingId ? "แก้ไขโพสต์" : "เขียนโพสต์ใหม่"}</h2>
           <form className="adm-form" onSubmit={save}>
             <div className="row2">

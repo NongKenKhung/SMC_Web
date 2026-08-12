@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { adminFetch } from "@/lib/admin";
+import { useScrollToForm } from "@/components/admin/useScrollToForm";
 
 interface AdminUser {
   id: number;
@@ -19,6 +20,7 @@ export default function AdminUsers() {
   const [form, setForm] = useState<typeof EMPTY | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
+  const { formRef, focusForm } = useScrollToForm();
 
   const load = useCallback(() => {
     adminFetch<AdminUser[]>("/admin/users").then(setRows).catch(() => {});
@@ -72,7 +74,7 @@ export default function AdminUsers() {
         <div className="adm-actions" style={{ marginBottom: 14 }}>
           <button
             className="adm-btn"
-            onClick={() => { setForm({ ...EMPTY }); setMsg({}); }}
+            onClick={() => { setForm({ ...EMPTY }); focusForm(); setMsg({}); }}
           >
             + เพิ่มผู้ดูแล
           </button>
@@ -120,7 +122,7 @@ export default function AdminUsers() {
       </div>
 
       {form && (
-        <div className="adm-card" style={{ marginTop: 18, maxWidth: 520 }}>
+        <div className="adm-card" ref={formRef} style={{ marginTop: 18, maxWidth: 520 }}>
           <h2>เพิ่มผู้ดูแลใหม่</h2>
           <form className="adm-form" onSubmit={create}>
             <div>

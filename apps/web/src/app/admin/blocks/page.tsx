@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import RichText from "@/components/admin/RichText";
 import Upload from "@/components/admin/Upload";
 import { adminFetch, type AdminBlock, type AdminSolution } from "@/lib/admin";
+import { useScrollToForm } from "@/components/admin/useScrollToForm";
 
 /** นิยามชุดเนื้อหาที่แก้ได้ — เพิ่มชุดใหม่ = เพิ่มรายการที่นี่ (ไม่ต้องแก้ฐานข้อมูล) */
 type GroupDef = {
@@ -71,6 +72,7 @@ export default function AdminBlocks() {
   const [items, setItems] = useState<AdminBlock[]>([]);
   const [form, setForm] = useState<FormState | null>(null);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
+  const { formRef, focusForm } = useScrollToForm();
 
   /* เพิ่มกลุ่ม "ฟีเจอร์ของ solution" ตามรายการ solution จริงในระบบ */
   useEffect(() => {
@@ -162,7 +164,7 @@ export default function AdminBlocks() {
         <p className="sub" style={{ marginTop: -6 }}>{def.hint}</p>
 
         <div className="adm-actions" style={{ margin: "14px 0" }}>
-          <button className="adm-btn" onClick={() => { setForm({ ...EMPTY }); setMsg({}); }}>+ เพิ่มรายการ</button>
+          <button className="adm-btn" onClick={() => { setForm({ ...EMPTY }); focusForm(); setMsg({}); }}>+ เพิ่มรายการ</button>
         </div>
 
         {items.length === 0 ? (
@@ -186,7 +188,7 @@ export default function AdminBlocks() {
                     <div className="adm-actions">
                       <button className="adm-btn ghost sm" disabled={i === 0} onClick={() => move(i, -1)}>↑</button>
                       <button className="adm-btn ghost sm" disabled={i === items.length - 1} onClick={() => move(i, 1)}>↓</button>
-                      <button className="adm-btn ghost sm" onClick={() => { setForm({ ...EMPTY, ...b, titleEn: b.titleEn ?? "", subtitleTh: b.subtitleTh ?? "", subtitleEn: b.subtitleEn ?? "", bodyTh: b.bodyTh ?? "", bodyEn: b.bodyEn ?? "", icon: b.icon ?? "", image: b.image ?? "" }); setMsg({}); }}>แก้ไข</button>
+                      <button className="adm-btn ghost sm" onClick={() => { setForm({ ...EMPTY, ...b, titleEn: b.titleEn ?? "", subtitleTh: b.subtitleTh ?? "", subtitleEn: b.subtitleEn ?? "", bodyTh: b.bodyTh ?? "", bodyEn: b.bodyEn ?? "", icon: b.icon ?? "", image: b.image ?? "" }); focusForm(); setMsg({}); }}>แก้ไข</button>
                       <button className="adm-btn danger sm" onClick={() => remove(b)}>ลบ</button>
                     </div>
                   </td>
@@ -198,7 +200,7 @@ export default function AdminBlocks() {
       </div>
 
       {form && (
-        <div className="adm-card">
+        <div className="adm-card" ref={formRef}>
           <h2>{form.id ? `แก้ไข: ${form.titleTh}` : `เพิ่มรายการใน "${def.label}"`}</h2>
           <form className="adm-form" onSubmit={save}>
             <div className="row2">

@@ -6,6 +6,7 @@ import RichText from "@/components/admin/RichText";
 import Upload from "@/components/admin/Upload";
 import { adminFetch, type AdminSolution } from "@/lib/admin";
 import { slugFrom, slugify } from "@/lib/slug";
+import { useScrollToForm } from "@/components/admin/useScrollToForm";
 
 type FormState = Partial<AdminSolution> & { nameTh: string; slug: string };
 
@@ -21,6 +22,7 @@ export default function AdminSolutions() {
   /* ถ้าผู้ใช้พิมพ์ slug เองแล้ว หยุดสร้างอัตโนมัติ — ไม่ทับของที่ตั้งใจตั้ง */
   const [slugTouched, setSlugTouched] = useState(false);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
+  const { formRef, focusForm } = useScrollToForm();
 
   const load = useCallback(() => {
     adminFetch<AdminSolution[]>("/admin/solutions").then(setRows).catch(() => {});
@@ -35,12 +37,14 @@ export default function AdminSolutions() {
     setEditingId(null);
     setSlugTouched(false); // เริ่มใหม่ = ให้สร้าง slug อัตโนมัติอีกครั้ง
     setForm({ ...EMPTY, parentId });
+    focusForm();
     setMsg({});
   }
   function openEdit(r: AdminSolution) {
     setEditingId(r.id);
     setSlugTouched(true); // ของเดิมมี slug แล้ว ห้ามเขียนทับ
     setForm({ ...r });
+    focusForm();
     setMsg({});
   }
 
@@ -119,7 +123,7 @@ export default function AdminSolutions() {
       </div>
 
       {form && (
-        <div className="adm-card">
+        <div className="adm-card" ref={formRef}>
           <h2>{editingId ? `แก้ไข: ${form.nameTh}` : form.parentId ? "เพิ่มหัวข้อย่อย" : "เพิ่มหมวดใหม่"}</h2>
           <form className="adm-form" onSubmit={save}>
             <div className="row2">

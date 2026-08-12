@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Upload from "@/components/admin/Upload";
 import { adminFetch, mediaUrl, type AdminPartner } from "@/lib/admin";
+import { useScrollToForm } from "@/components/admin/useScrollToForm";
 
 type FormState = Partial<AdminPartner> & { name: string };
 
@@ -13,6 +14,7 @@ export default function AdminPartners() {
   const [form, setForm] = useState<FormState | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
+  const { formRef, focusForm } = useScrollToForm();
 
   const load = useCallback(() => {
     adminFetch<AdminPartner[]>("/admin/partners").then(setRows).catch(() => {});
@@ -56,7 +58,7 @@ export default function AdminPartners() {
 
       <div className="adm-card">
         <div className="adm-actions" style={{ marginBottom: 14 }}>
-          <button className="adm-btn" onClick={() => { setEditingId(null); setForm({ ...EMPTY, order: rows.length + 1 }); setMsg({}); }}>
+          <button className="adm-btn" onClick={() => { setEditingId(null); setForm({ ...EMPTY, order: rows.length + 1 }); focusForm(); setMsg({}); }}>
             + เพิ่มพาร์ทเนอร์
           </button>
         </div>
@@ -78,7 +80,7 @@ export default function AdminPartners() {
                 <td><span className={`pill ${r.published ? "on" : "off"}`}>{r.published ? "แสดง" : "ซ่อน"}</span></td>
                 <td>
                   <div className="adm-actions">
-                    <button className="adm-btn ghost sm" onClick={() => { setEditingId(r.id); setForm({ ...r }); setMsg({}); }}>แก้ไข</button>
+                    <button className="adm-btn ghost sm" onClick={() => { setEditingId(r.id); setForm({ ...r }); focusForm(); setMsg({}); }}>แก้ไข</button>
                     <button className="adm-btn danger sm" onClick={() => remove(r)}>ลบ</button>
                   </div>
                 </td>
@@ -89,7 +91,7 @@ export default function AdminPartners() {
       </div>
 
       {form && (
-        <div className="adm-card">
+        <div className="adm-card" ref={formRef}>
           <h2>{editingId ? `แก้ไข: ${form.name}` : "เพิ่มพาร์ทเนอร์"}</h2>
           <form className="adm-form" onSubmit={save}>
             <div className="row3">
