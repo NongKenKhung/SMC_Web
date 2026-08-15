@@ -196,11 +196,42 @@ NEXT_PUBLIC_SITE_URL=https://k-sml.com   # ถูกฝังตอน build —
 WEB_PORT=127.0.0.1:8081                  # ปล่อย 80/443 ให้ nginx และไม่เปิด 3100 ออกนอกเครื่อง
 ```
 
-### 4. สตาร์ตพร้อมชั้น TLS
+### 4. สตาร์ต — เลือกตามสภาพเครื่อง
+
+**ก) VM ว่าง ไม่มี web server อื่น** — ใช้ nginx ใน container ที่เตรียมไว้ให้
 
 ```bash
 docker compose -f docker-compose.prod.yml -f docker-compose.tls.yml up -d --build
 ```
+
+**ข) VM มี nginx ของ host อยู่แล้ว** (มีเว็บอื่นรันอยู่บนเครื่องเดียวกัน)
+
+**ห้ามใช้ `docker-compose.tls.yml`** — nginx ใน container จะไปแย่งพอร์ต 80/443
+กับ nginx ของ host ทำให้เว็บอื่นบนเครื่องล่ม ให้สตาร์ตแค่ชั้น app:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+เลือกพอร์ตว่างสำหรับผูกกับ localhost (เช็คก่อนด้วย `sudo ss -lntp | grep 8090`)
+แล้วตั้งใน `.env` ให้ตรงกับ `upstream` ในไฟล์คอนฟิก:
+
+```bash
+WEB_PORT=127.0.0.1:8090
+```
+
+วางใบรับรองไว้ที่เดียวกับเว็บอื่นบนเครื่อง แล้วเสียบ site config เข้ากับ nginx เดิม:
+
+```bash
+sudo cp deploy/nginx-site-k-sml.com.conf /etc/nginx/sites-available/k-sml.com
+sudo ln -s /etc/nginx/sites-available/k-sml.com /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+> `nginx -t` ต้องผ่านก่อน reload เสมอ — reload ทั้งที่คอนฟิกผิดจะทำให้เว็บอื่นบนเครื่องล่มไปด้วย
+>
+> ถ้า nginx ของเครื่องประกาศ `set_real_ip_from` ของ Cloudflare ไว้ที่ระดับ http อยู่แล้ว
+> ให้ลบบล็อกนั้นออกจากหัวไฟล์ (ประกาศซ้ำได้ แต่ไม่จำเป็น)
 
 ### 5. ปิดทางเข้าตรงที่ไม่ผ่าน Cloudflare
 
