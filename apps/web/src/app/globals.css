@@ -645,8 +645,9 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 }
 .logo-card:hover { border-color: var(--orange); color: var(--orange); box-shadow: var(--shadow-2); transform: translateY(-4px); }
 /* โลโก้เป็นขาวดำ แล้วคืนสีตอน hover — ทำให้แถวโลโก้ดูสงบ ไม่ตีกัน */
-.logo-card img { filter: grayscale(1); opacity: .75; transition: filter var(--dur) var(--ease), opacity var(--dur) var(--ease); }
-.logo-card:hover img { filter: none; opacity: 1; }
+/* โลโก้แสดงสีจริงตั้งแต่แรก ไม่ทำเป็นขาวดำรอ hover */
+.logo-card img { transition: transform var(--dur) var(--ease); }
+.logo-card:hover img { transform: scale(1.04); }
 .logo-card b { font-size: 0.95rem; letter-spacing: 0.12em; font-weight: 700; }
 .logo-card span { font-size: 0.72rem; }
 .logo-card img { max-height: 60px; width: auto; object-fit: contain; }
@@ -736,11 +737,16 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
           mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
-.marquee-track { display: inline-flex; gap: var(--sp-14); white-space: nowrap; }
+/* width: max-content จำเป็น — ถ้าไม่ใส่ ความกว้างจะถูกจำกัดเท่ากล่องแม่
+   แล้ว flex item ถูกบีบจนตัวอักษรโดนตัด (flex-shrink ค่าเริ่มต้นคือ 1)
+   ระยะห่างใช้ padding ในแต่ละชิ้นแทน gap เพราะ gap ไม่ถูกนับรวมท้ายชุดสุดท้าย
+   ทำให้ระยะเลื่อน -50% ไม่ตรงกับความยาวหนึ่งชุดพอดี แล้วภาพกระตุกตอนวนรอบ */
+.marquee-track { display: flex; width: max-content; white-space: nowrap; }
 @media (prefers-reduced-motion: no-preference) {
   .marquee-track { animation: slide 26s linear infinite; }
 }
 .marquee-track span {
+  flex: none; padding-right: var(--sp-14);
   font-family: var(--ff-display); font-weight: 400;
   font-size: clamp(2rem, 4.6vw, 3.2rem); letter-spacing: 0.02em;
   text-transform: uppercase; color: var(--navy);
@@ -1067,12 +1073,6 @@ a.cat-card:hover .cat-go { gap: 11px; transition: gap 0.2s; }
 .site-footer .logo-chip { margin-bottom: 18px; }
 .site-footer .logo-chip img { height: 52px; }
 .footer-desc { font-size: 0.88rem; line-height: 1.8; }
-.socials { display: flex; gap: 10px; margin-top: 20px; }
-.socials a {
-  width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
-  background: rgba(255, 255, 255, 0.07); color: #fff; transition: 0.25s;
-}
-.socials a:hover { background: var(--orange); transform: translateY(-3px); }
 .site-footer h5 { color: #fff; font-size: 0.95rem; font-weight: 600; margin-bottom: 18px; }
 .f-links li { margin-bottom: 10px; }
 .f-links a { font-size: 0.88rem; color: #a9b6ce; transition: 0.2s; }
