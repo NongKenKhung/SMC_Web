@@ -1,0 +1,17 @@
+# ไฟล์ที่ Linux เป็นคนรัน/อ่าน ต้องเป็น LF เสมอ ไม่ว่าจะแก้มาจากเครื่องไหน
+# ถ้าปล่อยให้เป็น CRLF: bash จะอ่าน "pipefail\r" เป็นตัวเลือกที่ไม่รู้จัก
+# แล้วสคริปต์ล้มทันทีบนเซิร์ฟเวอร์ (ข้อความ error ยังเพี้ยนเพราะตัว \r ด้วย)
+*.sh            text eol=lf
+*.conf          text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+Dockerfile      text eol=lf
+.dockerignore   text eol=lf
+.env.example    text eol=lf
+
+# ไฟล์ไบนารี — ห้ามแตะ
+*.png binary
+*.jpg binary
+*.webp binary
+*.pdf binary
+*.ico binary
