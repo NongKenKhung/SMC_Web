@@ -746,7 +746,9 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   .marquee-track { animation: slide 26s linear infinite; }
 }
 .marquee-track span {
-  flex: none; padding-right: var(--sp-14);
+  /* ใช้ --sp-16 ไม่ใช่ --sp-14 — สเกลระยะห่างมีแค่ 12/16/20/24 ไม่มี 14
+     ค่าที่ไม่มีจริงจะถูกทิ้งแล้วกลายเป็น 0 ทำให้คำติดกันหมด */
+  flex: none; padding-right: var(--sp-16);
   font-family: var(--ff-display); font-weight: 400;
   font-size: clamp(2rem, 4.6vw, 3.2rem); letter-spacing: 0.02em;
   text-transform: uppercase; color: var(--navy);
