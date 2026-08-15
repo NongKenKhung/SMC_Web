@@ -5,7 +5,8 @@
 # ต้องสั่ง docker compose -f docker-compose.prod.yml up -d ให้สแตกขึ้นก่อน
 set -euo pipefail
 
-COMPOSE="docker compose -f docker-compose.prod.yml"
+# รันแบบเปิด TLS ให้สั่ง: COMPOSE_FILES="-f docker-compose.prod.yml -f docker-compose.tls.yml" bash deploy/import-data.sh
+COMPOSE="docker compose ${COMPOSE_FILES:--f docker-compose.prod.yml}"
 DIR="deploy/data"
 DB_NAME="${DB_NAME:-sml}"
 
