@@ -5,6 +5,11 @@ set -euo pipefail
 
 OUT="deploy/data"
 CONTAINER="${DB_CONTAINER:-sml-dev-db}"
+# อ่าน DB_NAME จาก .env ให้ตรงกับที่ compose ใช้สร้างฐานข้อมูล
+# ถ้าไม่อ่าน จะใช้ค่าเริ่มต้นซึ่งอาจไม่ตรงกับชื่อฐานข้อมูลจริงบนเซิร์ฟเวอร์
+if [ -z "${DB_NAME:-}" ] && [ -f .env ]; then
+  DB_NAME="$(grep -E '^DB_NAME=' .env | tail -1 | cut -d= -f2- | tr -d '"'"'"'' | xargs)"
+fi
 DB_NAME="${DB_NAME:-sml}"
 
 mkdir -p "$OUT"

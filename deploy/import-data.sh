@@ -8,6 +8,11 @@ set -euo pipefail
 # รันแบบเปิด TLS ให้สั่ง: COMPOSE_FILES="-f docker-compose.prod.yml -f docker-compose.tls.yml" bash deploy/import-data.sh
 COMPOSE="docker compose ${COMPOSE_FILES:--f docker-compose.prod.yml}"
 DIR="deploy/data"
+# อ่าน DB_NAME จาก .env ให้ตรงกับที่ compose ใช้สร้างฐานข้อมูล
+# ถ้าไม่อ่าน จะใช้ค่าเริ่มต้นซึ่งอาจไม่ตรงกับชื่อฐานข้อมูลจริงบนเซิร์ฟเวอร์
+if [ -z "${DB_NAME:-}" ] && [ -f .env ]; then
+  DB_NAME="$(grep -E '^DB_NAME=' .env | tail -1 | cut -d= -f2- | tr -d '"'"'"'' | xargs)"
+fi
 DB_NAME="${DB_NAME:-sml}"
 
 [ -f "$DIR/database.sql" ]   || { echo "ไม่พบ $DIR/database.sql" >&2; exit 1; }
