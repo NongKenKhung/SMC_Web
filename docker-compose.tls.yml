@@ -1,0 +1,21 @@
+# ชั้นเสริมสำหรับเปิด HTTPS ด้วยโดเมนจริง — ใช้คู่กับ docker-compose.prod.yml
+#
+#   docker compose -f docker-compose.prod.yml -f docker-compose.tls.yml up -d --build
+#
+# ต้องตั้งใน .env ก่อน:
+#   WEB_PORT=127.0.0.1:8081        ← ปล่อยพอร์ต 80/443 ให้ nginx (ค่าเดิม 80 จะชนกัน)
+#   NEXT_PUBLIC_SITE_URL=https://k-sml.com
+#
+# และต้องวางใบรับรองจาก Cloudflare ไว้ที่ deploy/certs/ (ดู DEPLOY.md)
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/certs:/certs:ro

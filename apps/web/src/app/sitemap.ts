@@ -8,7 +8,14 @@ import { SITE_URL } from "@/lib/site";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [tree, posts] = await Promise.all([getSolutionsTree(), getPosts()]);
 
-  const staticPaths = ["", "/solutions", "/partners", "/blog", "/about", "/contact"];
+  /* /pricing ใส่เฉพาะตอนมีราคาจริง — เกณฑ์เดียวกับที่ซ่อนเมนู ไม่งั้น sitemap จะชี้ไปหน้าเปล่า */
+  const hasPricing = (tree ?? []).some(
+    (s) => s.price != null || s.children.some((c) => c.price != null),
+  );
+  const staticPaths = [
+    "", "/solutions", ...(hasPricing ? ["/pricing"] : []),
+    "/partners", "/blog", "/about", "/contact",
+  ];
 
   /* โซลูชันมีทั้งหมวดแม่และหัวข้อย่อย — เก็บให้ครบทั้งสองชั้น */
   const solutionPaths = (tree ?? []).flatMap((s) => [

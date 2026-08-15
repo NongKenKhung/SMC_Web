@@ -16,6 +16,8 @@ export interface SolutionNode {
   summaryEn?: string | null;
   icon: string | null;
   order: number;
+  /** ราคา (บาท) — null = ยังไม่กำหนด จะไม่ขึ้นในตารางราคา */
+  price: number | null;
   children: Omit<SolutionNode, "children">[];
 }
 
@@ -68,6 +70,7 @@ export interface SolutionDetail extends WithAttachments {
   summaryEn: string | null;
   bodyTh: string | null;
   bodyEn: string | null;
+  price: number | null;
   coverImage: string | null;
   parent: { slug: string; nameTh: string; nameEn: string | null } | null;
   children: { slug: string; nameTh: string; nameEn: string | null; summaryTh: string | null }[];

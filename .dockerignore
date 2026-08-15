@@ -1,0 +1,22 @@
+# ของที่ไม่ควรเข้าไปใน image — ทำให้ build ช้าและ image ใหญ่โดยเปล่าประโยชน์
+node_modules
+**/node_modules
+.next
+**/.next
+dist
+**/dist
+.git
+.gitignore
+
+# ความลับ — ค่าจริงส่งผ่าน environment ของ compose ไม่ฝังใน image
+.env
+.env.*
+!.env.example
+
+# ไฟล์ที่ผู้ใช้อัปโหลด — อยู่ใน volume ของเซิร์ฟเวอร์ ไม่ใช่ใน image
+apps/api/uploads
+
+*.log
+*.tsbuildinfo
+docs
+README.md

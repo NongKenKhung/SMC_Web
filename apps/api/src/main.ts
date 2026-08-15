@@ -21,6 +21,14 @@ async function bootstrap() {
     },
   });
   app.setGlobalPrefix("api");
+
+  /* เบราว์เซอร์ไม่ได้ยิงมาที่ API ตรง ๆ — ยิงไปที่ Next แล้ว Next ส่งต่อมาให้
+     ถ้าไม่บอก express ว่าอยู่หลัง proxy req.ip จะเป็น IP ของ Next (หรือของ Caddy/Cloudflare
+     ตอน deploy) เหมือนกันหมดทุกคน ทำให้ตัวจำกัดจำนวนครั้งของฟอร์มติดต่อกลายเป็นโควตารวม
+     ของทั้งเว็บ คนที่ 6 ใน 10 นาทีจะส่งไม่ได้ทั้งที่เป็นคนละคน
+     ตั้งค่านี้แล้ว express จะอ่าน IP จริงจาก X-Forwarded-For ที่ตัวหน้าส่งต่อมา */
+  app.set("trust proxy", process.env.TRUST_PROXY ?? true);
+
   // dev: สะท้อน origin ที่เรียกมา (localhost ทุกพอร์ต) | production: ล็อกด้วย WEB_ORIGIN
   app.enableCors({ origin: process.env.WEB_ORIGIN ?? true });
   app.useGlobalPipes(

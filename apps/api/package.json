@@ -12,7 +12,8 @@
     "seed": "ts-node prisma/seed.ts",
     "seed:demo": "ts-node prisma/seed-demo.ts",
     "seed:demo:clear": "ts-node prisma/seed-demo-clear.ts",
-    "clean:uploads": "ts-node prisma/clean-uploads.ts"
+    "clean:uploads": "ts-node prisma/clean-uploads.ts",
+    "admin:password": "ts-node prisma/admin-password.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

@@ -49,10 +49,10 @@
   --fs-section: clamp(1.9rem, 4vw, 3rem);  /* หัวข้อ section ใหญ่ */
   --fs-display: clamp(3.2rem, 11vw, 10rem); /* ตัวอักษรยักษ์ใน hero (ฟอนต์ Anton ทรงแคบ ใช้ขนาดใหญ่ได้) */
   --fs-ghost: clamp(2.6rem, 7.5vw, 7rem);  /* ตัวอักษรฉากหลัง */
+  --ghost-stroke: 3px;                     /* ความหนาเส้นขอบของตัวอักษรฉากหลัง */
   /* พื้นที่ที่ section ต้องกันไว้ด้านบนให้ตัวอักษรฉากหลังแสดงได้เต็มคำ
      ผูกกับ --fs-ghost ตัวเดียวกัน → ระยะห่างเท่ากันทุกขนาดจอ */
   --ghost-space: calc(var(--fs-ghost) + var(--sp-16));
-  --fs-pb-ghost: clamp(2.4rem, 7vw, 6rem); /* ตัวอักษรฉากหลังใน banner หน้าใน */
 
   /* ฟอนต์ดิสเพลย์ทรงโปสเตอร์ — เฉพาะตัวอักษรยักษ์ภาษาอังกฤษ */
   --ff-display: var(--font-display), "Arial Narrow", Impact, sans-serif;
@@ -141,7 +141,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-size: 0.82rem; font-weight: 600; letter-spacing: 0.14em;
   text-transform: uppercase; color: var(--orange); margin-bottom: 14px;
 }
-.eyebrow::before { content: ""; width: 26px; height: 2px; background: var(--yellow); }
+/* ขีดขนาบสองข้าง — gap ของ inline-flex เว้นระยะให้เองทั้งซ้ายและขวา */
+.eyebrow::before, .eyebrow::after { content: ""; width: 26px; height: 2px; background: var(--yellow); }
 .sec-head h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 700; color: var(--navy); line-height: 1.3; }
 .sec-head p.lead { margin-top: 14px; color: var(--muted); font-size: 1rem; }
 .grad {
@@ -185,6 +186,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   transition: 0.25s; z-index: 50;
 }
 .has-sub:hover > .sub { opacity: 1; visibility: visible; transform: translateY(4px); }
+/* รายการเยอะ (เช่นเหลือหมวดเดียวแล้วลิสต์ระบบทั้งหมด) — แตกสองคอลัมน์ ไม่งั้นเมนูสูงเกินจอ */
+.sub.wide { display: grid; grid-template-columns: 1fr 1fr; gap: 0 4px; width: max-content; max-width: min(640px, calc(100vw - 40px)); }
+.sub.wide a { font-size: 0.88rem; padding: 9px 12px; }
 .sub li { position: relative; }
 .sub a {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -193,6 +197,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .sub a:hover { background: var(--orange-soft); color: var(--orange); }
 .sub .caret-r { width: 11px; height: 11px; opacity: 0.55; }
+
+/* รายการนำในเมนูย่อย (ตารางราคา) — แยกจากรายชื่อหมวดด้วยเส้นคั่น */
+.sub-lead { border-bottom: 1px dashed var(--line); padding-bottom: 6px; margin-bottom: 6px; }
+.sub-lead > a { color: var(--orange); font-weight: 600; }
+.d-sub .sub-lead { border-bottom-color: rgba(255, 255, 255, 0.18); }
 
 .sub2 {
   position: absolute; top: -10px; left: calc(100% + 6px); min-width: 230px;
@@ -362,7 +371,7 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   font-family: var(--ff-display);
   font-size: var(--fs-ghost); font-weight: 400;
   letter-spacing: 0.02em; text-transform: uppercase; line-height: 1;
-  color: transparent; -webkit-text-stroke: 1.5px rgba(16, 32, 62, 0.13);
+  color: transparent; -webkit-text-stroke: var(--ghost-stroke) rgba(16, 32, 62, 0.13);
 }
 .dark-sec .ghost-head { -webkit-text-stroke-color: rgba(255, 255, 255, 0.15); }
 .soft-sec .ghost-head { -webkit-text-stroke-color: rgba(16, 32, 62, 0.11); }
@@ -674,8 +683,7 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 /* ---------- Banner หน้าใน ---------- */
 .page-banner {
   position: relative; color: #fff;
-  /* ระยะล่างกันพื้นที่ให้ตัวอักษรฉากหลังมุมขวาล่างแสดงเต็มคำ ไม่ทับข้อความ */
-  padding: calc(var(--nav-h) + var(--sp-16)) 0 calc(var(--fs-pb-ghost) + var(--sp-12));
+  padding: calc(var(--nav-h) + var(--sp-16)) 0 var(--sp-16);
   background:
     radial-gradient(900px 420px at 12% 120%, rgba(242, 107, 33, 0.38), transparent 60%),
     linear-gradient(160deg, var(--navy-950), var(--navy-800));
@@ -685,16 +693,6 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
 /* orb ใน banner เล็กกว่าใน hero */
 .page-banner .orb-a { width: 420px; height: 420px; left: -120px; top: -100px; }
 .page-banner .orb-b { width: 460px; height: 460px; right: -140px; bottom: -160px; }
-/* ตัวอักษรเส้นขอบเป็นฉากหลัง มุมขวาล่าง — แสดงเต็มคำ ไม่ถูกขอบตัด */
-.pb-ghost {
-  position: absolute; right: var(--sp-6); bottom: var(--sp-5); z-index: 0;
-  font-family: var(--ff-display); font-size: var(--fs-pb-ghost);
-  line-height: 1; letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap;
-  color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.12);
-  pointer-events: none; user-select: none;
-}
-/* จอแคบ พื้นที่ไม่พอวางข้าง ๆ ข้อความ — ซ่อนไปเลยดีกว่าให้ทับกัน */
-@media (max-width: 860px) { .pb-ghost { display: none; } }
 .pb-inner { position: relative; z-index: 1; }
 /* คำอังกฤษยักษ์ + ชื่อหน้าภาษาไทยด้านล่าง (ลำดับเดียวกับ hero หน้าแรก) */
 .pb-en {
@@ -824,6 +822,45 @@ li.d-open > .d-acc .caret { transform: rotate(180deg); }
   background: var(--soft); transition: 0.2s;
 }
 .cat-list a:hover { background: var(--orange-soft); color: var(--orange); }
+/* การ์ดที่เป็นระบบเดี่ยว (กดได้ทั้งใบ) — ดันปุ่มไปชิดล่างให้ทุกใบสูงเท่ากัน */
+.cat-card { display: flex; flex-direction: column; }
+.cat-card > .cat-go { margin-top: auto; padding-top: 18px; }
+.cat-go {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  font-size: 0.88rem; font-weight: 600; color: var(--orange);
+}
+a.cat-card:hover .cat-go { gap: 11px; transition: gap 0.2s; }
+
+/* ---------- ตารางราคา ---------- */
+/* ตารางกว้างกว่าจอมือถือได้ ให้เลื่อนในกล่องตัวเอง ไม่ใช่ดันทั้งหน้าให้เลื่อนแนวนอน */
+.price-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-lg); background: #fff; }
+.price-table { width: 100%; border-collapse: collapse; min-width: 480px; }
+.price-table th, .price-table td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--line); }
+.price-table thead th {
+  background: var(--navy); color: #fff; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.02em; white-space: nowrap;
+}
+/* ห้ามใช้ชื่อ .num — ชนกับวงกลมเลขลำดับของ .feat ที่นิยามไว้ข้างล่าง (display:grid + 46px)
+   ซึ่งจะดึงเซลล์ออกจาก table layout แล้วตัวเลขล้นออกนอกช่อง */
+.price-table .price-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.price-table tbody tr:hover { background: var(--soft); }
+.price-table tbody a { color: var(--ink); font-weight: 500; }
+.price-table tbody a:hover { color: var(--orange); }
+/* แถวสุดท้ายไม่ต้องมีเส้นคั่น เพราะกล่องครอบมีขอบอยู่แล้ว */
+.price-table tbody tr:last-child td { border-bottom: 0; }
+/* หัวตารางกดเรียงได้ — ใช้ปุ่มจริงเพื่อให้ tab ถึงและกด Enter ได้ */
+.price-sort {
+  display: inline-flex; align-items: center; gap: 6px; width: 100%;
+  font: inherit; color: inherit; background: none; border: 0; padding: 0;
+  cursor: pointer; text-align: inherit;
+}
+.price-table thead th:has(.price-sort):hover { background: var(--navy-900, #16294d); }
+.price-table .price-num .price-sort { justify-content: flex-end; }
+.price-cat { color: var(--muted); font-size: 0.88rem; white-space: nowrap; }
+.price-note { margin-top: var(--sp-4); font-size: 0.88rem; color: var(--muted); }
+@media (max-width: 640px) {
+  .price-table th, .price-table td { padding: 12px 14px; font-size: 0.9rem; }
+}
 
 .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
 .feat { padding: 26px; }
@@ -1234,7 +1271,9 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
   background: var(--navy-950);
 }
 .embed-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.embed-frame.map { aspect-ratio: 21 / 9; }
+/* แผนที่อยู่ใน .container แยกก้อน ต่อท้าย .contact-grid โดยตรง
+   ถ้าไม่เว้นเอง จะไปแปะติดการ์ดฟอร์มพอดี (ของเดิม .map-ph ก็เว้น 70px ด้วยเหตุนี้) */
+.embed-frame.map { aspect-ratio: 21 / 9; margin-top: var(--sp-16); }
 .embed-open {
   position: absolute; right: var(--sp-4); bottom: var(--sp-4); z-index: 1;
   padding: 8px 16px; border-radius: var(--r-pill);
@@ -1247,6 +1286,10 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+@media (max-width: 1024px) {
+  /* จอแคบ contact-grid เรียงลงมาเป็นคอลัมน์เดียว ระยะห่างเลยเท่ากับ gap ของกริดพอ */
+  .embed-frame.map { margin-top: var(--sp-10); }
 }
 @media (max-width: 640px) {
   .embed-frame.map { aspect-ratio: 4 / 3; }

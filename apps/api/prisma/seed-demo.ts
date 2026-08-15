@@ -1,5 +1,5 @@
 /* ข้อมูลตัวอย่างสำหรับลองใช้งาน/สาธิต — ไม่ได้รันอัตโนมัติ
-   เรียกด้วย: pnpm db:seed:demo
+   เรียกด้วย: npm run db:seed:demo
    ข้อมูลจริงให้กรอกผ่าน /admin แทน ไฟล์นี้มีไว้ให้กู้ชุดตัวอย่างกลับมาเท่านั้น */
 import { config } from "dotenv";
 import { resolve } from "node:path";
@@ -225,7 +225,7 @@ async function main() {
     },
   ]);
 
-  console.log("✅ ใส่ข้อมูลตัวอย่างแล้ว — ลบออกได้ด้วย pnpm db:seed:demo:clear");
+  console.log("✅ ใส่ข้อมูลตัวอย่างแล้ว — ลบออกได้ด้วย npm run db:seed:demo:clear");
 }
 
 main()

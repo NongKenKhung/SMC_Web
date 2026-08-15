@@ -167,18 +167,6 @@ export default async function SolutionDetail({
       <Gallery items={isBrochure ? [] : (sol.gallery ?? [])} locale={locale} />
       <DownloadList items={sol.downloads ?? []} locale={locale} />
 
-      {/* CTA */}
-      <section className="sec-tight">
-        <div className="container">
-          <div className="cta-band reveal">
-            <div>
-              <h3>{t.solutions.detailCta}</h3>
-              <p>{t.solutions.detailCtaLead}</p>
-            </div>
-            <Link className="btn" href={`${base}/contact`}>{t.solutions.detailCtaBtn}</Link>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }

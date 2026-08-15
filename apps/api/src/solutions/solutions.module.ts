@@ -10,23 +10,28 @@ export class SolutionsService {
   ) {}
 
   /** โครงต้นไม้ 2 ชั้น (หมวด → หัวข้อย่อย) สำหรับเมนู dropdown และหน้า hub */
-  findTree() {
-    return this.prisma.solution.findMany({
+  async findTree() {
+    const rows = await this.prisma.solution.findMany({
       where: { parentId: null, published: true },
       orderBy: { order: "asc" },
       select: {
         id: true, slug: true, nameTh: true, nameEn: true,
-        summaryTh: true, summaryEn: true, icon: true, order: true,
+        summaryTh: true, summaryEn: true, icon: true, order: true, price: true,
         children: {
           where: { published: true },
           orderBy: { order: "asc" },
           select: {
             id: true, slug: true, nameTh: true, nameEn: true,
-            summaryTh: true, summaryEn: true, icon: true, order: true,
+            summaryTh: true, summaryEn: true, icon: true, order: true, price: true,
           },
         },
       },
     });
+    return rows.map((r) => ({
+      ...r,
+      price: toNumber(r.price),
+      children: r.children.map((c) => ({ ...c, price: toNumber(c.price) })),
+    }));
   }
 
   async findBySlug(slug: string) {
@@ -44,8 +49,15 @@ export class SolutionsService {
     if (!solution) throw new NotFoundException(`ไม่พบ solution: ${slug}`);
     // แนบ poster / แกลเลอรี / ไฟล์ดาวน์โหลด (Phase 6A)
     const media = await this.attachments.grouped("SOLUTION", String(solution.id));
-    return { ...solution, ...media };
+    return { ...solution, price: toNumber(solution.price), ...media };
   }
+}
+
+/** Prisma คืน Decimal เป็นอ็อบเจ็กต์ decimal.js ซึ่ง JSON.stringify แปลงเป็น "สตริง"
+ *  ฝั่งเว็บจะได้ค่าที่ต้องแปลงเองทุกที่ จึงแปลงเป็นตัวเลขตั้งแต่ตรงนี้ครั้งเดียว
+ *  (ราคาหลักล้านยังห่างจาก Number.MAX_SAFE_INTEGER มาก ไม่มีปัญหาความแม่นยำ) */
+function toNumber(v: unknown): number | null {
+  return v == null ? null : Number(v);
 }
 
 @Controller("solutions")

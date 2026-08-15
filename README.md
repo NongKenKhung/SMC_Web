@@ -11,6 +11,17 @@ apps/web          Next.js          (เว็บ + หน้า admin ที่ 
 packages/shared   types ที่ใช้ร่วมกัน
 ```
 
+แพ็กเกจ: **npm workspaces** (`workspaces` ใน `package.json` ที่ root) — lockfile คือ
+`package-lock.json` ไฟล์เดียวที่ root, สั่งงานรายแอปด้วย `-w @sml/api` / `-w @sml/web`
+
+> npm ยกทุก dependency ขึ้นมารวมที่ `node_modules` ที่ root (ไม่เหมือน pnpm ที่แยกให้แต่ละแอป)
+> จึงต้องมีสองอย่างนี้ใน `package.json` ที่ root ไม่งั้นพัง — อย่าลบ:
+>
+> - **`overrides` ของ `@tiptap/*`** — ปักไว้ที่ 3.29.2 ทั้งชุด ถ้าปล่อยให้ npm resolve เอง
+>   จะได้ `@tiptap/core` สองชุด แล้ว editor ในหน้า admin พัง (ProseMirror เทียบ schema ด้วย instanceof)
+> - **`postinstall`** — สั่ง `prisma generate` เอง เพราะ postinstall ของ `@prisma/client`
+>   หา `apps/api/prisma/schema.prisma` ไม่เจอตอนถูกยกขึ้นมาไว้ root แล้วทิ้ง client ตัวปลอมที่ throw ไว้
+
 ฐานข้อมูล: **PostgreSQL 16 ใน Docker** — container `sml-dev-db` พอร์ต **5430**
 (แยกจาก container `sml_postgres` เดิมของเครื่องที่ใช้พอร์ต 5432 — อย่าสับสนกัน)
 
@@ -29,16 +40,16 @@ Prisma CLI (ผ่าน `dotenv-cli` ใน scripts), Next.js (โหลดใ�
 ## เริ่มใช้งาน (ครั้งแรก)
 
 ```bash
-pnpm install
-pnpm db:up                                       # สตาร์ท PostgreSQL (docker compose)
-pnpm --filter @sml/api exec prisma migrate dev   # สร้างตาราง + ใส่ข้อมูลตัวอย่าง
+npm install
+npm run db:up                       # สตาร์ท PostgreSQL (docker compose)
+npm run prisma:migrate -w @sml/api  # สร้างตาราง + ใส่ข้อมูลตัวอย่าง
 ```
 
 ## รัน dev
 
 ```bash
-pnpm db:up      # ถ้า DB ยังไม่รัน (เปิดเครื่องใหม่ container จะขึ้นเองถ้า Docker เปิด)
-pnpm dev        # รัน api (4000) + web (3100) พร้อมกัน
+npm run db:up   # ถ้า DB ยังไม่รัน (เปิดเครื่องใหม่ container จะขึ้นเองถ้า Docker เปิด)
+npm run dev     # รัน api (4000) + web (3100) พร้อมกัน
 ```
 
 - เว็บ: http://localhost:3100
@@ -48,8 +59,14 @@ pnpm dev        # รัน api (4000) + web (3100) พร้อมกัน
 ## รันแบบ production (เปิดให้เครื่องอื่นในวง LAN เข้าได้)
 
 ```bash
-pnpm build      # build ทั้ง api และ web
-pnpm start      # รัน api (4000) + web (3100) โหมด production
+npm run prod    # build แล้วรัน api (4000) + web (3100) โหมด production
+```
+
+แยกขั้นตอนได้ถ้าไม่อยาก build ใหม่ทุกครั้ง:
+
+```bash
+npm run build   # build ทั้ง api และ web
+npm start       # รันอย่างเดียว (ต้อง build มาก่อน ไม่งั้น next start จะล้ม)
 ```
 
 เปิดจากเครื่องอื่นด้วย `http://<ip ของเครื่องนี้>:3100` — ดู ip ด้วย `ipconfig`
@@ -68,9 +85,22 @@ netsh advfirewall firewall add rule name="SMC web 3100" dir=in action=allow prot
 ค่าเดียวที่ควรแก้ตาม ip คือ `NEXT_PUBLIC_SITE_URL` ใน `.env`
 (มีผลกับ sitemap และลิงก์แชร์โซเชียลเท่านั้น)
 
-## บัญชีทดสอบ (seed)
+## บัญชีผู้ดูแลระบบ
 
-- `admin@sml.local` / `ChangeMe123!`
+`npm run db:seed` สร้างบัญชีแรกให้ โดยอ่าน `ADMIN_EMAIL` / `ADMIN_PASSWORD` จาก `.env`
+**ไม่ตั้ง `ADMIN_PASSWORD` = สุ่มรหัสให้แล้วพิมพ์บนหน้าจอครั้งเดียว** — จดไว้ทันที
+
+รหัสผ่านไม่ได้ฝังไว้ในโค้ด และ seed จะ**ไม่แตะบัญชีที่มีอยู่แล้ว** จึงรันซ้ำได้ปลอดภัย
+(คำสั่งนี้ถูกเรียกอัตโนมัติตอน `prisma migrate dev` ด้วย)
+
+ลืมรหัสผ่าน — ระบบไม่มีอีเมลกู้รหัส ใช้คำสั่งนี้ตั้งใหม่:
+
+```bash
+npm run db:admin:password
+```
+
+ตั้งรหัสเองได้โดยใส่ `ADMIN_PASSWORD` ใน `.env` ก่อนรัน (ต้องยาวอย่างน้อย 10 ตัว)
+เปลี่ยนรหัสตัวเองระหว่างใช้งานได้ที่ `/admin/account`
 
 ## เฟสงาน
 

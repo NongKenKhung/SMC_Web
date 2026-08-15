@@ -17,6 +17,8 @@
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*", "prisma/seed.ts"],
+  /* รวมสคริปต์ใน prisma/ ทั้งหมด ไม่ใช่แค่ seed.ts — เพราะบนเซิร์ฟเวอร์ที่ deploy ด้วย Docker
+     ไม่มี ts-node/tsconfig ให้ใช้ ต้องเรียกไฟล์ที่คอมไพล์แล้ว (dist/prisma/*.js) */
+  "include": ["src/**/*", "prisma/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

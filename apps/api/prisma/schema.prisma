@@ -39,6 +39,9 @@ model Solution {
   bodyTh     String?
   bodyEn     String?
   layout     String   @default("TEXT") // TEXT = หน้าเนื้อหาปกติ | BROCHURE = รูปโบรชัวเต็มหน้า
+  // ราคาต่อระบบ (บาท) — ว่าง = ยังไม่กำหนด จะไม่ขึ้นในตารางราคา
+  // ใช้ Decimal ไม่ใช่ Float เพราะเงินห้ามคลาดเคลื่อนจากเลขฐานสอง
+  price      Decimal? @db.Decimal(12, 2)
   coverImage String?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt

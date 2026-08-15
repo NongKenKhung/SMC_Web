@@ -9,6 +9,9 @@ import {
 } from "@/lib/api";
 import { dict, fmtDate, isLocale, pick } from "@/lib/i18n";
 
+/* หน้าแรกโชว์พอเป็นตัวอย่าง ที่เหลือไปดูต่อที่หน้ารวม */
+const HOME_MAX_SOLUTIONS = 6;
+
 const ArrowR = () => (
   <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -83,6 +86,7 @@ export default async function Home({
     getContent<EmbedContent>("site.embed", locale),
   ]);
   const poster = pageMedia?.poster ?? null;
+  const solutionNodes = tree ?? [];
 
   /* ถ้ามีข้อมูลใน admin ใช้ของนั้น ไม่มีก็ใช้ค่าเริ่มต้นที่ฝังมากับระบบ */
   const pillarBlocks = blocks["home.pillars"] ?? [];
@@ -268,7 +272,7 @@ export default async function Home({
       )}
 
       {/* ===== 4. โซลูชัน (รายการแถวใหญ่ กดได้ทั้งใบ) — ซ่อนทั้ง section ถ้ายังไม่มีข้อมูล ===== */}
-      {(tree ?? []).length > 0 && (
+      {solutionNodes.length > 0 && (
       <section className="sec-x soft-sec">
         <span className="ghost-head">Solutions</span>
         <div className="container">
@@ -280,12 +284,13 @@ export default async function Home({
             <p>{t.home.solutionsLead}</p>
           </div>
           <div className="sol-x">
-            {(tree ?? []).map((s, i) => (
+            {solutionNodes.slice(0, HOME_MAX_SOLUTIONS).map((s, i) => (
               <Link href={`${base}/solutions/${s.slug}`} key={s.id} className={`sol-x-item glow reveal${i ? ` d${i}` : ""}`}>
                 <span className="sol-x-num">{String(i + 1).padStart(2, "0")}</span>
                 <div className="sol-x-body">
                   <h3>{pick(s, "name", locale)}</h3>
-                  <p>{pick(s, "summary", locale)}</p>
+                  {/* ไม่ได้กรอกคำอธิบาย = ไม่ต้องเว้นบรรทัดว่างไว้ */}
+                  {pick(s, "summary", locale) && <p>{pick(s, "summary", locale)}</p>}
                   {s.children.length > 0 && (
                     <div className="sol-x-chips">
                       {s.children.map((c) => (
@@ -298,6 +303,11 @@ export default async function Home({
               </Link>
             ))}
           </div>
+          {solutionNodes.length > HOME_MAX_SOLUTIONS && (
+            <p style={{ textAlign: "center", marginTop: "var(--sp-12)" }} className="reveal">
+              <Link className="btn btn-primary" href={`${base}/solutions`}>{t.common.viewAll}</Link>
+            </p>
+          )}
         </div>
       </section>
       )}

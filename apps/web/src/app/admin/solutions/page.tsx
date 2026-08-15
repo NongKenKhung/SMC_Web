@@ -13,6 +13,7 @@ type FormState = Partial<AdminSolution> & { nameTh: string; slug: string };
 const EMPTY: FormState = {
   nameTh: "", nameEn: "", slug: "", summaryTh: "", summaryEn: "",
   bodyTh: "", bodyEn: "", coverImage: "", parentId: null, order: 0, published: true, layout: "TEXT",
+  price: null,
 };
 
 export default function AdminSolutions() {
@@ -60,6 +61,8 @@ export default function AdminSolutions() {
       parentId: form.parentId ?? undefined,
       order: Number(form.order ?? 0),
       published: !!form.published,
+      /* ช่องว่าง = ยังไม่กำหนดราคา ต้องส่ง null ไม่ใช่ 0 ไม่งั้นจะขึ้นตารางราคาเป็น 0.00 */
+      price: form.price === null || form.price === undefined || String(form.price) === "" ? null : Number(form.price),
     };
     try {
       if (editingId) {
@@ -186,6 +189,24 @@ export default function AdminSolutions() {
                 <label>ลำดับ</label>
                 <input type="number" value={form.order ?? 0} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
               </div>
+            </div>
+            <div className="row2">
+              <div>
+                <label>ราคา (บาท)</label>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="เว้นว่าง = ยังไม่กำหนดราคา"
+                  value={form.price ?? ""}
+                  onChange={(e) =>
+                    /* เก็บเป็น null เมื่อล้างช่อง — ส่ง 0 ไปจะกลายเป็นราคาศูนย์บนหน้าเว็บ */
+                    setForm({ ...form, price: e.target.value === "" ? null : Number(e.target.value) })
+                  }
+                />
+                <p className="adm-note">กรอกแล้วระบบนี้จะขึ้นในหน้าตารางราคา เว้นว่างไว้จะไม่ขึ้น</p>
+              </div>
+              <div />
             </div>
             <div className="row2">
               <div>

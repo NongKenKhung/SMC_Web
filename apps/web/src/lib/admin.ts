@@ -62,6 +62,8 @@ export interface AdminSolution {
   summaryTh: string | null; summaryEn: string | null;
   bodyTh: string | null; bodyEn: string | null;
   coverImage: string | null;
+  /** ราคา (บาท) — null = ยังไม่กำหนด API แปลง Decimal เป็นตัวเลขให้แล้ว */
+  price: number | null;
 }
 export interface AdminPartner {
   id: number; name: string; captionTh: string | null; captionEn: string | null; logoUrl: string | null;

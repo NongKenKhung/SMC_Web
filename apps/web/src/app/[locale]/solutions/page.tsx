@@ -25,7 +25,7 @@ export default async function SolutionsHub({
   if (!isLocale(locale)) notFound();
   const t = dict(locale);
   const base = `/${locale}`;
-  const tree = (await getSolutionsTree()) ?? [];
+  const nodes = (await getSolutionsTree()) ?? [];
   const pageMedia = await getPageMedia("solutions");
 
   return (
@@ -48,23 +48,42 @@ export default async function SolutionsHub({
             <p className="lead">{t.solutions.lead}</p>
           </div>
 
-          {tree.length === 0 && <p className="empty-note reveal">{t.empty.solutions}</p>}
+          {nodes.length === 0 && <p className="empty-note reveal">{t.empty.solutions}</p>}
 
           <div className="cat-grid">
-            {tree.map((cat, i) => (
-              <article className={`card cat-card glow reveal${i ? ` d${i}` : ""}`} key={cat.id}>
-                <div className="cat-circle">{CIRCLE_ICONS[i % CIRCLE_ICONS.length]}</div>
-                <h3>{pick(cat, "name", locale)}</h3>
-                <p>{pick(cat, "summary", locale)}</p>
-                <div className="cat-list">
-                  {cat.children.map((c) => (
-                    <Link href={`${base}/solutions/${c.slug}`} key={c.id}>
-                      {pick(c, "name", locale)} <ArrowR />
-                    </Link>
-                  ))}
-                </div>
-              </article>
-            ))}
+            {nodes.map((cat, i) => {
+              /* หน่วงเหลื่อมกันแค่ 3 ใบแรกพอ — ถ้าไล่ทีละใบครบ 18 ใบจะรอนานเกินไป */
+              const cls = `card cat-card glow reveal${i && i < 4 ? ` d${i}` : ""}`;
+              const head = (
+                <>
+                  <div className="cat-circle">{CIRCLE_ICONS[i % CIRCLE_ICONS.length]}</div>
+                  <h3>{pick(cat, "name", locale)}</h3>
+                  {/* ไม่ได้กรอกคำอธิบาย = ไม่ต้องเว้นที่ว่างไว้ */}
+                  {pick(cat, "summary", locale) && <p>{pick(cat, "summary", locale)}</p>}
+                </>
+              );
+
+              /* มีรายการย่อย = การ์ดหมวด ต้องกดเข้าแต่ละรายการได้ทีละอัน
+                 ไม่มีรายการย่อย = ตัวการ์ดเองคือระบบ กดได้ทั้งใบ
+                 (สองแบบนี้ห้ามรวมกัน — <a> ซ้อน <a> เป็น HTML ที่ผิด) */
+              return cat.children.length > 0 ? (
+                <article className={cls} key={cat.id}>
+                  {head}
+                  <div className="cat-list">
+                    {cat.children.map((c) => (
+                      <Link href={`${base}/solutions/${c.slug}`} key={c.id}>
+                        {pick(c, "name", locale)} <ArrowR />
+                      </Link>
+                    ))}
+                  </div>
+                </article>
+              ) : (
+                <Link className={cls} href={`${base}/solutions/${cat.slug}`} key={cat.id}>
+                  {head}
+                  <span className="cat-go">{t.common.readMore} <ArrowR /></span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

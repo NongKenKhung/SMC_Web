@@ -2,7 +2,7 @@ import Link from "next/link";
 import { mediaUrl, type AttachmentItem } from "@/lib/api";
 
 /** Banner หัวหน้าใน — โทนเดียวกับ hero หน้าแรก:
- *  คำอังกฤษยักษ์ฟอนต์โปสเตอร์ + ชื่อหน้าภาษาไทย + ตัวอักษรเส้นขอบเป็นฉากหลัง + แสงออโรรา
+ *  คำอังกฤษ + ชื่อหน้าภาษาไทย + แสงออโรรา
  *  ถ้ามี poster จะใช้รูปเป็นพื้นหลังแทนลายจุด */
 export default function PageBanner({
   title,
@@ -28,7 +28,6 @@ export default function PageBanner({
       )}
       <span className="orb orb-a" aria-hidden="true" />
       <span className="orb orb-b" aria-hidden="true" />
-      {en && <span className="pb-ghost" aria-hidden="true">{en}</span>}
       <div className="container pb-inner">
         <p className="crumb">
           {crumbs.map((c, i) => (

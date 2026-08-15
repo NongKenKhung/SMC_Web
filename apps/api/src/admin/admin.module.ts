@@ -4,9 +4,10 @@ import {
   Body, Controller, Delete, Get, Module, Param,
   ParseIntPipe, Patch, Post, Put, UseGuards,
 } from "@nestjs/common";
-import { Type } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import {
-  IsBoolean, IsIn, IsInt, IsOptional, IsString, MaxLength, MinLength,
+  IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsString,
+  Max, MaxLength, Min, MinLength, ValidateIf,
 } from "class-validator";
 import { JwtAuthGuard } from "../auth/auth.module";
 import { cleanExternalUrl, cleanHtmlFields } from "../common/sanitize";
@@ -52,6 +53,16 @@ class SolutionDto {
 
   @IsOptional() @IsIn(["TEXT", "BROCHURE"])
   layout?: string;
+
+  /* ราคา (บาท) — ว่าง/null = ยังไม่กำหนด ไม่ขึ้นในตารางราคา
+     ฟอร์มส่ง "" มาเมื่อผู้ใช้ล้างช่อง จึงต้องแปลงเป็น null ไม่ใช่ 0 */
+  @IsOptional()
+  @Transform(({ value }) => (value === "" || value === null || value === undefined ? null : Number(value)))
+  @ValidateIf((_, v) => v !== null)
+  @IsNumber({ maxDecimalPlaces: 2 }, { message: "ราคาต้องเป็นตัวเลข ทศนิยมไม่เกิน 2 ตำแหน่ง" })
+  @Min(0, { message: "ราคาต้องไม่ติดลบ" })
+  @Max(9_999_999_999, { message: "ราคาเกินขอบเขตที่เก็บได้" })
+  price?: number | null;
 }
 class SolutionPatchDto extends SolutionDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(80)
@@ -148,10 +159,13 @@ export class AdminSolutionsController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Get()
-  list() {
-    return this.prisma.solution.findMany({
+  async list() {
+    const rows = await this.prisma.solution.findMany({
       orderBy: [{ parentId: "asc" }, { order: "asc" }],
     });
+    /* Prisma คืน Decimal เป็นอ็อบเจ็กต์ที่ JSON แปลงเป็นสตริง — แปลงเป็นตัวเลขให้ตรงกับ
+       ที่ API สาธารณะส่ง ไม่งั้นช่องราคาในฟอร์มจะได้สตริงมาปนกับตัวเลข */
+    return rows.map((r) => ({ ...r, price: r.price == null ? null : Number(r.price) }));
   }
 
   @Post()

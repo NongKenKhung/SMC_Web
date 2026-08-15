@@ -1,0 +1,87 @@
+# สแตกสำหรับรันบนเซิร์ฟเวอร์จริง (Compute Engine VM) — db + api + web
+#
+#   สร้าง/อัปเดต:  docker compose -f docker-compose.prod.yml up -d --build
+#   ดู log:        docker compose -f docker-compose.prod.yml logs -f
+#   หยุด:          docker compose -f docker-compose.prod.yml down
+#
+# อ่านค่าจากไฟล์ .env ที่วางไว้ข้าง ๆ ไฟล์นี้บนเซิร์ฟเวอร์
+# หมายเหตุ: SITE_URL ถูกฝังตอน build เปลี่ยนแล้วต้อง --build ใหม่เสมอ
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?ต้องตั้ง DB_PASSWORD ใน .env}
+      POSTGRES_DB: ${DB_NAME:-sml}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # ไม่ publish พอร์ตออกนอกเครื่อง — เข้าถึงได้เฉพาะ container ในสแตกนี้
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DB_NAME:-sml}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      target: runtime
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?ต้องตั้ง NEXT_PUBLIC_SITE_URL ใน .env}
+        NEXT_PUBLIC_API_URL: http://api:4000/api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      # ชื่อโฮสต์ db มาจากชื่อ service ด้านบน ไม่ใช่ localhost
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@db:5432/${DB_NAME:-sml}?schema=public
+      API_PORT: 4000
+      JWT_SECRET: ${JWT_SECRET:?ต้องตั้ง JWT_SECRET ใน .env}
+      WEB_ORIGIN: ${NEXT_PUBLIC_SITE_URL}
+      UPLOADS_DIR: /data/uploads
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      CONTACT_NOTIFY_TO: ${CONTACT_NOTIFY_TO:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@smc.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    volumes:
+      - uploads:/data/uploads
+    # 1) อัปเดตโครงสร้างตารางให้ตรงกับ schema — migrate deploy ใช้เฉพาะ migration ที่ commit แล้ว
+    #    ไม่สร้าง migration ใหม่เอง จึงปลอดภัยกับข้อมูลจริง
+    # 2) seed สร้างบัญชีผู้ดูแลถ้ายังไม่มี — ถ้ามีอยู่แล้วจะไม่แตะรหัสผ่าน รันซ้ำได้
+    #    ถ้าไม่มีขั้นนี้ เซิร์ฟเวอร์ใหม่ที่ยังไม่ได้ import ข้อมูลจะไม่มีใครล็อกอินได้เลย
+    #    ใช้ไฟล์ที่คอมไพล์แล้ว (dist/prisma/seed.js) ไม่ใช่ npm run db:seed ที่เรียก ts-node
+    #    เพราะ ts-node ต้องมี tsconfig.json ซึ่ง image ตอนรันไม่ได้เก็บไว้
+    command: >
+      sh -c "npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma &&
+             node apps/api/dist/prisma/seed.js &&
+             node apps/api/dist/src/main.js"
+
+  web:
+    build:
+      context: .
+      target: runtime
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_API_URL: http://api:4000/api
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://api:4000/api
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    # เปิดพอร์ต 80 ให้คนนอกเข้า ส่วน api ไม่ต้องเปิด เพราะเบราว์เซอร์ยิง /api มาที่ web แล้ว web ส่งต่อให้
+    # ตั้ง WEB_PORT ใน .env ถ้าต้องการพอร์ตอื่น (เช่นมี reverse proxy อยู่หน้า 80 แล้ว)
+    ports:
+      - "${WEB_PORT:-80}:3100"
+    command: ["npx", "next", "start", "apps/web", "-p", "3100"]
+
+volumes:
+  pgdata:
+  uploads:

@@ -2,6 +2,9 @@ import Link from "next/link";
 import type { ContactContent, SolutionNode } from "@/lib/api";
 import { dict, pick, type Locale } from "@/lib/i18n";
 
+/* คอลัมน์ในฟุตเตอร์ไม่ควรยาวเกินคอลัมน์อื่น — เกินนี้ให้ไปดูต่อที่หน้ารวม */
+const FOOTER_MAX = 6;
+
 const Icon = {
   pin: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -36,9 +39,12 @@ export default function SiteFooter({
 }) {
   const t = dict(locale);
   const base = `/${locale}`;
+  /* ยังไม่มีระบบไหนใส่ราคา = ไม่ต้องลิงก์ไปหน้าเปล่า (เกณฑ์เดียวกับเมนูบนสุด) */
+  const hasPricing = tree.some((c) => c.price != null || c.children.some((k) => k.price != null));
   const links = [
     { href: base, label: t.nav.home },
     { href: `${base}/solutions`, label: t.nav.solutions },
+    ...(hasPricing ? [{ href: `${base}/pricing`, label: t.nav.pricing }] : []),
     { href: `${base}/partners`, label: t.nav.partners },
     { href: `${base}/blog`, label: t.nav.blog },
     { href: `${base}/about`, label: t.nav.about },
@@ -77,11 +83,16 @@ export default function SiteFooter({
             <div>
               <h5>{t.footer.solutions}</h5>
               <ul className="f-links">
-                {tree.map((s) => (
+                {tree.slice(0, FOOTER_MAX).map((s) => (
                   <li key={s.id}>
                     <Link href={`${base}/solutions/${s.slug}`}>{pick(s, "name", locale)}</Link>
                   </li>
                 ))}
+                {tree.length > FOOTER_MAX && (
+                  <li>
+                    <Link href={`${base}/solutions`}>{t.common.viewAll} →</Link>
+                  </li>
+                )}
               </ul>
             </div>
           )}

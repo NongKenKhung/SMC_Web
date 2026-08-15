@@ -12,3 +12,7 @@ out/
 !.env.example
 .DS_Store
 apps/api/uploads/
+# ข้อมูลที่ export ไว้ย้ายขึ้นเซิร์ฟเวอร์ — ดัมป์ฐานข้อมูลและไฟล์อัปโหลด ไม่ควรเข้า git
+deploy/data/
+# ใบรับรอง TLS ของเซิร์ฟเวอร์ — ห้ามเข้า git
+deploy/certs/*.pem

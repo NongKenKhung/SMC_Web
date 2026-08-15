@@ -4,9 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { adminFetch, clearToken } from "@/lib/admin";
 
-/* รหัสผ่านที่มากับระบบตอนติดตั้ง — เตือนให้เปลี่ยนถ้ายังใช้อยู่ */
-const DEFAULT_PASSWORD = "ChangeMe123!";
-
 export default function AdminAccount() {
   const router = useRouter();
   const [me, setMe] = useState<{ name: string; email: string } | null>(null);
@@ -20,7 +17,6 @@ export default function AdminAccount() {
     adminFetch<{ name: string; email: string }>("/auth/me").then(setMe).catch(() => {});
   }, []);
 
-  const usingDefault = current === DEFAULT_PASSWORD;
   const tooShort = next.length > 0 && next.length < 10;
   const mismatch = confirm.length > 0 && next !== confirm;
   const canSubmit = current && next.length >= 10 && next === confirm && !busy;
@@ -72,11 +68,6 @@ export default function AdminAccount() {
               onChange={(e) => setCurrent(e.target.value)}
               required
             />
-            {usingDefault && (
-              <p className="adm-warn">
-                นี่คือรหัสผ่านที่มากับระบบตอนติดตั้ง — ควรเปลี่ยนก่อนเปิดเว็บให้คนภายนอกเข้าถึง
-              </p>
-            )}
           </div>
 
           <div>

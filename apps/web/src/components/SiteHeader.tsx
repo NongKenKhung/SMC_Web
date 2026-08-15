@@ -48,10 +48,12 @@ export default function SiteHeader({
 
   /* ยังไม่มีโซลูชันในระบบ = ไม่ต้องมีเมนูย่อย ไม่งั้นจะเปิดกล่องเปล่าออกมา */
   const hasSolutions = tree.length > 0;
+  const hasPricing = tree.some((c) => c.price != null || c.children.some((k) => k.price != null));
 
   const links = [
     { href: base, label: t.nav.home },
-    { href: `${base}/solutions`, label: t.nav.solutions, sub: hasSolutions },
+    /* ราคาไม่ได้อยู่ระดับบนแล้ว — ย้ายไปเป็นรายการแรกในเมนูย่อยของโซลูชันด้านล่าง */
+    { href: `${base}/solutions`, label: t.nav.solutions, sub: hasSolutions || hasPricing },
     { href: `${base}/partners`, label: t.nav.partners },
     { href: `${base}/blog`, label: t.nav.blog },
     { href: `${base}/about`, label: t.nav.about },
@@ -77,7 +79,14 @@ export default function SiteHeader({
                     <Link href={l.href} className={isActive(l.href) ? "active" : ""}>
                       {l.label} <CaretDown />
                     </Link>
-                    <ul className="sub">
+                    {/* รายการยาวเกิน 8 = แตกสองคอลัมน์ ไม่งั้นเมนูสูงเกินจอ */}
+                    <ul className={`sub${tree.length > 8 ? " wide" : ""}`}>
+                      {/* ตารางราคาอยู่หัวเมนู คั่นจากรายการหมวดด้วยเส้นประ */}
+                      {hasPricing && (
+                        <li className="sub-lead">
+                          <Link href={`${base}/pricing`}>{t.nav.pricingAll}</Link>
+                        </li>
+                      )}
                       {tree.map((cat) => (
                         <li key={cat.id}>
                           <Link href={`${base}/solutions/${cat.slug}`}>
@@ -139,6 +148,11 @@ export default function SiteHeader({
                     {l.label} <CaretDown />
                   </button>
                   <ul className="d-sub">
+                    {hasPricing && (
+                      <li className="sub-lead">
+                        <Link href={`${base}/pricing`}>{t.nav.pricingAll}</Link>
+                      </li>
+                    )}
                     {tree.map((cat) => (
                       <li key={cat.id}>
                         <Link href={`${base}/solutions/${cat.slug}`}>
