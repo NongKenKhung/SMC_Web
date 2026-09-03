@@ -279,3 +279,15 @@ body { background: var(--a-soft); }
 .layout-pick b { font-size: .88rem; color: var(--a-navy); font-weight: 600; }
 .layout-pick span { font-size: .76rem; color: #7c879b; line-height: 1.5; }
 @media (max-width: 700px) { .layout-pick { grid-template-columns: 1fr; } }
+
+/* ตัวเลือกไอคอนของหมวดโซลูชัน */
+.icon-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+.icon-pick button {
+  width: 52px; height: 52px; display: grid; place-items: center;
+  border: 1px solid #d5ddeb; border-radius: 10px; background: #fff;
+  color: #6b7a90; cursor: pointer; transition: .18s; padding: 0;
+}
+.icon-pick button svg { width: 26px; height: 26px; }
+.icon-pick button:hover { border-color: #f26b21; color: #f26b21; }
+.icon-pick button.on { border-color: #f26b21; background: #fff4ec; color: #f26b21; }
+.icon-auto { font-size: .62rem; line-height: 1.2; }

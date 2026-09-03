@@ -7,13 +7,14 @@ import Upload from "@/components/admin/Upload";
 import { adminFetch, type AdminSolution } from "@/lib/admin";
 import { slugFrom, slugify } from "@/lib/slug";
 import { useScrollToForm } from "@/components/admin/useScrollToForm";
+import SolutionIcon, { SOLUTION_ICONS } from "@/components/SolutionIcon";
 
 type FormState = Partial<AdminSolution> & { nameTh: string; slug: string };
 
 const EMPTY: FormState = {
   nameTh: "", nameEn: "", slug: "", summaryTh: "", summaryEn: "",
   bodyTh: "", bodyEn: "", coverImage: "", parentId: null, order: 0, published: true, layout: "TEXT",
-  price: null,
+  price: null, icon: "",
 };
 
 export default function AdminSolutions() {
@@ -61,6 +62,7 @@ export default function AdminSolutions() {
       parentId: form.parentId ?? undefined,
       order: Number(form.order ?? 0),
       published: !!form.published,
+      icon: form.icon ?? "",
       /* ช่องว่าง = ยังไม่กำหนดราคา ต้องส่ง null ไม่ใช่ 0 ไม่งั้นจะขึ้นตารางราคาเป็น 0.00 */
       price: form.price === null || form.price === undefined || String(form.price) === "" ? null : Number(form.price),
     };
@@ -206,7 +208,32 @@ export default function AdminSolutions() {
                 />
                 <p className="adm-note">กรอกแล้วระบบนี้จะขึ้นในหน้าตารางราคา เว้นว่างไว้จะไม่ขึ้น</p>
               </div>
-              <div />
+              <div>
+                <label>ไอคอนของหมวด</label>
+                <div className="icon-pick">
+                  {/* ปุ่มแรก = ไม่เลือก ระบบจะวนไอคอนตามลำดับการ์ดให้เอง */}
+                  <button
+                    type="button"
+                    className={!form.icon ? "on" : ""}
+                    title="อัตโนมัติ"
+                    onClick={() => setForm({ ...form, icon: "" })}
+                  >
+                    <span className="icon-auto">อัตโนมัติ</span>
+                  </button>
+                  {Object.entries(SOLUTION_ICONS).map(([k, v]) => (
+                    <button
+                      type="button"
+                      key={k}
+                      className={form.icon === k ? "on" : ""}
+                      title={v.label}
+                      onClick={() => setForm({ ...form, icon: k })}
+                    >
+                      <SolutionIcon name={k} />
+                    </button>
+                  ))}
+                </div>
+                <p className="adm-note">ใช้กับหมวดที่มีหัวข้อย่อยเท่านั้น — แสดงในวงกลมบนการ์ดหน้ารวมโซลูชัน</p>
+              </div>
             </div>
             <div className="row2">
               <div>

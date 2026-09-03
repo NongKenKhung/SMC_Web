@@ -54,6 +54,11 @@ class SolutionDto {
   @IsOptional() @IsIn(["TEXT", "BROCHURE"])
   layout?: string;
 
+  /* คีย์ไอคอนของหมวด (เช่น water, air) — ว่าง = ให้หน้าเว็บวนไอคอนตามลำดับเอง
+     ต้องประกาศไว้ที่นี่ ไม่งั้น ValidationPipe ที่ตั้ง whitelist ไว้จะตัดทิ้งเงียบ ๆ */
+  @IsOptional() @IsString() @MaxLength(40)
+  icon?: string;
+
   /* ราคา (บาท) — ว่าง/null = ยังไม่กำหนด ไม่ขึ้นในตารางราคา
      ฟอร์มส่ง "" มาเมื่อผู้ใช้ล้างช่อง จึงต้องแปลงเป็น null ไม่ใช่ 0 */
   @IsOptional()

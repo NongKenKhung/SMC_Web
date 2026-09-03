@@ -2,13 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageBanner from "@/components/PageBanner";
 import { getPageMedia, getSolutionsTree } from "@/lib/api";
+import SolutionIcon from "@/components/SolutionIcon";
 import { dict, isLocale, pick } from "@/lib/i18n";
 
-const CIRCLE_ICONS = [
-  <svg key="0" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="2" width="10" height="20" rx="3" /><circle cx="12" cy="7" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="17" r="1.6" /></svg>,
-  <svg key="1" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14" /><path d="M9 10h2M9 14h2M13 10h2M13 14h2M11 21v-4h2v4" /></svg>,
-  <svg key="2" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="3" /></svg>,
-];
 
 const ArrowR = () => (
   <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
@@ -56,7 +52,7 @@ export default async function SolutionsHub({
               const cls = `card cat-card glow reveal${i && i < 4 ? ` d${i}` : ""}`;
               const head = (
                 <>
-                  <div className="cat-circle">{CIRCLE_ICONS[i % CIRCLE_ICONS.length]}</div>
+                  <div className="cat-circle"><SolutionIcon name={cat.icon} index={i} /></div>
                   <h3>{pick(cat, "name", locale)}</h3>
                   {/* ไม่ได้กรอกคำอธิบาย = ไม่ต้องเว้นที่ว่างไว้ */}
                   {pick(cat, "summary", locale) && <p>{pick(cat, "summary", locale)}</p>}

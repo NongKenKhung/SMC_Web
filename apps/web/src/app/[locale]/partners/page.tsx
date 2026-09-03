@@ -41,7 +41,9 @@ export default async function PartnersPage({
             {partners.map((p) => {
               const card = (
                 <div className="logo-card glow" key={p.id}>
-                  {p.logoUrl ? <img src={mediaUrl(p.logoUrl)!} alt={p.name} /> : <b>{p.name}</b>}
+                  {p.logoUrl && <img src={mediaUrl(p.logoUrl)!} alt="" />}
+                  {/* แสดงชื่อเสมอ ไม่ใช่เฉพาะตอนไม่มีโลโก้ — โลโก้บางอันไม่มีชื่อบริษัทอยู่ในรูป */}
+                  <b>{p.name}</b>
                   {pick(p, "caption", locale) && <span>{pick(p, "caption", locale)}</span>}
                 </div>
               );
