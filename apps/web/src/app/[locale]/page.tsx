@@ -325,9 +325,9 @@ export default async function Home({
           <div className="logo-row reveal">
             {(partners ?? []).slice(0, 5).map((p) => (
               <div className="logo-card" key={p.id}>
-                {p.logoUrl && <img src={mediaUrl(p.logoUrl)!} alt="" />}
-                  {/* แสดงชื่อเสมอ ไม่ใช่เฉพาะตอนไม่มีโลโก้ — โลโก้บางอันไม่มีชื่อบริษัทอยู่ในรูป */}
-                  <b>{p.name}</b>
+                {p.logoUrl && <img src={mediaUrl(p.logoUrl)!} alt={p.nameInLogo ? p.name : ""} />}
+                {/* โลโก้บางอันไม่มีชื่อบริษัทในรูป จึงต้องพิมพ์ชื่อให้ ส่วนอันที่มีแล้วไม่ต้องซ้ำ */}
+                {!p.nameInLogo && <b>{p.name}</b>}
                 {pick(p, "caption", locale) && <span>{pick(p, "caption", locale)}</span>}
               </div>
             ))}

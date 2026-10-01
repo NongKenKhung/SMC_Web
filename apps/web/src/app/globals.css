@@ -889,10 +889,25 @@ a.cat-card:hover .cat-go { gap: 11px; transition: gap 0.2s; }
 .detail-hero {
   border-radius: 22px; overflow: hidden; margin-top: 8px;
   background: linear-gradient(130deg, var(--navy-900), var(--navy) 55%, #2e4e86);
-  aspect-ratio: 16 / 5.6; display: grid; place-items: center; color: #fff; position: relative;
+  display: grid; place-items: center; color: #fff; position: relative;
+  /* ไม่ล็อกอัตราส่วนเมื่อมีรูปจริง — ปล่อยให้ความสูงเดินตามรูป แล้วคุมด้วยเพดานแทน
+     ของเดิมล็อก 16/5.6 คู่กับ object-fit: cover ทำให้รูปแนวตั้ง 251×320 ถูกขยาย 4.5 เท่า
+     และตัดทิ้ง 73% เหลือแค่แถบกลางภาพ (ที่ผู้ใช้เห็นเป็นอาการ "โดนบีบ") */
+  min-height: 220px; max-height: 560px;
+  /* กรอบหดตามรูป — รูปแนวนอนกว้าง ๆ ก็ยังเต็มความกว้างเหมือนเดิม
+     ส่วนรูปแนวตั้งจะได้กรอบพอดีตัว ไม่เหลือพื้นกรมท่าว่างข้างละครึ่งจอ */
+  width: fit-content; max-width: 100%; margin-inline: auto;
 }
+/* ไม่มีรูป = ยังเป็นกล่องเปล่าทรงกว้างเหมือนเดิม */
+.detail-hero:not(:has(img)) { aspect-ratio: 16 / 5.6; width: auto; }
 .detail-hero .ph-label { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); background: rgba(11, 23, 48, 0.7); font-size: 0.78rem; padding: 6px 14px; border-radius: 999px; color: #c7d1e4; white-space: nowrap; }
-.detail-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* contain ไม่ใช่ cover — รูป poster ที่อัปผ่าน admin มีทั้งแนวตั้งและแนวนอน
+   ห้ามตัดส่วนใดของรูปทิ้ง และห้ามขยายเกินขนาดไฟล์จริงจนเบลอ */
+.detail-hero img {
+  position: static; display: block;
+  width: auto; height: auto; max-width: 100%; max-height: 560px;
+  object-fit: contain;
+}
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
 /* เนื้อหาจาก rich text editor (Phase 6B) — HTML ผ่าน sanitize ฝั่งเซิร์ฟเวอร์แล้ว */
 .prose { max-width: 760px; margin-inline: auto; color: var(--muted); }
@@ -918,7 +933,10 @@ a.cat-card:hover .cat-go { gap: 11px; transition: gap 0.2s; }
 .prose pre { background: var(--navy-950); color: #e6ecf7; padding: 16px 18px; border-radius: 12px; overflow-x: auto; }
 .prose pre code { background: none; border: none; color: inherit; }
 .prose hr { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
-.prose table { width: 100%; border-collapse: collapse; font-size: .93rem; display: block; overflow-x: auto; }
+.prose .table-wrap { overflow-x: auto; }
+/* เลื่อนแนวนอนที่กล่องครอบ ไม่ใช่ที่ <table> — ถ้าตารางเป็น display:block ความกว้างจะหด
+   ตามเนื้อหาแล้ว width:100% ไม่มีผล (ดู wrapTables ใน RichContent.tsx) */
+.prose table { width: 100%; border-collapse: collapse; font-size: .93rem; }
 .prose th, .prose td { border: 1px solid var(--line); padding: 10px 14px; text-align: left; }
 .prose th { background: var(--soft); color: var(--navy); font-weight: 600; }
 
@@ -996,7 +1014,9 @@ a.cat-card:hover .cat-go { gap: 11px; transition: gap 0.2s; }
 .map-pin svg { transform: rotate(45deg); }
 
 /* ---------- แกลเลอรี + ไฟล์ดาวน์โหลด (Phase 6A) ---------- */
-.gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+.gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+/* 300px = 3 ใบต่อแถวบนจอ 1132px (เดิม 240px ได้ 4 ใบ ภาพเล็กเกินจนดูรายละเอียดสินค้าไม่ออก)
+   auto-fill ไม่ใช่ auto-fit — มีรูปใบเดียวต้องกว้างเท่าใบเดียว ไม่ยืดเต็มแถว */
 .gal-item {
   position: relative; border-radius: 14px; overflow: hidden; background: var(--navy-soft);
   border: 1px solid var(--line); padding: 0; display: block; width: 100%; transition: .28s;
@@ -1202,7 +1222,10 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
   .video-card { aspect-ratio: 4 / 3; }
   .play-btn { width: 64px; height: 64px; }
   .play-btn svg { width: 24px; height: 24px; }
-  .detail-hero { aspect-ratio: 16 / 9; }
+  /* จอแคบก็ยังไม่ล็อกอัตราส่วนเมื่อมีรูป — คุมด้วยเพดานความสูงแทน */
+  .detail-hero { max-height: 380px; }
+  .detail-hero:not(:has(img)) { aspect-ratio: 16 / 9; }
+  .detail-hero img { max-height: 380px; }
   .detail-hero > svg { width: 84px; height: 84px; }
   .vm-card { padding: 28px 24px; }
   .form-card { padding: 26px 22px; }

@@ -83,6 +83,7 @@ export interface Partner {
   captionEn: string | null;
   logoUrl: string | null;
   websiteUrl: string | null;
+  nameInLogo: boolean;
 }
 
 export interface PostItem {

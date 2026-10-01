@@ -56,6 +56,9 @@ model Partner {
   websiteUrl String?
   order      Int     @default(0)
   published  Boolean @default(true)
+  /// โลโก้มีชื่อบริษัทอยู่ในรูปแล้ว — ไม่ต้องพิมพ์ชื่อซ้ำใต้โลโก้
+  /// (ยังเก็บ name ไว้เสมอ เพราะใช้เป็นข้อความแทนรูปให้โปรแกรมอ่านหน้าจอ)
+  nameInLogo Boolean @default(false)
 }
 
 model Post {

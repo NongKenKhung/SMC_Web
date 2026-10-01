@@ -98,6 +98,11 @@ class PartnerDto {
 
   @IsOptional() @IsBoolean()
   published?: boolean;
+
+  /* โลโก้มีชื่อบริษัทอยู่ในรูปแล้ว = ไม่ต้องแสดงชื่อซ้ำใต้โลโก้
+     ต้องประกาศที่นี่ ไม่งั้น ValidationPipe ที่ตั้ง whitelist ไว้จะตัดทิ้งเงียบ ๆ */
+  @IsOptional() @IsBoolean()
+  nameInLogo?: boolean;
 }
 class PartnerPatchDto extends PartnerDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(160)

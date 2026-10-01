@@ -67,7 +67,7 @@ export interface AdminSolution {
 }
 export interface AdminPartner {
   id: number; name: string; captionTh: string | null; captionEn: string | null; logoUrl: string | null;
-  websiteUrl: string | null; order: number; published: boolean;
+  websiteUrl: string | null; order: number; published: boolean; nameInLogo: boolean;
 }
 export interface AdminPost {
   id: number; slug: string; category: string;

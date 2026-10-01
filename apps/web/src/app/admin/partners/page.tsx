@@ -7,7 +7,7 @@ import { useScrollToForm } from "@/components/admin/useScrollToForm";
 
 type FormState = Partial<AdminPartner> & { name: string };
 
-const EMPTY: FormState = { name: "", captionTh: "", captionEn: "", logoUrl: "", websiteUrl: "", order: 0, published: true };
+const EMPTY: FormState = { name: "", captionTh: "", captionEn: "", logoUrl: "", websiteUrl: "", order: 0, published: true, nameInLogo: false };
 
 export default function AdminPartners() {
   const [rows, setRows] = useState<AdminPartner[]>([]);
@@ -27,6 +27,7 @@ export default function AdminPartners() {
     const payload = {
       name: form.name, captionTh: form.captionTh ?? "", captionEn: form.captionEn ?? "", logoUrl: form.logoUrl ?? "",
       websiteUrl: form.websiteUrl ?? "", order: Number(form.order ?? 0), published: !!form.published,
+      nameInLogo: !!form.nameInLogo,
     };
     try {
       if (editingId) {
@@ -124,6 +125,10 @@ export default function AdminPartners() {
               <label>โลโก้</label>
               <Upload value={form.logoUrl} onDone={(url) => setForm({ ...form, logoUrl: url })} />
             </div>
+            <label className="check">
+              <input type="checkbox" checked={!!form.nameInLogo} onChange={(e) => setForm({ ...form, nameInLogo: e.target.checked })} />
+              โลโก้มีชื่ออยู่ในรูปแล้ว — ไม่ต้องแสดงชื่อซ้ำใต้โลโก้
+            </label>
             <label className="check">
               <input type="checkbox" checked={!!form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
               แสดงบนเว็บ

@@ -41,9 +41,11 @@ export default async function PartnersPage({
             {partners.map((p) => {
               const card = (
                 <div className="logo-card glow" key={p.id}>
-                  {p.logoUrl && <img src={mediaUrl(p.logoUrl)!} alt="" />}
-                  {/* แสดงชื่อเสมอ ไม่ใช่เฉพาะตอนไม่มีโลโก้ — โลโก้บางอันไม่มีชื่อบริษัทอยู่ในรูป */}
-                  <b>{p.name}</b>
+                  {/* โลโก้ที่มีชื่ออยู่ในรูปแล้ว ต้องใส่ชื่อเป็นข้อความแทนรูป
+                      เพราะไม่มี <b> ข้างล่างให้โปรแกรมอ่านหน้าจออ่านแทน */}
+                  {p.logoUrl && <img src={mediaUrl(p.logoUrl)!} alt={p.nameInLogo ? p.name : ""} />}
+                  {/* โลโก้บางอันไม่มีชื่อบริษัทในรูป จึงต้องพิมพ์ชื่อให้ ส่วนอันที่มีแล้วไม่ต้องซ้ำ */}
+                  {!p.nameInLogo && <b>{p.name}</b>}
                   {pick(p, "caption", locale) && <span>{pick(p, "caption", locale)}</span>}
                 </div>
               );
