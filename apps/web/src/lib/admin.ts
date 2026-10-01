@@ -57,7 +57,7 @@ export const mediaUrl = (path?: string | null) =>
 /* ---------- types ฝั่ง admin ---------- */
 export interface AdminSolution {
   id: number; slug: string; parentId: number | null; order: number;
-  published: boolean; icon: string | null; layout: string;
+  published: boolean; icon: string | null; layout: string; widget: string | null;
   nameTh: string; nameEn: string | null;
   summaryTh: string | null; summaryEn: string | null;
   bodyTh: string | null; bodyEn: string | null;

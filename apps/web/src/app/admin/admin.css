@@ -291,3 +291,11 @@ body { background: var(--a-soft); }
 .icon-pick button:hover { border-color: #f26b21; color: #f26b21; }
 .icon-pick button.on { border-color: #f26b21; background: #fff4ec; color: #f26b21; }
 .icon-auto { font-size: .62rem; line-height: 1.2; }
+
+/* ตารางใน editor — ให้หน้าตาใกล้กับที่จะแสดงบนเว็บ และเห็นช่องที่เลือกอยู่ */
+.rt-content .tableWrapper { overflow-x: auto; }
+.rt-content table { border-collapse: collapse; width: 100%; table-layout: fixed; margin: .4em 0; }
+.rt-content th, .rt-content td { border: 1px solid #d5ddeb; padding: 6px 10px; vertical-align: top; position: relative; }
+.rt-content th { background: #f3f6fb; color: var(--a-navy); font-weight: 600; text-align: left; }
+.rt-content th p, .rt-content td p { margin: 0; }
+.rt-content .selectedCell::after { content: ""; position: absolute; inset: 0; background: rgba(242, 107, 33, .14); pointer-events: none; }

@@ -48,6 +48,10 @@ export const SOLUTION_ICONS: Record<string, { label: string; path: React.ReactNo
     label: "แดชบอร์ด / กราฟ",
     path: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M8 16v-4M12 16V8M16 16v-6" /></>,
   },
+  pin: {
+    label: "พื้นที่ติดตั้ง / โครงการ",
+    path: <><path d="M12 22s7-6.4 7-12a7 7 0 0 0-14 0c0 5.6 7 12 7 12z" /><circle cx="12" cy="10" r="2.6" /></>,
+  },
 };
 
 /** ลำดับไอคอนสำรอง ใช้เมื่อหมวดนั้นยังไม่ได้เลือกไอคอนไว้ */

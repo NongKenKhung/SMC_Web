@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Brochure, DownloadList, Gallery } from "@/components/Attachments";
+import CctvSection from "@/components/CctvSection";
 import PageBanner from "@/components/PageBanner";
 import RichContent, { blockText } from "@/components/RichContent";
 import { getBlocks, getSolution, mediaUrl } from "@/lib/api";
@@ -117,6 +118,9 @@ export default async function SolutionDetail({
           )}
         </div>
       </section>
+
+      {/* ส่วนแสดงผลพิเศษที่เลือกไว้ใน admin — ต่อจากเนื้อหาแนะนำระบบ */}
+      {sol.widget === "cctv" && <CctvSection locale={locale} />}
 
       {/* โบรชัว — รูปทั้งหน้าเรียงต่อกัน */}
       <Brochure items={brochure} locale={locale} />

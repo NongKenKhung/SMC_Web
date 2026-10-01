@@ -72,6 +72,8 @@ export interface SolutionDetail extends WithAttachments {
   bodyEn: string | null;
   price: number | null;
   coverImage: string | null;
+  /** ส่วนแสดงผลพิเศษที่ฝังท้ายหน้า — null = ไม่มี | "cctv" = แผนที่+ภาพสดกล้องวงจรปิด */
+  widget: string | null;
   parent: { slug: string; nameTh: string; nameEn: string | null } | null;
   children: { slug: string; nameTh: string; nameEn: string | null; summaryTh: string | null }[];
 }

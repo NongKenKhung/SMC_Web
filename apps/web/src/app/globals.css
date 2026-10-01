@@ -1392,3 +1392,184 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
   margin-top: var(--sp-3); text-align: center;
   font-size: var(--fs-sm); color: var(--text-3);
 }
+
+/* =========================================================
+   กล้องวงจรปิดในหน้าโซลูชัน (widget = "cctv")
+   สีสถานะเป็นชุดเดียวกันทั้งส่วน ไม่ตั้งสีรายจุด
+   ========================================================= */
+:root {
+  --st-normal: #2fae63;
+  --st-watch: #f0b429;
+  --st-critical: #e03131;
+  --st-offline: #94a2bb;
+}
+
+/* กล้องวงจรปิด — ภาพสดจากต้นทางภายนอก */
+/* หน้าต่างดูภาพ */
+.cctv-modal {
+  position: fixed; inset: 0; z-index: 120; background: rgba(11, 23, 48, .88);
+  display: grid; place-items: center; padding: var(--sp-5);
+}
+.cctv-modal-inner { width: min(960px, 100%); background: var(--navy-950); border-radius: 14px; overflow: hidden; }
+.cctv-modal-inner header {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4); color: #fff;
+}
+.cctv-modal-inner header b { display: block; font-size: var(--fs-sm); font-weight: 600; }
+.cctv-modal-inner header span { font-size: var(--fs-xs); color: var(--on-dark-3); }
+.cctv-modal-inner header button {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(255, 255, 255, .12); color: #fff; font-size: 1.4rem; line-height: 1;
+}
+.cctv-modal-inner header button:hover { background: var(--orange); }
+.cctv-stage { position: relative; aspect-ratio: 16 / 9; background: #000; display: grid; place-items: center; }
+.cctv-stage video { width: 100%; height: 100%; display: block; object-fit: contain; }
+.cctv-loading { position: absolute; color: var(--on-dark-3); font-size: var(--fs-sm); }
+.cctv-failed { padding: var(--sp-10) var(--sp-5); text-align: center; color: var(--on-dark-2); font-size: var(--fs-sm); }
+.cctv-retry {
+  display: block; margin: var(--sp-4) auto 0; padding: 7px 20px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.28); background: none; color: #fff; font: inherit; cursor: pointer;
+}
+.cctv-retry:hover { background: var(--orange); border-color: var(--orange); }
+
+/* เครดิตเจ้าของภาพ */
+.cctv-credit {
+  margin-top: var(--sp-8); padding: var(--sp-5) var(--sp-6);
+  background: var(--soft); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.cctv-credit h4 { font-size: var(--fs-base); font-weight: 600; color: var(--navy); }
+.cctv-credit p { font-size: var(--fs-sm); color: var(--text-3); margin-top: 4px; }
+.cctv-credit .cctv-by b { color: var(--text-2); font-weight: 600; }
+.cctv-credit a { display: inline-block; margin-top: var(--sp-3); font-size: var(--fs-sm); color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+.cctv-credit a:hover { color: var(--orange-600); }
+
+
+/* =========================================================
+   แผนที่จุดกล้องวงจรปิด (Leaflet)
+   ========================================================= */
+.cmap { min-width: 0; }
+/* isolation สร้าง stacking context ใหม่ — Leaflet ใช้ z-index ภายในสูงถึง 1000
+   ถ้าไม่กักไว้ แผนที่จะลอยทับแถบเมนูที่ fixed และหน้าต่างเล่นวิดีโอ */
+.cmap-canvas {
+  position: relative; isolation: isolate; z-index: 0;
+  height: 520px; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--line); background: var(--soft);
+}
+.cmap-loading { background: linear-gradient(110deg, var(--soft) 30%, #eef2f8 50%, var(--soft) 70%); background-size: 200% 100%; animation: cmap-shimmer 1.4s linear infinite; }
+@keyframes cmap-shimmer { to { background-position: -200% 0; } }
+.cmap-hint { margin-top: var(--sp-2); font-size: var(--fs-xs); color: var(--text-4); }
+.cmap .leaflet-container { font-family: inherit; }
+.cmap .leaflet-control-attribution { font-size: 10px; }
+
+/* หมุด */
+.cmap-pin {
+  position: relative; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--navy); color: #fff; border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(11, 23, 48, .35); transition: transform .15s ease, background .15s ease;
+}
+.cmap-pin:hover { transform: scale(1.12); }
+.cmap-pin.is-part { background: linear-gradient(135deg, var(--navy) 50%, var(--st-offline) 50%); }
+.cmap-pin.is-off { background: var(--st-offline); }
+.cmap-pin.is-active { background: var(--orange); transform: scale(1.18); box-shadow: 0 0 0 6px rgba(242, 107, 33, .25), 0 2px 8px rgba(11, 23, 48, .35); }
+.cmap-pin b {
+  position: absolute; top: -7px; right: -7px; min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 999px; background: var(--orange); color: #fff; border: 2px solid #fff;
+  font-size: 10px; font-weight: 700; line-height: 14px; text-align: center;
+}
+.cmap-pin.is-active b { background: var(--navy); }
+
+/* ป๊อปอัปเลือกมุมกล้อง */
+.cmap .leaflet-popup-content-wrapper { border-radius: 12px; padding: 0; }
+.cmap .leaflet-popup-content { margin: 6px; }
+.cmap-pop { display: grid; gap: 4px; }
+.cmap-cam {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
+  padding: 8px 10px; border: 0; border-radius: 8px; background: var(--soft);
+  font: inherit; font-size: 13px; color: var(--ink); text-align: left; cursor: pointer;
+}
+.cmap-cam:hover { background: var(--orange-soft); }
+.cmap-cam span { min-width: 0; line-height: 1.35; }
+.cmap-cam em { display: block; font-style: normal; font-size: 11px; color: var(--text-3); }
+.cmap-cam i { flex: none; font-style: normal; font-size: 11px; font-weight: 600; color: var(--orange); }
+.cmap-cam.is-off i { color: var(--text-4); }
+
+@media (max-width: 640px) {
+  .cmap-canvas { height: 380px; }
+}
+
+/* วงรวมหมุด (leaflet.markercluster) — ใช้สีชุดเดียวกับหมุด ไม่ใช้สีเขียว-เหลืองเริ่มต้นของปลั๊กอิน */
+.cmap-cluster {
+  display: grid; place-items: center; border-radius: 50%;
+  background: var(--navy); color: #fff; font-weight: 700; font-size: 14px;
+  border: 3px solid #fff; box-shadow: 0 0 0 5px rgba(31, 56, 100, .22), 0 2px 8px rgba(11, 23, 48, .35);
+  transition: transform .15s ease;
+}
+.cmap-cluster:hover { transform: scale(1.08); }
+
+
+/* ---------- ตัวเลขสรุป + แผนที่คู่รายการทางแยก ---------- */
+.cctv-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4);
+  max-width: 880px; margin: 0 auto var(--sp-8);
+}
+.cctv-stats > div {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: var(--sp-4) var(--sp-5); text-align: center;
+}
+/* dd อยู่บน dt ในสายตา แต่ในโค้ดยังเป็น dt ก่อน dd ตามความหมาย (ชื่อ → ค่า) */
+.cctv-stats > div { display: flex; flex-direction: column-reverse; }
+.cctv-stats dd { font-size: 2rem; font-weight: 700; color: var(--navy); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.cctv-stats dt { font-size: var(--fs-sm); color: var(--text-3); margin-top: 2px; }
+.cctv-stats .is-live dd { color: #1f7d47; }
+.cctv-stats .is-live dt::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--st-normal); margin-right: 6px; vertical-align: middle;
+}
+
+.cctv-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--sp-5); align-items: start; }
+
+.cctv-panel {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+  height: 520px; display: flex; flex-direction: column; overflow: hidden;
+}
+.cctv-panel h4 {
+  flex: none; padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--line);
+  font-size: var(--fs-sm); font-weight: 600; color: var(--text-2);
+}
+.cctv-panel ul { list-style: none; overflow-y: auto; padding: var(--sp-2); }
+.cctv-group + .cctv-group { margin-top: 2px; }
+.cctv-group-head {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px 12px; border: 0; border-radius: 10px; background: none;
+  font: inherit; font-size: var(--fs-sm); color: var(--ink); text-align: left; cursor: pointer;
+}
+.cctv-group-head:hover { background: var(--soft); }
+.cctv-group.is-open .cctv-group-head { background: var(--navy-soft); color: var(--navy); font-weight: 600; }
+.cctv-group-head span { flex: 1; min-width: 0; line-height: 1.35; }
+.cctv-group-head em { flex: none; font-style: normal; font-size: var(--fs-xs); color: var(--text-3); }
+.cctv-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--st-normal); }
+.cctv-dot.is-part { background: linear-gradient(90deg, var(--st-normal) 50%, var(--st-offline) 50%); }
+.cctv-dot.is-off { background: var(--st-offline); }
+
+.cctv-angles { display: grid; gap: 4px; padding: 6px 4px 10px 30px; }
+.cctv-angle {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
+  padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--white);
+  font: inherit; font-size: 13px; color: var(--ink); text-align: left; cursor: pointer;
+}
+.cctv-angle:hover { border-color: var(--orange); }
+.cctv-angle span { min-width: 0; line-height: 1.35; }
+.cctv-angle small { display: block; font-size: 11px; color: var(--text-3); }
+.cctv-angle b { flex: none; font-size: 11px; font-weight: 600; color: var(--orange); }
+.cctv-angle.is-off b { color: var(--text-4); font-weight: 500; }
+/* มุมกล้องที่เพิ่งดู — คู่กับหมุดสีส้มบนแผนที่ */
+.cctv-angle.is-last { border-color: var(--orange); background: var(--orange-soft); }
+
+@media (max-width: 960px) {
+  .cctv-layout { grid-template-columns: 1fr; }
+  .cctv-panel { height: auto; max-height: 460px; }
+}
+@media (max-width: 640px) {
+  .cctv-stats { grid-template-columns: repeat(2, 1fr); }
+  .cctv-stats dd { font-size: 1.6rem; }
+}

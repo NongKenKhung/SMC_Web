@@ -59,6 +59,14 @@ class SolutionDto {
   @IsOptional() @IsString() @MaxLength(40)
   icon?: string;
 
+  /* ส่วนแสดงผลพิเศษที่ฝังในหน้าโซลูชัน — รับเฉพาะค่าที่หน้าเว็บรู้จัก
+     ฟอร์มส่ง "" มาเมื่อเลือก "ไม่มี" จึงต้องแปลงเป็น null ไม่ใช่เก็บสตริงว่าง */
+  @IsOptional()
+  @Transform(({ value }) => (value === "" || value === undefined ? null : value))
+  @ValidateIf((_, v) => v !== null)
+  @IsIn(["cctv"], { message: "widget ที่รองรับ: cctv" })
+  widget?: string | null;
+
   /* ราคา (บาท) — ว่าง/null = ยังไม่กำหนด ไม่ขึ้นในตารางราคา
      ฟอร์มส่ง "" มาเมื่อผู้ใช้ล้างช่อง จึงต้องแปลงเป็น null ไม่ใช่ 0 */
   @IsOptional()

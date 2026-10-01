@@ -129,9 +129,16 @@ cd ~/smc && bash deploy/import-data.sh
 ## อัปเดตเว็บทีหลัง
 
 ```bash
-cd ~/smc && git pull
-docker compose -f docker-compose.prod.yml up -d --build
+cd ~/smc && bash deploy/update.sh
 ```
+
+สคริปต์ทำให้ครบตามลำดับ: ตรวจก่อนเริ่ม (ไฟล์บนเซิร์ฟเวอร์ไม่ถูกแก้, ดิสก์ว่างพอ) → บอกว่ามี commit และ migration อะไรเข้ามา
+→ **สำรองฐานข้อมูลและไฟล์อัปโหลด** ไว้ที่ `~/backup/predeploy-<เวลา>/` → ดึงโค้ด → build และสตาร์ตใหม่
+→ รอ api พร้อม → ตรวจหน้าเว็บหลักว่าตอบ 200 → พิมพ์คำสั่งย้อนกลับไว้ให้ทุกครั้ง
+
+- ไม่มีโค้ดใหม่ = จบเฉย ๆ ไม่ build ซ้ำ (บังคับ build ด้วย `FORCE=1 bash deploy/update.sh`)
+- ขั้นไหนไม่ผ่าน สคริปต์หยุดทันที — ถ้าหยุดก่อนขั้น "build" แปลว่าเว็บยังเป็นเวอร์ชันเดิม ไม่มีอะไรเปลี่ยน
+- ไม่ลบ volume และไม่ใช้ `docker system prune` เพราะเครื่องนี้มีเว็บอื่นอยู่ด้วย
 
 ข้อมูลและไฟล์อัปโหลดอยู่ใน Docker volume จึงไม่หายตอน build ใหม่
 
@@ -141,8 +148,9 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ```bash
 # ทุกวันตีสอง เก็บย้อนหลัง 14 วัน
+# -d ต้องเป็นชื่อเดียวกับ DB_NAME ใน .env (เครื่องที่ใช้อยู่ตอนนี้คือ smc ไม่ใช่ค่าเริ่มต้น sml)
 0 2 * * * cd ~/smc && docker compose -f docker-compose.prod.yml exec -T db \
-  pg_dump -U postgres -d sml --no-owner --no-acl | gzip > ~/backup/db-$(date +\%F).sql.gz \
+  pg_dump -U postgres -d smc --no-owner --no-acl | gzip > ~/backup/db-$(date +\%F).sql.gz \
   && find ~/backup -name 'db-*.sql.gz' -mtime +14 -delete
 ```
 

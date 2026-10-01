@@ -13,7 +13,7 @@ type FormState = Partial<AdminSolution> & { nameTh: string; slug: string };
 
 const EMPTY: FormState = {
   nameTh: "", nameEn: "", slug: "", summaryTh: "", summaryEn: "",
-  bodyTh: "", bodyEn: "", coverImage: "", parentId: null, order: 0, published: true, layout: "TEXT",
+  bodyTh: "", bodyEn: "", coverImage: "", parentId: null, order: 0, published: true, layout: "TEXT", widget: "",
   price: null, icon: "",
 };
 
@@ -63,6 +63,8 @@ export default function AdminSolutions() {
       order: Number(form.order ?? 0),
       published: !!form.published,
       icon: form.icon ?? "",
+      /* "" = ไม่มี — API แปลงเป็น null ให้เอง */
+      widget: form.widget ?? "",
       /* ช่องว่าง = ยังไม่กำหนดราคา ต้องส่ง null ไม่ใช่ 0 ไม่งั้นจะขึ้นตารางราคาเป็น 0.00 */
       price: form.price === null || form.price === undefined || String(form.price) === "" ? null : Number(form.price),
     };
@@ -270,6 +272,16 @@ export default function AdminSolutions() {
                   <span>ใช้รูปเป็นทั้งหน้า ใส่ได้หลายหน้าเรียงต่อกัน</span>
                 </label>
               </div>
+            </div>
+
+            {/* ส่วนแสดงผลพิเศษ — ของที่เขียนด้วยโค้ด ไม่ใช่เนื้อหาที่พิมพ์ได้ เช่น แผนที่กล้องสด
+                ต่อท้ายเนื้อหาของหน้าโซลูชันนี้ เลือกได้ทั้งแบบข้อความและแบบโบรชัว */}
+            <div>
+              <label>ส่วนแสดงผลพิเศษ</label>
+              <select value={form.widget ?? ""} onChange={(e) => setForm({ ...form, widget: e.target.value })}>
+                <option value="">ไม่มี</option>
+                <option value="cctv">แผนที่ + ภาพสดกล้องวงจรปิด (เทศบาลเมืองฉะเชิงเทรา 40 จุด)</option>
+              </select>
             </div>
 
             {form.layout !== "BROCHURE" && (

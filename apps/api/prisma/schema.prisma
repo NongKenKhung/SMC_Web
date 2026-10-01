@@ -43,6 +43,9 @@ model Solution {
   // ใช้ Decimal ไม่ใช่ Float เพราะเงินห้ามคลาดเคลื่อนจากเลขฐานสอง
   price      Decimal? @db.Decimal(12, 2)
   coverImage String?
+  /// ส่วนแสดงผลพิเศษที่ฝังในหน้าโซลูชัน — ว่าง = ไม่มี | "cctv" = แผนที่+ภาพสดกล้องวงจรปิด
+  /// เป็นฟิลด์แยกแทนการผูกกับ slug เพื่อให้เลือกจากหน้า admin ได้ และเปลี่ยน slug ได้โดยไม่พัง
+  widget     String?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }

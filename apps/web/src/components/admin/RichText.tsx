@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
-import { EditorContent, useEditor, type Editor } from "@tiptap/react";
+import { TableKit } from "@tiptap/extension-table";
+import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useRef, useState } from "react";
 import { adminFetch } from "@/lib/admin";
@@ -41,6 +41,10 @@ function Toolbar({ editor, onPickImage }: { editor: Editor; onPickImage: () => v
     editor.chain().focus().extendMarkRange("link").setLink({ href: url.trim() }).run();
   };
 
+  /* TipTap v3 ไม่ render ใหม่ทุกครั้งที่เคอร์เซอร์ขยับ — ต้อง subscribe เองว่าตอนนี้อยู่ในตารางไหม
+     ไม่งั้นคลิกเข้าไปในตารางแล้วปุ่มจัดการแถว/คอลัมน์จะไม่โผล่ */
+  const inTable = useEditorState({ editor, selector: (ctx) => ctx.editor.isActive("table") });
+
   return (
     <div className="rt-bar">
       <Btn title="ตัวหนา" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}><b>B</b></Btn>
@@ -56,6 +60,21 @@ function Toolbar({ editor, onPickImage }: { editor: Editor; onPickImage: () => v
       <span className="rt-sep" />
       <Btn title="ลิงก์" active={editor.isActive("link")} onClick={setLink}>🔗</Btn>
       <Btn title="แทรกรูปในเนื้อหา" onClick={onPickImage}>🖼 รูป</Btn>
+      <span className="rt-sep" />
+      <Btn
+        title="แทรกตาราง 3×3 — แถวแรกเป็นหัวตาราง"
+        disabled={inTable}
+        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+      >▦ ตาราง</Btn>
+      {inTable && (
+        <>
+          <Btn title="เพิ่มแถวใต้แถวนี้" onClick={() => editor.chain().focus().addRowAfter().run()}>+ แถว</Btn>
+          <Btn title="ลบแถวนี้" onClick={() => editor.chain().focus().deleteRow().run()}>− แถว</Btn>
+          <Btn title="เพิ่มคอลัมน์ทางขวา" onClick={() => editor.chain().focus().addColumnAfter().run()}>+ คอลัมน์</Btn>
+          <Btn title="ลบคอลัมน์นี้" onClick={() => editor.chain().focus().deleteColumn().run()}>− คอลัมน์</Btn>
+          <Btn title="ลบทั้งตาราง" onClick={() => editor.chain().focus().deleteTable().run()}>ลบตาราง</Btn>
+        </>
+      )}
       <span className="rt-sep" />
       <Btn title="ล้างรูปแบบ" onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}>ล้างรูปแบบ</Btn>
     </div>
@@ -80,9 +99,17 @@ export default function RichText({
     /* ต้องปิด เพราะ Next.js render ฝั่งเซิร์ฟเวอร์ก่อน — ถ้าไม่ปิดจะ hydration mismatch */
     immediatelyRender: false,
     extensions: [
-      StarterKit.configure({ heading: { levels: [2, 3, 4] } }),
-      Link.configure({ openOnClick: false, autolink: false }),
+      StarterKit.configure({
+        heading: { levels: [2, 3, 4] },
+        /* StarterKit v3 มี Link อยู่ในตัวแล้ว — ตั้งค่าที่นี่ ห้ามใส่ Link แยกอีกตัว
+           (เคยใส่ซ้ำจน tiptap เตือน "Duplicate extension names found: ['link']") */
+        link: { openOnClick: false, autolink: false },
+      }),
       Image.configure({ inline: false }),
+      /* ตาราง — เดิมไม่มี ทำให้ตารางที่อยู่ในเนื้อหาไม่แสดงใน editor
+         และพอพิมพ์แก้อะไรแล้วบันทึก ตารางหายทั้งตาราง (ทดสอบยืนยันแล้ว)
+         ปิดการลากปรับความกว้างคอลัมน์ — มันใส่ style ความกว้างลง HTML ซึ่ง sanitizer ตัดทิ้งอยู่ดี */
+      TableKit.configure({ table: { resizable: false } }),
     ],
     content: value || "",
     editorProps: {
