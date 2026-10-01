@@ -32,28 +32,32 @@ export interface CctvGroup {
 export const CCTV_BASE = "https://camerai1.iticfoundation.org/hls";
 export const streamUrl = (id: string) => `${CCTV_BASE}/${id}.m3u8`;
 
-/** เครดิตตามที่เว็บต้นทางระบุไว้เอง — ต้องแสดงให้ครบทุกหน่วยงาน ไม่เลือกแสดงเฉพาะบางราย */
 export const CCTV_SOURCE = {
-  siteTh: "ศูนย์ข้อมูลการจราจรอัจฉริยะ จังหวัดฉะเชิงเทรา",
-  siteEn: "Chachoengsao Smart City — Intelligent Traffic Information Center",
-  url: "https://sites.google.com/view/ccs-cctv",
   areaTh: "เขตเทศบาลเมืองฉะเชิงเทรา",
   areaEn: "Chachoengsao Municipality",
-  partnersTh: [
-    "สำนักงานเมืองอัจฉริยะจังหวัดฉะเชิงเทรา",
-    "เทศบาลเมืองฉะเชิงเทรา",
-    "กองบังคับการตำรวจภูธรจังหวัดฉะเชิงเทรา",
-    "บริษัท โตโยต้า มอเตอร์ (ประเทศไทย) จำกัด",
-    "มูลนิธิศูนย์ข้อมูลจราจรอัจฉริยะไทย (ITIC)",
-  ],
-  partnersEn: [
-    "Chachoengsao Smart City Office",
-    "Chachoengsao Municipality",
-    "Chachoengsao Provincial Police",
-    "Toyota Motor Thailand Co., Ltd.",
-    "Intelligent Traffic Information Center Foundation (ITIC)",
-  ],
 } as const;
+
+/** โลโก้หน่วยงานร่วมพัฒนาที่แสดงใต้แผนที่ — ไฟล์อยู่ใน public/credits/ ได้มาจากเว็บทางการของแต่ละหน่วยงาน
+ *  width/height คือขนาดจริงของไฟล์ (ให้เบราว์เซอร์กันที่ไว้ก่อนรูปโหลด หน้าไม่กระตุก)
+ *  shown คือความสูงที่แสดงบนจอ — ตั้งแยกรายโลโก้ เพราะตัวอักษรยาวกับตรากลมสูงเท่ากันแล้วดูหนักไม่เท่ากัน */
+export const CCTV_CREDITS = [
+  {
+    nameTh: "บริษัท โตโยต้า มอเตอร์ ประเทศไทย จำกัด",
+    nameEn: "Toyota Motor Thailand Co., Ltd.",
+    src: "/credits/toyota.webp",
+    width: 542,
+    height: 96,
+    shown: 24,
+  },
+  {
+    nameTh: "เทศบาลเมืองฉะเชิงเทรา",
+    nameEn: "Chachoengsao Municipality",
+    src: "/credits/chachoengsao-municipality.webp",
+    width: 192,
+    height: 192,
+    shown: 72,
+  },
+] as const;
 
 export const CCTV_GROUPS: CctvGroup[] = [
   {

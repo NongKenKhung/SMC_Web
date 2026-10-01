@@ -179,8 +179,6 @@ const th = {
     failed: "ต่อกล้องนี้ไม่ติดในขณะนี้ อาจเป็นเพราะกล้องหยุดส่งภาพชั่วคราว",
     retry: "ลองใหม่",
     sourceTitle: "หน่วยงานร่วมพัฒนา",
-    sourceLead: "ภาพสดเผยแพร่ผ่านศูนย์ข้อมูลการจราจรอัจฉริยะ จังหวัดฉะเชิงเทรา",
-    sourceBy: "ร่วมพัฒนาโดย",
   },
   empty: {
     solutions: "ยังไม่มีโซลูชันในระบบ — เพิ่มได้ที่หน้าผู้ดูแลระบบ",
@@ -345,8 +343,6 @@ const en: typeof th = {
     failed: "This camera cannot be reached right now. It may have stopped streaming temporarily.",
     retry: "Try again",
     sourceTitle: "Contributing organisations",
-    sourceLead: "Live views are published through the Chachoengsao Intelligent Traffic Information Center.",
-    sourceBy: "Developed jointly by",
   },
   empty: {
     solutions: "No solutions yet — add them from the admin area",

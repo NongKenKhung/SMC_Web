@@ -136,6 +136,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .sec-tight { padding: 68px 0; }
 .sec-head { max-width: 720px; margin: 0 auto 52px; text-align: center; }
 .sec-head.left { margin-inline: 0; text-align: left; }
+/* หัวข้อที่ไม่มีอะไรต่อท้าย (เช่นหน้าโซลูชันที่ไม่มีเนื้อหาและรูป) — ไม่ต้องเว้นระยะคั่น ขอบบน-ล่างจะเท่ากัน */
+.sec-head:last-child { margin-bottom: 0; }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
   font-size: 0.82rem; font-weight: 600; letter-spacing: 0.14em;
@@ -1432,16 +1434,19 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
 }
 .cctv-retry:hover { background: var(--orange); border-color: var(--orange); }
 
-/* เครดิตเจ้าของภาพ */
+/* โลโก้หน่วยงานร่วมพัฒนา — พื้นขาวให้สีโลโก้ตรงกับต้นฉบับ */
 .cctv-credit {
-  margin-top: var(--sp-8); padding: var(--sp-5) var(--sp-6);
-  background: var(--soft); border: 1px solid var(--line); border-radius: var(--radius);
+  margin-top: var(--sp-8); padding: var(--sp-5) var(--sp-8);
+  display: flex; align-items: center; justify-content: center; gap: var(--sp-8);
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
 }
-.cctv-credit h4 { font-size: var(--fs-base); font-weight: 600; color: var(--navy); }
-.cctv-credit p { font-size: var(--fs-sm); color: var(--text-3); margin-top: 4px; }
-.cctv-credit .cctv-by b { color: var(--text-2); font-weight: 600; }
-.cctv-credit a { display: inline-block; margin-top: var(--sp-3); font-size: var(--fs-sm); color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
-.cctv-credit a:hover { color: var(--orange-600); }
+.cctv-credit h4 {
+  flex: none; padding-right: var(--sp-8); border-right: 1px solid var(--line);
+  font-size: var(--fs-sm); font-weight: 600; color: var(--text-3);
+}
+.cctv-logos { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-6) var(--sp-12); }
+/* ความสูงตั้งรายโลโก้ผ่าน --shown (ดู CCTV_CREDITS) ความกว้างตามสัดส่วนไฟล์ */
+.cctv-logos img { display: block; height: var(--shown); width: auto; max-width: 100%; }
 
 
 /* =========================================================
@@ -1572,4 +1577,8 @@ html { scrollbar-color: var(--orange) var(--navy-950); }
 @media (max-width: 640px) {
   .cctv-stats { grid-template-columns: repeat(2, 1fr); }
   .cctv-stats dd { font-size: 1.6rem; }
+  /* จอแคบ: หัวข้ออยู่บน โลโก้เรียงกลางด้านล่าง */
+  .cctv-credit { flex-direction: column; gap: var(--sp-4); padding: var(--sp-5); text-align: center; }
+  .cctv-credit h4 { padding-right: 0; border-right: 0; }
+  .cctv-logos { justify-content: center; gap: var(--sp-4) var(--sp-10); }
 }

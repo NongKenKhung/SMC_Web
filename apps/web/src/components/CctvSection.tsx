@@ -1,5 +1,5 @@
 import CctvWall from "@/components/CctvWall";
-import { ALL_CAMERAS, CCTV_GROUPS, CCTV_SOURCE, getCameraStatus, groupByPosition } from "@/lib/cctv";
+import { ALL_CAMERAS, CCTV_CREDITS, CCTV_GROUPS, CCTV_SOURCE, getCameraStatus, groupByPosition } from "@/lib/cctv";
 import { dict, type Locale } from "@/lib/i18n";
 
 /** แผนที่ + ภาพสดกล้องวงจรปิด สำหรับฝังในหน้าโซลูชันที่ตั้ง widget = "cctv"
@@ -18,7 +18,6 @@ export default async function CctvSection({ locale }: { locale: Locale }) {
   /* รวมกล้องที่อยู่แยกเดียวกันเป็นหมุดเดียว — ส่งไปแค่ id ไม่ส่งข้อมูลกล้องซ้ำสองชุด */
   const points = groupByPosition(cameras).map((g) => ({ key: g.key, lat: g.lat, lng: g.lng, ids: g.cams.map((c) => c.id) }));
   const groups = CCTV_GROUPS.map((g) => ({ key: g.key, titleTh: g.titleTh, ids: g.cameras.map((c) => c.id) }));
-  const partners = en ? CCTV_SOURCE.partnersEn : CCTV_SOURCE.partnersTh;
 
   /* ตัวเลขทุกตัวนับจากข้อมูลจริง ไม่ได้พิมพ์ไว้ — กล้องเพิ่ม/ล่ม ตัวเลขเปลี่ยนตามเอง */
   const stats = [
@@ -57,14 +56,24 @@ export default async function CctvSection({ locale }: { locale: Locale }) {
           }}
         />
 
-        {/* หน่วยงานร่วมพัฒนาระบบกล้อง — แสดงครบทุกรายตามที่ระบุไว้ในเว็บของศูนย์ข้อมูลจราจรจังหวัด */}
+        {/* โลโก้หน่วยงานร่วมพัฒนา — ชื่อเต็มอยู่ใน alt (โปรแกรมอ่านหน้าจอ) และ title (ชี้เมาส์) */}
         <aside className="cctv-credit reveal">
           <h4>{t.cctv.sourceTitle}</h4>
-          <p>{t.cctv.sourceLead}</p>
-          <p className="cctv-by"><b>{t.cctv.sourceBy}</b> {partners.join(" · ")}</p>
-          <a href={CCTV_SOURCE.url} target="_blank" rel="noopener noreferrer nofollow">
-            {en ? CCTV_SOURCE.siteEn : CCTV_SOURCE.siteTh} ↗
-          </a>
+          <ul className="cctv-logos">
+            {CCTV_CREDITS.map((c) => {
+              const name = en ? c.nameEn : c.nameTh;
+              return (
+                <li key={c.src}>
+                  <img
+                    src={c.src} alt={name} title={name}
+                    width={c.width} height={c.height}
+                    style={{ "--shown": `${c.shown}px` } as React.CSSProperties}
+                    loading="lazy" decoding="async"
+                  />
+                </li>
+              );
+            })}
+          </ul>
         </aside>
       </div>
     </section>
