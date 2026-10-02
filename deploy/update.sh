@@ -30,26 +30,42 @@ main() {
   # ---------- 0) ตรวจก่อนเริ่ม ----------
   say "0/6 ตรวจก่อนเริ่ม"
   [ -f .env ] || die "ไม่พบ .env — ต้องรันที่โฟลเดอร์โปรเจกต์บนเซิร์ฟเวอร์ (เช่น ~/smc)"
-  local DB_NAME WEB_PORT BRANCH PREV FREE_GB
+  local DB_NAME WEB_PORT WEB_HOST WEB_URL BRANCH PREV FREE_GB DOCKER_DIR
   DB_NAME="$(envval DB_NAME)"; DB_NAME="${DB_NAME:-sml}"
   WEB_PORT="$(envval WEB_PORT)"; WEB_PORT="${WEB_PORT:-80}"
+  # WEB_PORT เขียนแบบเดียวกับ ports ของ compose: "8090" หรือ "127.0.0.1:8090" (เปิดให้ nginx ในเครื่องเท่านั้น)
+  # ต้องแยกเอาเลขพอร์ตเอง — ต่อสตริงตรง ๆ จะได้ http://127.0.0.1:127.0.0.1:8090 แล้วตรวจไม่ผ่านทั้งที่เว็บขึ้นแล้ว
+  WEB_HOST=127.0.0.1
+  case "$WEB_PORT" in *:*) WEB_HOST="${WEB_PORT%:*}" ;; esac
+  case "$WEB_HOST" in 0.0.0.0|"") WEB_HOST=127.0.0.1 ;; esac
+  WEB_URL="http://$WEB_HOST:${WEB_PORT##*:}"
   BRANCH="$(git rev-parse --abbrev-ref HEAD)"
   PREV="$(git rev-parse --short HEAD)"
   # หลังสั่งย้อนกลับด้วย git checkout <commit> จะไม่ได้อยู่บน branch ไหน — ดึงโค้ดต่อไม่ได้
   [ "$BRANCH" != HEAD ] || die "ตอนนี้อยู่ที่ commit $PREV ไม่ได้อยู่บน branch (น่าจะเพิ่งย้อนกลับ) — สั่ง git checkout <ชื่อ branch> ก่อน"
-  ok "branch $BRANCH · commit ปัจจุบัน $PREV · ฐานข้อมูล $DB_NAME · พอร์ตเว็บ $WEB_PORT"
+  ok "branch $BRANCH · commit ปัจจุบัน $PREV · ฐานข้อมูล $DB_NAME · เว็บ $WEB_URL"
 
   if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
     git status --short --untracked-files=no | sed 's/^/    /'
     die "มีไฟล์ถูกแก้บนเซิร์ฟเวอร์ — ดึงโค้ดแล้วจะชนกัน ดูด้วย git diff ก่อน แล้วค่อยรันใหม่"
   fi
 
-  FREE_GB=$(df -BG --output=avail . | tail -1 | tr -dc '0-9')
+  # วัดที่ดิสก์ที่ docker เก็บ image จริง (ปกติคือ /var/lib/docker) — build กินพื้นที่ตรงนั้น
+  DOCKER_DIR="$(docker info --format '{{.DockerRootDir}}' 2>/dev/null || true)"
+  [ -n "$DOCKER_DIR" ] && [ -d "$DOCKER_DIR" ] || DOCKER_DIR=.
+  free_gb() { df -BG --output=avail "$DOCKER_DIR" | tail -1 | tr -dc '0-9'; }
+  FREE_GB=$(free_gb)
   if [ "${FREE_GB:-0}" -lt 4 ]; then
-    warn "พื้นที่ว่างเหลือ ${FREE_GB}GB — ล้างแคชการ build ของ docker ก่อน (ไม่แตะ volume หรือข้อมูล)"
-    docker builder prune -f >/dev/null
-    FREE_GB=$(df -BG --output=avail . | tail -1 | tr -dc '0-9')
-    [ "$FREE_GB" -ge 4 ] || die "พื้นที่ว่างเหลือ ${FREE_GB}GB ไม่พอ build (ต้องมีอย่างน้อย 4GB) — ขยายดิสก์ก่อน"
+    # image ไม่มีชื่อ = ของเก่าที่ค้างจาก build รอบก่อน (build ใหม่แล้วชื่อย้ายไป image ใหม่) ไม่มี container ไหนใช้
+    # ปกติกินที่มากที่สุด — ไม่แตะ volume, container หรือ image ที่มีชื่อของงานอื่น
+    warn "พื้นที่ว่างเหลือ ${FREE_GB}GB — ล้าง image ไม่มีชื่อที่ค้างจาก build รอบก่อน และแคชการ build"
+    docker image prune -f >/dev/null
+    docker builder prune -f >/dev/null 2>&1 || true
+    FREE_GB=$(free_gb)
+    if [ "${FREE_GB:-0}" -lt 4 ]; then
+      docker system df 2>/dev/null | sed 's/^/    /' || true
+      die "พื้นที่ว่างเหลือ ${FREE_GB}GB ไม่พอ build (ต้องมีอย่างน้อย 4GB) — ยังไม่ได้เปลี่ยนอะไรบนเว็บ ส่งตารางด้านบนมาดูก่อน หรือขยายดิสก์ของ VM"
+    fi
   fi
   ok "พื้นที่ว่าง ${FREE_GB}GB"
 
@@ -117,7 +133,7 @@ main() {
   local code="000" i
   for i in $(seq 1 60); do
     # ยิงผ่านพอร์ตของเว็บ — ได้ทดสอบทั้ง web และการส่งต่อ /api ไปที่ api ในครั้งเดียว
-    code=$(curl -s -o /dev/null -m 10 -w '%{http_code}' "http://127.0.0.1:$WEB_PORT/api/solutions" || true)
+    code=$(curl -s -o /dev/null -m 10 -w '%{http_code}' "$WEB_URL/api/solutions" || true)
     [ "$code" = 200 ] && break
     sleep 5
   done
@@ -134,7 +150,7 @@ main() {
   say "6/6 ตรวจหน้าเว็บ"
   local FAILED=0 path
   for path in /th /en /th/solutions /th/partners /api/solutions; do
-    code=$(curl -s -o /dev/null -m 30 -w '%{http_code}' "http://127.0.0.1:$WEB_PORT$path" || true)
+    code=$(curl -s -o /dev/null -m 30 -w '%{http_code}' "$WEB_URL$path" || true)
     if [ "$code" = 200 ]; then ok "$path → $code"; else warn "$path → $code"; FAILED=1; fi
   done
 
